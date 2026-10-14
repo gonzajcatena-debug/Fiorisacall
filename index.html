@@ -1,1 +1,126 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fiorisacall</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--text:#141720;--muted:#6b7280;--line:#e3e6ee;--accent:#4f46e5;--rec:#dc2626;--ok:#16a34a}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1117;--card:#181b24;--text:#f1f2f6;--muted:#9aa1b2;--line:#2a2f3c;--accent:#818cf8;--rec:#ef4444;--ok:#22c55e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+main{width:100%;max-width:440px;margin:0 auto;padding:28px 20px}
+h1{margin:0;font-size:26px;letter-spacing:-.5px}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);font-size:14px;margin:6px 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.txt{min-height:48px;font-size:17px;line-height:1.4}
+.txt.empty{color:var(--muted);font-size:15px}
+#main{width:100%;border:0;border-radius:16px;padding:18px;font-size:18px;font-weight:600;color:#fff;background:var(--accent)}
+#main.rec{background:var(--rec);animation:pulse 1s infinite}
+#main.play{background:var(--ok)}
+#main:disabled{opacity:.6}
+@keyframes pulse{50%{opacity:.75}}
+#again{width:100%;margin-top:10px;background:none;border:1px solid var(--line);color:var(--text);border-radius:16px;padding:14px;font-size:16px;display:none}
+#status{font-size:14px;color:var(--muted);text-align:center;margin-top:14px;min-height:20px}
+#status.err{color:var(--rec)}
+</style>
+</head>
+<body>
+<main>
+<h1>Fiorisa<span>call</span></h1>
+<p class="sub">Hablá en español, se escucha en inglés.</p>
+<div class="card"><div class="label">Lo que dijiste</div><div id="es" class="txt empty">Tu voz transcripta aparecerá acá…</div></div>
+<div class="card"><div class="label">En inglés</div><div id="en" class="txt empty">La traducción aparecerá acá…</div></div>
+<button id="main">Iniciar grabación</button>
+<button id="again">Grabar de nuevo</button>
+<div id="status"></div>
+</main>
+<script>
+(function(){
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+var btn=document.getElementById('main'),again=document.getElementById('again');
+var esEl=document.getElementById('es'),enEl=document.getElementById('en'),st=document.getElementById('status');
+var rec=null,state='idle',finalText='',interim='',englishText='',voices=[],lastErr='';
+
+function setStatus(m,err){st.textContent=m||'';st.className=err?'err':'';}
+function show(el,t,ph){el.textContent=t||ph;el.className='txt'+(t?'':' empty');}
+function setState(s){
+  state=s;btn.disabled=false;btn.className='';
+  if(s==='idle'){btn.textContent='Iniciar grabación';}
+  if(s==='rec'){btn.textContent='Terminar';btn.className='rec';}
+  if(s==='busy'){btn.textContent='Traduciendo…';btn.disabled=true;}
+  if(s==='play'){btn.textContent='Reproduciendo…';btn.className='play';btn.disabled=true;}
+  if(s==='done'){btn.textContent='Escuchar de nuevo';}
+  again.style.display=(s==='done')?'block':'none';
+}
+function loadVoices(){try{voices=speechSynthesis.getVoices();}catch(e){}}
+try{loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}catch(e){}
+
+function speak(text){
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';
+    var v=voices.filter(function(x){return x.lang&&x.lang.indexOf('en')===0;})[0];
+    if(v)u.voice=v;
+    u.onstart=function(){setState('play');setStatus('');};
+    u.onend=function(){setState('done');};
+    u.onerror=function(){setState('done');setStatus('No se pudo reproducir el audio.',true);};
+    setState('play');
+    speechSynthesis.speak(u);
+  }catch(e){setState('done');setStatus('Este navegador no puede reproducir voz.',true);}
+}
+
+function translate(text){
+  setState('busy');setStatus('Traduciendo…');
+  var url='https://api.mymemory.translated.net/get?q='+encodeURIComponent(text)+'&langpair=es|en';
+  fetch(url).then(function(r){return r.json();}).then(function(d){
+    var t=d&&d.responseData&&d.responseData.translatedText;
+    if(!t)throw new Error('sin traducción');
+    englishText=t;show(enEl,t,'');setStatus('');speak(t);
+  }).catch(function(){
+    setState('idle');setStatus('No se pudo traducir. Revisá tu conexión e intentá de nuevo.',true);
+  });
+}
+
+function startRec(){
+  if(!SR){setStatus('Tu navegador no soporta reconocimiento de voz. Probá con Safari o Chrome.',true);return;}
+  finalText='';interim='';lastErr='';englishText='';
+  show(esEl,'','Escuchando…');show(enEl,'','La traducción aparecerá acá…');
+  rec=new SR();
+  rec.lang='es-AR';rec.interimResults=true;rec.continuous=false;
+  rec.onresult=function(e){
+    var f='',i='';
+    for(var k=0;k<e.results.length;k++){
+      if(e.results[k].isFinal)f+=e.results[k][0].transcript;else i+=e.results[k][0].transcript;
+    }
+    finalText=f;interim=i;show(esEl,(f+' '+i).trim(),'Escuchando…');
+  };
+  rec.onerror=function(e){
+    lastErr=e.error;
+    if(e.error==='not-allowed'||e.error==='service-not-allowed')setStatus('Permiso de micrófono denegado. Activalo en Ajustes → Safari → Micrófono.',true);
+    else if(e.error==='no-speech')setStatus('No te escuché. Probá de nuevo.',true);
+    else setStatus('Error: '+e.error,true);
+  };
+  rec.onend=function(){
+    var text=(finalText+' '+interim).trim();
+    if(lastErr||!text){setState('idle');show(esEl,'','Tu voz transcripta aparecerá acá…');return;}
+    show(esEl,text,'');translate(text);
+  };
+  try{rec.start();setState('rec');setStatus('Hablá ahora…');}
+  catch(e){setStatus('No se pudo iniciar el micrófono.',true);setState('idle');}
+}
+
+btn.addEventListener('click',function(){
+  if(state==='idle')startRec();
+  else if(state==='rec'){try{rec.stop();}catch(e){}}
+  else if(state==='done'&&englishText)speak(englishText);
+});
+again.addEventListener('click',function(){try{speechSynthesis.cancel();}catch(e){}startRec();});
+})();
+</script>
+</body>
+</html>
