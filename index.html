@@ -517,7 +517,9 @@ function renderSetup() {
   $("setName").value = DB.name; fillSelect($("setMe"), DB.me); fillSelect($("setOther"), DB.other);
 }
 $("setNext").addEventListener("click", function () {
-  DB.name = $("setName").value.trim(); DB.me = $("setMe").value; DB.other = $("setOther").value; saveDB(); go("signin");
+  DB.name = $("setName").value.trim(); DB.me = $("setMe").value; DB.other = $("setOther").value;
+  if (DB.me === DB.other) DB.other = DB.me === "en" ? "es" : "en";
+  saveDB(); go("signin");
 });
 
 /* ====================== Micrófono ====================== */
@@ -558,8 +560,15 @@ function renderHome() {
   if (!list.length) box.appendChild(el("p", "empty-note", "Todavía no hay conversaciones. Tocá Nueva conversación para empezar."));
   list.forEach(function (c) { box.appendChild(convoRow(c)); });
 }
-$("hMe").addEventListener("change", function (e) { DB.me = e.target.value; saveDB(); });
-$("hOther").addEventListener("change", function (e) { DB.other = e.target.value; saveDB(); });
+/* Si elegís el mismo idioma para los dos, el otro se intercambia solo (así siempre hay algo que traducir) */
+function chooseLang(which, val) {
+  if (which === "me") { if (val === DB.other) DB.other = DB.me; DB.me = val; }
+  else { if (val === DB.me) DB.me = DB.other; DB.other = val; }
+  saveDB();
+  [["hMe", DB.me], ["hOther", DB.other], ["cMe", DB.me], ["cOther", DB.other], ["aMe", DB.me], ["aOther", DB.other]].forEach(function (x) { $(x[0]).value = x[1]; });
+}
+$("hMe").addEventListener("change", function (e) { chooseLang("me", e.target.value); });
+$("hOther").addEventListener("change", function (e) { chooseLang("other", e.target.value); });
 $("newConvo").addEventListener("click", function () { go("convo"); });
 
 /* ====================== Conversación ====================== */
@@ -590,8 +599,8 @@ function syncToggles() {
 $("pVoice").addEventListener("click", function () { DB.voice = !DB.voice; saveDB(); syncToggles(); if (!DB.voice) { try { speechSynthesis.cancel(); } catch (e) {} } });
 $("pAuto").addEventListener("click", function () { DB.auto = !DB.auto; saveDB(); syncToggles(); });
 $("cBack").addEventListener("click", function () { go("home"); });
-$("cMe").addEventListener("change", function (e) { DB.me = e.target.value; saveDB(); renderChips(); setPhase(S.phase); });
-$("cOther").addEventListener("change", function (e) { DB.other = e.target.value; saveDB(); setPhase(S.phase); });
+$("cMe").addEventListener("change", function (e) { chooseLang("me", e.target.value); renderChips(); setPhase(S.phase); });
+$("cOther").addEventListener("change", function (e) { chooseLang("other", e.target.value); renderChips(); setPhase(S.phase); });
 $("cSwap").addEventListener("click", function () {
   var t = DB.me; DB.me = DB.other; DB.other = t; saveDB();
   $("cMe").value = DB.me; $("cOther").value = DB.other; renderChips(); setPhase(S.phase);
@@ -641,29 +650,29 @@ function unlockAudio() {
 }
 try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function () {}; } catch (e) {}
 
-function pickVoice(lang) {
-  var vs = []; try { vs = speechSynthesis.getVoices() || []; } catch (e) {}
-  var want = (LOCALES[lang] || lang).toLowerCase();
-  var norm = function (v) { return v.lang.replace("_", "-").toLowerCase(); };
-  for (var i = 0; i < vs.length; i++) if (norm(vs[i]) === want) return vs[i];
-  for (var j = 0; j < vs.length; j++) if (norm(vs[j]).indexOf(lang) === 0) return vs[j];
-  return null;
-}
+/* Voces del teléfono: se usan idiomas que el iPhone trae instalados de fábrica.
+   No se elige una voz puntual (en iPhone la lista incluye voces de juguete); el sistema usa la suya por idioma. */
+var TTS_LOCALES = {
+  es:"es-MX", en:"en-US", pt:"pt-BR", fr:"fr-FR", it:"it-IT", de:"de-DE", nl:"nl-NL",
+  ru:"ru-RU", tr:"tr-TR", ar:"ar-SA", hi:"hi-IN", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN"
+};
 function speak(text, lang) {
+  // Devuelve true si la voz llegó a sonar y false si el teléfono no la reprodujo
   return new Promise(function (resolve) {
-    var done = false, guard;
-    function finish() { if (!done) { done = true; clearTimeout(guard); resolve(); } }
-    guard = setTimeout(finish, Math.max(5000, text.length * 140));
+    var done = false, started = false, guard;
+    function finish(ok) { if (!done) { done = true; clearTimeout(guard); resolve(ok); } }
+    guard = setTimeout(function () { finish(started); }, Math.max(6000, text.length * 160));
     try {
       speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text);
-      u.lang = LOCALES[lang] || lang;
-      var v = pickVoice(lang); if (v) u.voice = v;
+      u.lang = TTS_LOCALES[lang] || lang;
       u.volume = 1; u.rate = 1;
-      u.onend = finish; u.onerror = finish;
+      u.onstart = function () { started = true; };
+      u.onend = function () { finish(true); };
+      u.onerror = function () { finish(false); };
       speechSynthesis.resume();
       speechSynthesis.speak(u);
-    } catch (e) { finish(); }
+    } catch (e) { finish(false); }
   });
 }
 
@@ -710,6 +719,9 @@ function listen() {
     setPhase("idle");
     if (err === "not-allowed" || err === "service-not-allowed") {
       setStatus("Sin permiso para el dictado. Activá el micrófono para Safari y el dictado en Ajustes > General > Teclado.", true); return;
+    }
+    if (err === "language-not-supported") {
+      setStatus("Este teléfono no tiene el dictado en " + langName(lang) + ". Podés escribir tu mensaje o elegir otro idioma.", true); return;
     }
     if (err && err !== "no-speech" && err !== "aborted") { setStatus("No se pudo escuchar (" + err + "). Probá de nuevo.", true); return; }
     S.silent++;
@@ -758,7 +770,12 @@ function buildMsg(m) {
       if (!li.querySelector(".replay")) {
         var b = el("button", "replay", "Escuchar de nuevo"); b.type = "button";
         b.setAttribute("aria-label", "Escuchar de nuevo: " + tr);
-        b.addEventListener("click", function () { unlockAudio(); speak(tr, m.to); });
+        b.addEventListener("click", function () {
+          unlockAudio();
+          speak(tr, m.to).then(function (ok) {
+            if (!ok && current === "convo") setStatus("No se pudo reproducir la voz en " + langName(m.to) + ". Revisá el volumen y el modo silencio.", true);
+          });
+        });
         li.appendChild(b);
       }
     },
@@ -791,6 +808,7 @@ function sendText(text, who, fromLang, existingRun) {
   var from = fromLang || (who === "me" ? DB.me : DB.other);
   var to = who === "me" ? DB.other : DB.me;
   setPhase("working");
+  setStatus("Traduciendo de " + langName(from) + " a " + langName(to) + "…");
   var msg = { who: who, from: from, to: to, orig: text, ts: Date.now() };
   var entry = pushMsg(msg);
   translate(text, from, to).then(function (tr) {
@@ -799,9 +817,13 @@ function sendText(text, who, fromLang, existingRun) {
     ensureConvo().items.push(msg); saveDB();
     S.turn = who === "me" ? "other" : "me"; renderTurn();
     if (DB.voice) { setPhase("speaking"); return speak(tr, to); }
-  }).then(function () {
+  }).then(function (voiceOk) {
     if (!alive()) return;
     setPhase("idle");
+    if (voiceOk === false) {
+      setStatus("No se pudo reproducir la voz en " + langName(to) + ". Revisá el volumen y el modo silencio, o tocá Escuchar de nuevo.", true);
+      return;
+    }
     if (DB.auto) setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(); }, DB.voice ? 450 : 900);
   }).catch(function (e) {
     if (!alive()) return;
@@ -855,8 +877,8 @@ function renderSettings() {
   });
 }
 $("aName").addEventListener("input", function (e) { DB.name = e.target.value.trim(); saveDB(); });
-$("aMe").addEventListener("change", function (e) { DB.me = e.target.value; saveDB(); });
-$("aOther").addEventListener("change", function (e) { DB.other = e.target.value; saveDB(); });
+$("aMe").addEventListener("change", function (e) { chooseLang("me", e.target.value); });
+$("aOther").addEventListener("change", function (e) { chooseLang("other", e.target.value); });
 $("aVoice").addEventListener("change", function (e) { DB.voice = e.target.checked; saveDB(); });
 $("aAuto").addEventListener("change", function (e) { DB.auto = e.target.checked; saveDB(); });
 $("aContrast").addEventListener("change", function (e) { DB.contrast = e.target.checked; saveDB(); applyPrefs(); });
