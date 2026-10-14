@@ -13,90 +13,154 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root{
-  --ink:#241238; --ink2:#3A2158; --peony:#C72C65; --peony-d:#A81F52;
-  --leaf:#2E8B6A; --bg:#FAF6FB; --card:#fff; --line:#E6DBEC; --mute:#6F6380;
+  --dark:#241238; --on-dark:#fff; --text:#241238; --mute:#6F6380; --bg:#FAF6FB; --card:#fff; --line:#E6DBEC;
+  --accent:#C72C65; --on-accent:#fff; --accent-d:#A81F52; --ok:#2E8B6A; --mine:#F6E4EC; --mine-line:#EBC3D3;
+  --ts:1;
   --serif:ui-serif,"New York",Georgia,serif;
   --sans:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
+body.hc{
+  --dark:#000; --on-dark:#fff; --text:#fff; --mute:#FFE600; --bg:#000; --card:#000; --line:#fff;
+  --accent:#FFE600; --on-accent:#000; --accent-d:#FFE600; --ok:#00FF9D; --mine:#111; --mine-line:#FFE600;
+}
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
-html,body{height:100%}
-body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-text-size-adjust:100%;overscroll-behavior:none}
-button,select{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
-.screen{height:100%;display:flex;flex-direction:column}
-
-/* ---------- Login ---------- */
-.login{background:var(--ink);color:#fff;position:relative;overflow:hidden;
-  padding:env(safe-area-inset-top) 28px calc(env(safe-area-inset-bottom) + 28px)}
-.login .bloom{position:absolute;right:-90px;top:-70px;width:340px;height:340px;color:var(--peony);opacity:.9}
-.login .hero{margin-top:auto;position:relative}
+html{font-size:calc(100% * var(--ts));height:100%}
+body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%;overscroll-behavior:none}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--ok);outline-offset:2px}
+h1:focus{outline:none}
+#app{height:100%;display:flex;flex-direction:column}
+.screen{flex:1;min-height:0;display:flex;flex-direction:column}
+.warn{flex:none;background:#FFE08A;color:#4a3600;padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;font-size:.9rem;line-height:1.4;position:relative;z-index:5}
+.warn a{color:#4a3600;font-weight:700;word-break:break-all}
 .word{font-family:var(--serif);font-weight:600;letter-spacing:-.02em}
-.login .word{font-size:clamp(44px,14vw,64px);line-height:1}
-.login .tag{margin-top:14px;font-size:19px;line-height:1.35;max-width:17em;color:#E9DDF3}
-.login .actions{margin-top:36px;display:grid;gap:12px}
-.btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;border-radius:16px;border:0;
-  font-weight:600;font-size:17px;cursor:pointer;padding:0 18px}
-.btn.google{background:#fff;color:#1d1d1f}
-.btn.apple{background:transparent;color:#C9B9DA;border:1.5px dashed #6B4E8C}
-.btn[disabled]{cursor:not-allowed}
-.login .fine{margin-top:18px;font-size:14px;color:#BBA9D0;min-height:1.4em}
-.login .fine.err{color:#FFB3C8}
 
-/* ---------- App ---------- */
-.top{background:var(--ink);color:#fff;display:flex;align-items:center;gap:10px;
-  padding:calc(env(safe-area-inset-top) + 10px) 18px 12px}
-.top svg{width:26px;height:26px;color:#F26A9B}
-.top .word{font-size:22px}
-main{flex:1;min-height:0;display:flex;flex-direction:column}
-.tab{flex:1;min-height:0;display:flex;flex-direction:column}
+/* botones */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;width:100%;border-radius:16px;border:0;font-weight:600;font-size:1.05rem;padding:0 18px;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--text)}
+.btn.light{background:#fff;color:#1d1d1f}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.stack{display:grid;gap:12px}
+.icon-btn{width:44px;height:44px;border-radius:14px;border:0;background:rgba(255,255,255,.14);color:var(--on-dark);display:grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn svg{width:22px;height:22px}
+body.hc .icon-btn{border:1.5px solid #fff;background:transparent}
 
-.langs{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 8px}
-.field label{display:block;font-size:13px;color:var(--mute);margin:0 0 4px 4px}
-select{width:100%;min-height:46px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);padding:0 12px;font-size:16px;appearance:none;
-  background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);
-  background-position:calc(100% - 20px) 20px,calc(100% - 15px) 20px;background-size:5px 5px;background-repeat:no-repeat}
-.speaker{display:grid;grid-template-columns:1fr 1fr;margin:6px 16px 4px;padding:4px;background:#EFE5F4;border-radius:16px;gap:4px}
-.speaker button{min-height:42px;border:0;border-radius:12px;background:transparent;font-weight:600;font-size:15px;color:var(--mute);cursor:pointer}
-.speaker button[aria-checked="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(36,18,56,.18)}
+/* pantallas oscuras */
+.dark{background:var(--dark);color:var(--on-dark);position:relative;overflow:hidden;
+  padding:calc(env(safe-area-inset-top) + 20px) 26px calc(env(safe-area-inset-bottom) + 26px)}
+.dark .btn.ghost{color:var(--on-dark);border-color:#6B4E8C}
+body.hc .dark .btn.ghost{border-color:#fff}
+.bloom{position:absolute;right:-90px;top:-70px;width:340px;height:340px;color:var(--accent);opacity:.9;pointer-events:none}
+.center{margin:auto;text-align:center;position:relative}
+.center .big{width:120px;height:120px;color:#F26A9B;margin:0 auto 14px}
+.center h1{font-size:clamp(40px,12vw,56px);line-height:1}
+.hero{margin-top:auto;position:relative}
+.hero h1{font-size:clamp(34px,10vw,46px);line-height:1.05;font-family:var(--serif)}
+.hero p{margin-top:12px;font-size:1.1rem;line-height:1.4;color:#E9DDF3;max-width:19em}
+body.hc .hero p{color:#fff}
+.skip{align-self:flex-end;background:none;border:0;color:#E9DDF3;font-size:1rem;min-height:44px;padding:0 6px;cursor:pointer;position:relative;z-index:1}
+.ico{width:76px;height:76px;border-radius:24px;background:rgba(255,255,255,.12);display:grid;place-items:center;margin-bottom:22px;color:#F26A9B}
+body.hc .ico{border:1.5px solid #fff;background:transparent;color:#FFE600}
+.ico svg{width:40px;height:40px}
+.dots{display:flex;gap:8px;margin:26px 0 18px}
+.dots i{width:9px;height:9px;border-radius:50%;background:#6B4E8C}
+.dots i.on{background:#F26A9B;width:26px;border-radius:6px}
+body.hc .dots i{background:#666}body.hc .dots i.on{background:#FFE600}
+.fine{margin-top:16px;font-size:.9rem;color:#BBA9D0;line-height:1.4}
+body.hc .fine{color:#fff}
 
-.log{flex:1;min-height:0;overflow-y:auto;list-style:none;padding:12px 16px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}
-.empty{margin:auto;text-align:center;color:var(--mute);max-width:16em;line-height:1.45;font-size:16px}
-.msg{max-width:86%;padding:12px 14px;border-radius:18px;background:var(--card);border:1.5px solid var(--line)}
-.msg.me{align-self:flex-end;border-bottom-right-radius:6px;background:#F6E4EC;border-color:#EBC3D3}
-.msg.other{align-self:flex-start;border-bottom-left-radius:6px}
-.msg .orig{font-size:14px;color:var(--mute);line-height:1.35}
-.msg .trans{margin-top:5px;font-family:var(--serif);font-size:20px;line-height:1.3;font-weight:600}
-.msg .trans.wait{color:var(--mute);font-family:var(--sans);font-size:15px;font-weight:400}
+/* pantallas claras */
+.top{background:var(--dark);color:var(--on-dark);display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 16px 12px;flex:none}
+body.hc .top{border-bottom:1.5px solid #fff}
+.top h1{font-family:var(--serif);font-size:1.3rem;flex:1}
+.top .logo{width:26px;height:26px;color:#F26A9B}
+.body{flex:1;min-height:0;overflow-y:auto;padding:18px 16px 24px;-webkit-overflow-scrolling:touch}
+.lead{font-size:1.05rem;line-height:1.45;color:var(--mute);margin-bottom:18px}
+.field{display:block;margin-bottom:14px}
+.field>span{display:block;font-size:.85rem;color:var(--mute);margin:0 0 5px 4px}
+select,input[type=text]{width:100%;min-height:50px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);padding:0 14px;font-size:1rem}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);
+  background-position:calc(100% - 20px) 22px,calc(100% - 15px) 22px;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+.status-msg{min-height:1.4em;margin-top:12px;font-size:.95rem;color:var(--mute);line-height:1.4}
+.status-msg.err{color:var(--accent-d);font-weight:600}
+.dark .status-msg{color:#E9DDF3}
 
-.replay{margin-top:8px;min-height:40px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-weight:600;font-size:14px;color:var(--leaf);cursor:pointer}
-.dock{padding:6px 16px 12px;display:flex;flex-direction:column;align-items:center;gap:10px}
-#status{min-height:1.4em;font-size:15px;color:var(--mute);text-align:center}
-#status.err{color:var(--peony-d);font-weight:600}
-.micwrap{position:relative;width:132px;height:132px;display:grid;place-items:center}
-.ring{position:absolute;inset:0;border-radius:50%;background:var(--peony);opacity:.22;
-  transform:scale(calc(1 + var(--lvl,0) * .55));transition:transform .12s ease-out}
-.mic{position:relative;width:112px;height:112px;border-radius:50%;border:0;background:var(--peony);color:#fff;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:700;font-size:16px;cursor:pointer;
-  box-shadow:0 8px 20px rgba(199,44,101,.35)}
-.mic svg{width:34px;height:34px}
-.mic[data-phase="listening"]{background:var(--ink)}
-.mic[data-phase="working"],.mic[data-phase="speaking"]{background:var(--leaf)}
-.switch{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--ink);min-height:44px}
-.switch input{width:22px;height:22px;accent-color:var(--peony)}
+/* inicio */
+.hello{font-family:var(--serif);font-size:1.9rem;margin-bottom:4px}
+.cta{display:flex;align-items:center;gap:16px;width:100%;text-align:left;border:0;border-radius:22px;padding:22px 20px;background:var(--accent);color:var(--on-accent);cursor:pointer;margin:16px 0 20px}
+.cta svg{width:42px;height:42px;flex:none}
+.cta strong{display:block;font-size:1.3rem}
+.cta span{font-size:.95rem;opacity:.9}
+body.hc .cta{border:2px solid #FFE600}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+h2.sec{font-size:1rem;margin:6px 0 10px;color:var(--mute);font-weight:600}
+.row{display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px;cursor:pointer}
+.row strong{display:block;font-size:1rem}
+.row span{display:block;font-size:.9rem;color:var(--mute);margin-top:3px;line-height:1.35}
+.empty-note{color:var(--mute);font-size:1rem;line-height:1.45;padding:6px 2px}
 
-.profile{padding:28px 20px;align-items:flex-start;gap:14px}
-.profile .who{display:flex;align-items:center;gap:14px}
-.avatar{width:64px;height:64px;border-radius:50%;background:var(--ink2);color:#fff;display:grid;place-items:center;font-size:26px;font-weight:700;overflow:hidden}
-.avatar img{width:100%;height:100%;object-fit:cover}
-.profile h2{font-family:var(--serif);font-size:26px}
-.profile p{color:var(--mute);font-size:15px;line-height:1.4}
-.btn.out{background:var(--card);border:1.5px solid var(--line);margin-top:10px}
+/* conversación */
+.langs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;padding:12px 14px 6px;align-items:end}
+.langs .field{margin:0}
+.swap{width:46px;height:50px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;display:grid;place-items:center;color:var(--text)}
+.swap svg{width:22px;height:22px}
+.turn{display:grid;grid-template-columns:1fr 1fr;margin:6px 14px 2px;padding:4px;background:#EFE5F4;border-radius:16px;gap:4px}
+body.hc .turn{background:#111;border:1.5px solid #fff}
+.turn button{min-height:42px;border:0;border-radius:12px;background:transparent;font-weight:600;font-size:.95rem;color:var(--mute);cursor:pointer}
+.turn button[aria-checked="true"]{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(36,18,56,.18)}
+body.hc .turn button[aria-checked="true"]{background:#FFE600;color:#000}
+.note{margin:8px 14px 0;padding:10px 12px;border-radius:12px;background:#FFF3D6;color:#5a4300;font-size:.9rem;line-height:1.4}
+body.hc .note{background:#000;border:1.5px solid #FFE600;color:#FFE600}
+.log{flex:1;min-height:0;overflow-y:auto;list-style:none;padding:12px 14px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}
+.empty{margin:auto;text-align:center;color:var(--mute);max-width:17em;line-height:1.45}
+.msg{max-width:90%;padding:12px 14px;border-radius:18px;background:var(--card);border:1.5px solid var(--line)}
+.msg.mine{align-self:flex-end;border-bottom-right-radius:6px;background:var(--mine);border-color:var(--mine-line)}
+.msg.theirs{align-self:flex-start;border-bottom-left-radius:6px}
+.msg .who{font-size:.8rem;color:var(--mute);margin-bottom:4px}
+.msg .orig{font-size:.95rem;color:var(--mute);line-height:1.35}
+.msg .trans{margin-top:6px;font-family:var(--serif);font-size:1.3rem;line-height:1.3;font-weight:600}
+.msg .trans.wait{color:var(--mute);font-family:var(--sans);font-size:1rem;font-weight:400}
+.replay{margin-top:8px;min-height:40px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-weight:600;font-size:.9rem;color:var(--ok);cursor:pointer}
+.dock{padding:4px 14px calc(env(safe-area-inset-bottom) + 8px);display:flex;flex-direction:column;gap:8px;flex:none;border-top:1px solid var(--line)}
+#status{min-height:1.3em;font-size:.95rem;color:var(--mute);text-align:center;padding-top:6px}
+#status.err{color:var(--accent-d);font-weight:600}
+.microw{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.micwrap{position:relative;width:104px;height:104px;display:grid;place-items:center}
+.ring{position:absolute;inset:0;border-radius:50%;background:var(--accent);opacity:.22;transform:scale(calc(1 + var(--lvl,0) * .45));transition:transform .12s ease-out}
+.mic{position:relative;width:88px;height:88px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:700;font-size:.85rem;cursor:pointer;box-shadow:0 6px 16px rgba(199,44,101,.35)}
+.mic svg{width:30px;height:30px}
+.mic[data-phase="listening"]{background:var(--dark);color:var(--on-dark);border:2px solid var(--accent)}
+.mic[data-phase="working"],.mic[data-phase="speaking"]{background:var(--ok);color:#000}
+.pill{min-height:44px;border-radius:22px;border:1.5px solid var(--line);background:var(--card);font-weight:600;font-size:.85rem;padding:0 10px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#000}
+.pills{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;-webkit-overflow-scrolling:touch}
+.chip{flex:none;min-height:40px;border-radius:20px;border:1.5px solid var(--line);background:var(--card);padding:0 14px;font-size:.9rem;cursor:pointer;white-space:nowrap}
+.composer{display:grid;grid-template-columns:1fr auto;gap:8px}
+.composer input{min-height:48px}
+.composer button{min-width:84px;min-height:48px;border-radius:14px;border:0;background:var(--dark);color:var(--on-dark);font-weight:600;cursor:pointer}
+body.hc .composer button{border:1.5px solid #fff}
 
-nav.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav.tabs button{min-height:56px;border:0;background:transparent;font-weight:600;font-size:14px;color:var(--mute);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-nav.tabs button svg{width:24px;height:24px}
-nav.tabs button[aria-selected="true"]{color:var(--peony)}
+/* ajustes */
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px;margin-bottom:16px}
+.card h2{font-size:1.05rem;margin-bottom:12px}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px}
+.tg+.tg{border-top:1px solid var(--line)}
+.tg span{font-size:1rem;line-height:1.3}
+.tg small{display:block;color:var(--mute);font-size:.85rem;margin-top:2px}
+.tg input{width:26px;height:26px;accent-color:var(--accent);flex:none}
+.sizes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.sizes button{min-height:48px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-weight:700;cursor:pointer}
+.sizes button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.danger{color:var(--accent-d)}
+
+/* navegación inferior */
+nav.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);flex:none}
+nav.tabs button{min-height:58px;border:0;background:transparent;font-weight:600;font-size:.8rem;color:var(--mute);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+nav.tabs svg{width:24px;height:24px}
+nav.tabs button[aria-selected="true"]{color:var(--accent)}
 
 @media (prefers-reduced-motion:reduce){.ring{transition:none}}
 </style>
@@ -114,548 +178,705 @@ nav.tabs button[aria-selected="true"]{color:var(--peony)}
     </g>
     <circle r="9" fill="#FAF6FB"/>
   </symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path fill="currentColor" d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-6a3.5 3.5 0 0 0-7 0v6A3.5 3.5 0 0 0 12 15zm6-3.5a1 1 0 1 0-2 0 4 4 0 0 1-8 0 1 1 0 1 0-2 0 6 6 0 0 0 5 5.9V20H9.5a1 1 0 1 0 0 2h5a1 1 0 1 0 0-2H13v-2.6a6 6 0 0 0 5-5.9z"/></symbol>
 </svg>
 
-<!-- ======== LOGIN ======== -->
-<section id="login" class="screen login" hidden>
-  <svg class="bloom" aria-hidden="true"><use href="#flower"/></svg>
-  <div class="hero">
-    <h1 class="word">Fiorisacall</h1>
-    <p class="tag">Hablá en tu idioma. Que te escuchen en el suyo.</p>
-    <div class="actions">
-      <button id="btnGoogle" class="btn google" type="button">
-        <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
-        Continuar con Google
-      </button>
-      <button class="btn apple" type="button" disabled aria-disabled="true">Apple · próximamente</button>
-    </div>
-    <p id="loginMsg" class="fine" role="status"></p>
+<div id="app">
+
+<div id="fileWarn" class="warn" hidden>
+  Estás viendo una copia del archivo y así el micrófono no funciona. Abrí la app desde este link, en Safari:
+  <a href="https://gonzajcatena-debug.github.io/Fiorisacall/">gonzajcatena-debug.github.io/Fiorisacall</a>
+</div>
+
+<!-- 1. Inicio de la app -->
+<section id="s-splash" class="screen dark" aria-label="Fiorisacall">
+  <div class="center">
+    <svg class="big" aria-hidden="true"><use href="#flower"/></svg>
+    <h1 class="word" tabindex="-1">Fiorisacall</h1>
   </div>
 </section>
 
-<!-- ======== APP ======== -->
-<section id="app" class="screen" hidden>
-  <header class="top">
-    <svg aria-hidden="true"><use href="#flower"/></svg>
-    <span class="word">Fiorisacall</span>
-  </header>
-
-  <main>
-    <div id="tabTranslate" class="tab">
-      <div class="langs">
-        <div class="field"><label for="selMe">Yo hablo</label><select id="selMe"></select></div>
-        <div class="field"><label for="selOther">La otra persona habla</label><select id="selOther"></select></div>
-      </div>
-      <div class="speaker" role="radiogroup" aria-label="Quién habla ahora">
-        <button type="button" role="radio" id="spkMe" aria-checked="true">Hablo yo</button>
-        <button type="button" role="radio" id="spkOther" aria-checked="false">Habla la otra persona</button>
-      </div>
-
-      <ol id="log" class="log" aria-live="polite">
-        <li class="empty" id="empty">Elegí los idiomas, tocá Hablar y decí algo. Se escucha traducido.</li>
-      </ol>
-
-      <div class="dock">
-        <p id="status" role="status">Tocá Hablar para empezar</p>
-        <div class="micwrap">
-          <span class="ring" id="ring" aria-hidden="true"></span>
-          <button id="mic" class="mic" type="button" data-phase="idle">
-            <svg id="micIcon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-6a3.5 3.5 0 0 0-7 0v6A3.5 3.5 0 0 0 12 15zm6-3.5a1 1 0 1 0-2 0 4 4 0 0 1-8 0 1 1 0 1 0-2 0 6 6 0 0 0 5 5.9V20H9.5a1 1 0 1 0 0 2h5a1 1 0 1 0 0-2H13v-2.6a6 6 0 0 0 5-5.9z"/></svg>
-            <span id="micLabel">Hablar</span>
-          </button>
-        </div>
-        <label class="switch"><input type="checkbox" id="cont"> Conversación continua</label>
-      </div>
-    </div>
-
-    <div id="tabProfile" class="tab profile" hidden>
-      <div class="who">
-        <div class="avatar" id="avatar" aria-hidden="true"></div>
-        <div><h2 id="pName"></h2><p id="pMail"></p></div>
-      </div>
-      <p id="pNote">Tu cuenta quedó registrada con Google. Tus idiomas se guardan en este teléfono.</p>
-      <button id="btnOut" class="btn out" type="button">Cerrar sesión</button>
-    </div>
-  </main>
-
-  <nav class="tabs" aria-label="Secciones">
-    <button id="navTranslate" type="button" aria-selected="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5h9M8.5 3v2M6 5c.6 3.2 3 5.8 6 7M12 5c-.8 3.6-3.6 6.4-7 7.5M13 21l4-10 4 10M14.4 18h5.2"/></svg>
-      Traducir
-    </button>
-    <button id="navProfile" type="button" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.2-6 8-6s6.8 2 8 6"/></svg>
-      Perfil
-    </button>
-  </nav>
+<!-- 2. Bienvenida -->
+<section id="s-welcome" class="screen dark" hidden>
+  <svg class="bloom" aria-hidden="true"><use href="#flower"/></svg>
+  <button id="wSkip" class="skip" type="button">Omitir</button>
+  <div class="hero">
+    <div id="wIco" class="ico" aria-hidden="true"></div>
+    <h1 id="wTitle" tabindex="-1"></h1>
+    <p id="wText"></p>
+    <div id="wDots" class="dots" aria-hidden="true"></div>
+    <button id="wNext" class="btn primary" type="button">Siguiente</button>
+  </div>
 </section>
 
-<audio id="player" playsinline></audio>
+<!-- 3. Perfil e idioma -->
+<section id="s-setup" class="screen" hidden>
+  <header class="top"><h1 tabindex="-1">Tu perfil</h1></header>
+  <div class="body">
+    <p class="lead">Contanos cómo te llamás y qué idioma hablás. Después podés cambiarlo cuando quieras.</p>
+    <label class="field"><span>Tu nombre</span><input id="setName" type="text" autocomplete="given-name" maxlength="30"></label>
+    <label class="field"><span>Yo hablo</span><select id="setMe"></select></label>
+    <label class="field"><span>Hablo con personas que hablan</span><select id="setOther"></select></label>
+    <button id="setNext" class="btn primary" type="button">Continuar</button>
+  </div>
+</section>
 
-<script type="module">
-/* ====== CONFIGURACIÓN ======
-   Modo prueba (ahora): sin ingreso y sin servidor. Usa el dictado, la traducción gratuita y la voz del teléfono.
-   Modo completo (después): completar API_URL y FIREBASE para activar login con Google y voz en la nube. */
-const CONFIG = {
-  API_URL: "",
-  FIREBASE: null   // { apiKey, authDomain, projectId, appId }
-};
-/* ================================================== */
-let initializeApp, getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
-    getRedirectResult, onAuthStateChanged, signOut;
+<!-- 4. Permiso del micrófono -->
+<section id="s-mic" class="screen" hidden>
+  <header class="top"><h1 tabindex="-1">Micrófono</h1></header>
+  <div class="body">
+    <p class="lead">Fiorisacall necesita el micrófono para escuchar lo que decís y traducirlo. Si preferís, también podés escribir tus mensajes.</p>
+    <div class="stack">
+      <button id="micAllow" class="btn primary" type="button">Permitir micrófono</button>
+      <button id="micSkip" class="btn ghost" type="button">Ahora no</button>
+    </div>
+    <p id="micMsg" class="status-msg" role="status"></p>
+  </div>
+</section>
 
-const $ = (id) => document.getElementById(id);
-const LANGS = [
-  ["es","Español"],["en","English"],["pt","Português"],["fr","Français"],["it","Italiano"],
-  ["de","Deutsch"],["nl","Nederlands"],["ru","Русский"],["tr","Türkçe"],["ar","العربية"],
-  ["hi","हिन्दी"],["ja","日本語"],["ko","한국어"],["zh","中文"]
-];
-const SILENT_WAV = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==";
+<!-- 5. Ingreso -->
+<section id="s-signin" class="screen dark" hidden>
+  <svg class="bloom" aria-hidden="true"><use href="#flower"/></svg>
+  <div class="hero">
+    <h1 tabindex="-1">Ingresá a tu cuenta</h1>
+    <p>Pronto vas a poder entrar con Google o con Apple. Mientras probamos la app, tus datos quedan guardados en este teléfono.</p>
+    <div class="stack" style="margin-top:26px">
+      <button class="btn light" type="button" disabled aria-disabled="true">Google · próximamente</button>
+      <button class="btn ghost" type="button" disabled aria-disabled="true">Apple · próximamente</button>
+      <button id="enter" class="btn primary" type="button">Entrar en modo prueba</button>
+    </div>
+  </div>
+</section>
 
-const S = {
-  user: null, me: "es", other: "en", speaker: "me", continuous: false,
-  phase: "idle", run: 0, stream: null, rec: null, chunks: [], ctx: null,
-  meter: null, heard: false, discard: false, srcNode: null, unlocked: false
-};
+<!-- 6. Inicio -->
+<section id="s-home" class="screen" hidden>
+  <header class="top">
+    <svg class="logo" aria-hidden="true"><use href="#flower"/></svg>
+    <h1 class="word" tabindex="-1">Fiorisacall</h1>
+  </header>
+  <div class="body">
+    <p id="hello" class="hello"></p>
+    <p class="lead" style="margin-bottom:0">¿Con quién hablamos hoy?</p>
+    <button id="newConvo" class="cta" type="button">
+      <svg aria-hidden="true"><use href="#i-mic"/></svg>
+      <div><strong>Nueva conversación</strong><span>Hablá y se traduce en vivo</span></div>
+    </button>
+    <div class="pair">
+      <label class="field" style="margin:0"><span>Yo hablo</span><select id="hMe"></select></label>
+      <label class="field" style="margin:0"><span>La otra persona</span><select id="hOther"></select></label>
+    </div>
+    <h2 class="sec">Últimas conversaciones</h2>
+    <div id="hRecent"></div>
+  </div>
+</section>
 
-/* ---------- Firebase / login ---------- */
-const configured = !!(CONFIG.FIREBASE && CONFIG.API_URL);
-const TEST = !configured;
-let auth = null;
-if (configured) {
-  (async () => {
-    try {
-      const base = "https://www.gstatic.com/firebasejs/10.12.5/";
-      ({ initializeApp } = await import(base + "firebase-app.js"));
-      ({ getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
-         getRedirectResult, onAuthStateChanged, signOut } = await import(base + "firebase-auth.js"));
-      auth = getAuth(initializeApp(CONFIG.FIREBASE));
-      getRedirectResult(auth).catch((e) => loginMsg(authError(e), true));
-      onAuthStateChanged(auth, (user) => { S.user = user; user ? showApp() : showLogin(); });
-    } catch (e) { showLogin(); loginMsg("No se pudo cargar el ingreso. Revisá tu internet.", true); }
-  })();
-} else {
-  showApp();
-}
+<!-- 7. Conversación -->
+<section id="s-convo" class="screen" hidden>
+  <header class="top">
+    <button id="cBack" class="icon-btn" type="button" aria-label="Volver al inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <h1 tabindex="-1">Conversación</h1>
+  </header>
+  <div class="langs">
+    <label class="field"><span>Yo hablo</span><select id="cMe"></select></label>
+    <button id="cSwap" class="swap" type="button" aria-label="Intercambiar idiomas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg>
+    </button>
+    <label class="field"><span>La otra persona</span><select id="cOther"></select></label>
+  </div>
+  <div class="turn" role="radiogroup" aria-label="Quién habla ahora">
+    <button id="tMe" type="button" role="radio" aria-checked="true">Hablo yo</button>
+    <button id="tOther" type="button" role="radio" aria-checked="false">Habla la otra persona</button>
+  </div>
+  <p id="cNote" class="note" hidden></p>
+  <ol id="log" class="log" aria-live="polite" aria-label="Conversación"></ol>
+  <div class="dock">
+    <p id="status" role="status"></p>
+    <div class="microw">
+      <div class="pills"><button id="pVoice" class="pill" type="button" aria-pressed="true">Voz: sí</button></div>
+      <div class="micwrap">
+        <span id="ring" class="ring" aria-hidden="true"></span>
+        <button id="mic" class="mic" type="button" data-phase="idle" aria-label="Hablar">
+          <svg aria-hidden="true"><use href="#i-mic"/></svg>
+          <span id="micLabel">Hablar</span>
+        </button>
+      </div>
+      <div class="pills"><button id="pAuto" class="pill" type="button" aria-pressed="true">Fluida: sí</button></div>
+    </div>
+    <div id="chips" class="chips" role="group" aria-label="Frases rápidas"></div>
+    <form id="composer" class="composer" autocomplete="off">
+      <input id="typed" type="text" enterkeyhint="send" placeholder="O escribí tu mensaje" aria-label="Escribí tu mensaje" maxlength="300">
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+</section>
 
-function authError(e) {
-  const c = e && e.code || "";
-  if (c.includes("popup-closed") || c.includes("cancelled")) return "Cancelaste el ingreso. Probá de nuevo.";
-  if (c.includes("unauthorized-domain")) return "Este sitio no está autorizado en Firebase (Authorized domains).";
-  if (c.includes("network")) return "Sin conexión. Revisá tu internet e intentá de nuevo.";
-  return "No se pudo ingresar con Google. Intentá de nuevo.";
-}
-function loginMsg(t, err) { const el = $("loginMsg"); el.textContent = t || ""; el.classList.toggle("err", !!err); }
+<!-- 8. Historial -->
+<section id="s-history" class="screen" hidden>
+  <header class="top"><h1 tabindex="-1">Historial</h1></header>
+  <div class="body">
+    <div id="hList"></div>
+    <button id="hClear" class="btn ghost danger" type="button" style="margin-top:8px">Borrar todo el historial</button>
+  </div>
+</section>
 
-$("btnGoogle").addEventListener("click", async () => {
-  if (!auth) return loginMsg("Falta completar la configuración en index.html.", true);
-  loginMsg("Abriendo Google…");
-  const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: "select_account" });
+<!-- 9. Ver una conversación guardada -->
+<section id="s-view" class="screen" hidden>
+  <header class="top">
+    <button id="vBack" class="icon-btn" type="button" aria-label="Volver al historial">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <h1 id="vTitle" tabindex="-1">Conversación</h1>
+  </header>
+  <ol id="vLog" class="log"></ol>
+  <div class="dock">
+    <button id="vDel" class="btn ghost danger" type="button">Borrar esta conversación</button>
+  </div>
+</section>
+
+<!-- 10. Ajustes -->
+<section id="s-settings" class="screen" hidden>
+  <header class="top"><h1 tabindex="-1">Ajustes</h1></header>
+  <div class="body">
+    <div class="card">
+      <h2>Perfil</h2>
+      <label class="field"><span>Tu nombre</span><input id="aName" type="text" autocomplete="given-name" maxlength="30"></label>
+      <label class="field"><span>Yo hablo</span><select id="aMe"></select></label>
+      <label class="field" style="margin-bottom:0"><span>La otra persona habla</span><select id="aOther"></select></label>
+    </div>
+    <div class="card">
+      <h2>Conversación</h2>
+      <label class="tg"><span>Reproducir la voz<small>Si lo apagás, solo se muestra el texto.</small></span><input id="aVoice" type="checkbox"></label>
+      <label class="tg"><span>Conversación fluida<small>El micrófono se abre solo después de cada turno.</small></span><input id="aAuto" type="checkbox"></label>
+    </div>
+    <div class="card">
+      <h2>Accesibilidad</h2>
+      <div class="tg" style="display:block">
+        <span>Tamaño del texto</span>
+        <div class="sizes" role="group" aria-label="Tamaño del texto">
+          <button type="button" data-size="0" aria-pressed="true">Normal</button>
+          <button type="button" data-size="1" aria-pressed="false">Grande</button>
+          <button type="button" data-size="2" aria-pressed="false">Muy grande</button>
+        </div>
+      </div>
+      <label class="tg"><span>Alto contraste<small>Fondo negro y letras claras.</small></span><input id="aContrast" type="checkbox"></label>
+    </div>
+    <div class="card">
+      <h2>Datos</h2>
+      <div class="stack">
+        <button id="aWelcome" class="btn ghost" type="button">Ver la bienvenida de nuevo</button>
+        <button id="aWipe" class="btn ghost danger" type="button">Borrar todos mis datos</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<nav id="nav" class="tabs" aria-label="Secciones" hidden>
+  <button type="button" data-go="home" aria-selected="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7M6 10v10h12V10"/></svg>Inicio
+  </button>
+  <button type="button" data-go="history" aria-selected="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>Historial
+  </button>
+  <button type="button" data-go="settings" aria-selected="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.2-6 8-6s6.8 2 8 6"/></svg>Perfil
+  </button>
+</nav>
+
+</div>
+
+<script>
+/* Si algo falla, se muestra un cartel en pantalla en vez de dejarla en blanco */
+function showFatal(msg) {
   try {
-    await signInWithPopup(auth, provider);
-  } catch (e) {
-    const c = e && e.code || "";
-    if (c.includes("popup-blocked") || c.includes("operation-not-supported")) {
-      try { await signInWithRedirect(auth, provider); } catch (e2) { loginMsg(authError(e2), true); }
-    } else loginMsg(authError(e), true);
-  }
-});
-$("btnOut").addEventListener("click", async () => { cancelAll(); await signOut(auth); });
-
-function showLogin() { $("login").hidden = false; $("app").hidden = true; }
-function showApp() {
-  $("login").hidden = true; $("app").hidden = false;
-  loginMsg("");
-  const u = S.user;
-  if (!u) {
-    $("pName").textContent = "Modo prueba";
-    $("pMail").textContent = "Sin cuenta por ahora";
-    $("avatar").textContent = "F";
-    $("btnOut").hidden = true;
-    $("pNote").textContent = "El ingreso con Google se activa más adelante. Tus idiomas se guardan en este teléfono.";
-    loadPrefs(); renderLangs();
-    return;
-  }
-  $("pName").textContent = u.displayName || "Usuario";
-  $("pMail").textContent = u.email || "";
-  const av = $("avatar"); av.textContent = "";
-  if (u.photoURL) { const im = new Image(); im.src = u.photoURL; im.alt = ""; im.referrerPolicy = "no-referrer"; av.appendChild(im); }
-  else av.textContent = (u.displayName || u.email || "?").trim().charAt(0).toUpperCase();
-  loadPrefs(); renderLangs();
-}
-
-/* ---------- Preferencias ---------- */
-function prefKey() { return "fc:prefs:" + (S.user ? S.user.uid : "anon"); }
-function loadPrefs() {
-  try {
-    const p = JSON.parse(localStorage.getItem(prefKey()) || "null");
-    if (p && p.me && p.other) { S.me = p.me; S.other = p.other; return; }
+    var d = document.getElementById("fatal");
+    if (!d) {
+      d = document.createElement("div"); d.id = "fatal";
+      d.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:99;background:#fff;color:#a81f52;padding:12px 14px 28px;font:14px/1.4 system-ui,sans-serif;border-top:3px solid #a81f52";
+      document.body.appendChild(d);
+    }
+    d.textContent = "Error: " + msg + " · Mandame una captura de esta pantalla.";
   } catch (e) {}
-  const nav = (navigator.language || "es").slice(0, 2);
-  S.me = LANGS.some(([c]) => c === nav) ? nav : "es";
-  S.other = S.me === "en" ? "es" : "en";
 }
-function savePrefs() { try { localStorage.setItem(prefKey(), JSON.stringify({ me: S.me, other: S.other })); } catch (e) {} }
-function renderLangs() {
-  for (const [id, val] of [["selMe", S.me], ["selOther", S.other]]) {
-    const sel = $(id); sel.textContent = "";
-    for (const [c, n] of LANGS) { const o = document.createElement("option"); o.value = c; o.textContent = n; sel.appendChild(o); }
-    sel.value = val;
-  }
-}
-$("selMe").addEventListener("change", (e) => { S.me = e.target.value; savePrefs(); });
-$("selOther").addEventListener("change", (e) => { S.other = e.target.value; savePrefs(); });
+window.addEventListener("error", function (e) { showFatal((e.message || "desconocido") + (e.lineno ? " (línea " + e.lineno + ")" : "")); });
+window.addEventListener("unhandledrejection", function (e) { showFatal(String((e.reason && e.reason.message) || e.reason || "desconocido")); });
+(function () {
+"use strict";
 
-/* ---------- Pestañas ---------- */
-function tab(which) {
-  const t = which === "translate";
-  $("tabTranslate").hidden = !t; $("tabProfile").hidden = t;
-  $("navTranslate").setAttribute("aria-selected", t); $("navProfile").setAttribute("aria-selected", !t);
-}
-$("navTranslate").addEventListener("click", () => tab("translate"));
-$("navProfile").addEventListener("click", () => tab("profile"));
+/* ====================== Datos ====================== */
+var $ = function (id) { return document.getElementById(id); };
+var LANGS = [
+  ["es","Español","🇪🇸"],["en","English","🇺🇸"],["pt","Português","🇧🇷"],["fr","Français","🇫🇷"],["it","Italiano","🇮🇹"],
+  ["de","Deutsch","🇩🇪"],["nl","Nederlands","🇳🇱"],["ru","Русский","🇷🇺"],["tr","Türkçe","🇹🇷"],["ar","العربية","🇸🇦"],
+  ["hi","हिन्दी","🇮🇳"],["ja","日本語","🇯🇵"],["ko","한국어","🇰🇷"],["zh","中文","🇨🇳"]
+];
+var LOCALES = {
+  es:"es-AR", en:"en-US", pt:"pt-BR", fr:"fr-FR", it:"it-IT", de:"de-DE", nl:"nl-NL",
+  ru:"ru-RU", tr:"tr-TR", ar:"ar-SA", hi:"hi-IN", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN"
+};
+var PHRASES = {
+  es:["Hola","Gracias","¿Dónde está el baño?","Necesito ayuda","¿Podés repetir, por favor?","Hablá más despacio, por favor"],
+  en:["Hello","Thank you","Where is the bathroom?","I need help","Can you repeat that, please?","Please speak slowly"],
+  pt:["Olá","Obrigado","Onde fica o banheiro?","Preciso de ajuda","Pode repetir, por favor?","Fale mais devagar, por favor"],
+  fr:["Bonjour","Merci","Où sont les toilettes ?","J'ai besoin d'aide","Pouvez-vous répéter, s'il vous plaît ?","Parlez plus lentement, s'il vous plaît"],
+  it:["Ciao","Grazie","Dov'è il bagno?","Ho bisogno di aiuto","Può ripetere, per favore?","Parli più lentamente, per favore"],
+  de:["Hallo","Danke","Wo ist die Toilette?","Ich brauche Hilfe","Können Sie das bitte wiederholen?","Bitte sprechen Sie langsamer"]
+};
+var SLIDES = [
+  { i:"mic", t:"Hablá en tu idioma", p:"Decí lo que quieras y Fiorisacall lo traduce al instante, en cualquiera de los idiomas que elijas." },
+  { i:"cap", t:"Escuchalo o leelo", p:"La otra persona te escucha en su idioma, o lo lee en pantalla si hay ruido. Vos elegís." },
+  { i:"acc", t:"Para todas las personas", p:"Subtítulos grandes, alto contraste, mensajes escritos y compatibilidad con lectores de pantalla." }
+];
+var ICONS = {
+  mic: '<svg viewBox="0 0 24 24"><use href="#i-mic"/></svg>',
+  cap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 11h4M13 11h4M7 15h2M11 15h6"/></svg>',
+  acc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M5 9h14M12 9v5M12 14l-3 6M12 14l3 6"/></svg>'
+};
 
-/* ---------- Quién habla ---------- */
-function setSpeaker(s) {
-  S.speaker = s;
-  $("spkMe").setAttribute("aria-checked", s === "me");
-  $("spkOther").setAttribute("aria-checked", s === "other");
-}
-$("spkMe").addEventListener("click", () => setSpeaker("me"));
-$("spkOther").addEventListener("click", () => setSpeaker("other"));
-$("cont").addEventListener("change", (e) => { S.continuous = e.target.checked; });
+var KEY = "fc:v2";
+var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, history:[] };
+var DB = loadDB();
 
-/* ---------- Estado visual ---------- */
-const LABELS = { idle: "Hablar", listening: "Detener", working: "Traduciendo", speaking: "Parar" };
-const STATUS = { idle: "Tocá Hablar para empezar", listening: "Escuchando… tocá Detener cuando termines", working: "Traduciendo…", speaking: "Reproduciendo…" };
-function setPhase(p) {
-  S.phase = p;
-  const m = $("mic"); m.dataset.phase = p;
-  $("micLabel").textContent = LABELS[p];
-  setStatus(p === "listening" && S.continuous ? "Escuchando… dejá de hablar y se traduce solo" : STATUS[p]);
-  if (p !== "listening") $("ring").style.setProperty("--lvl", 0);
+function loadDB() {
+  try {
+    var d = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (d && typeof d === "object") {
+      var out = {}; for (var k in DEF) out[k] = (k in d) ? d[k] : DEF[k];
+      if (!Array.isArray(out.history)) out.history = [];
+      return out;
+    }
+  } catch (e) {}
+  var o = {}; for (var k2 in DEF) o[k2] = DEF[k2]; o.history = [];
+  return o;
 }
-function setStatus(t, err) { const s = $("status"); s.textContent = t; s.classList.toggle("err", !!err); }
+function saveDB() { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} }
 
-/* ---------- Audio: desbloqueo para iPhone ---------- */
-function unlockAudio() {
-  const p = $("player");
-  if (!S.unlocked) { p.src = SILENT_WAV; p.play().then(() => { S.unlocked = true; }).catch(() => {}); }
-  if (!S.ctx) S.ctx = new (window.AudioContext || window.webkitAudioContext)();
-  if (S.ctx.state === "suspended") S.ctx.resume();
-  // iPhone: la voz del teléfono solo suena si se activa con un toque del usuario
-  try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+if (!DB.onboarded) {
+  var nl = (navigator.language || "es").slice(0, 2);
+  if (LANGS.some(function (l) { return l[0] === nl; })) { DB.me = nl; DB.other = nl === "en" ? "es" : "en"; }
 }
 
-/* ---------- Botón principal ---------- */
-$("mic").addEventListener("click", () => {
-  unlockAudio();
-  if (S.phase === "idle") startListening();
-  else if (S.phase === "listening") stopListening();
-  else cancelAll();
+function langName(c) { for (var i = 0; i < LANGS.length; i++) if (LANGS[i][0] === c) return LANGS[i][1]; return c; }
+function langTag(c) { for (var i = 0; i < LANGS.length; i++) if (LANGS[i][0] === c) return LANGS[i][2] + " " + LANGS[i][1]; return c; }
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function fillSelect(sel, val) {
+  sel.textContent = "";
+  LANGS.forEach(function (l) { var o = document.createElement("option"); o.value = l[0]; o.textContent = l[2] + "  " + l[1]; sel.appendChild(o); });
+  sel.value = val;
+}
+function applyPrefs() {
+  document.documentElement.style.setProperty("--ts", [1, 1.2, 1.4][DB.size] || 1);
+  document.body.classList.toggle("hc", !!DB.contrast);
+  var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = DB.contrast ? "#000000" : "#241238";
+}
+
+/* ====================== Navegación ====================== */
+var ROUTES = ["splash","welcome","setup","mic","signin","home","convo","history","view","settings"];
+var WITH_NAV = { home:1, history:1, settings:1 };
+var current = "splash";
+
+function go(name) {
+  if (current === "convo" && name !== "convo") cancelAll();
+  current = name;
+  ROUTES.forEach(function (r) { $("s-" + r).hidden = (r !== name); });
+  $("nav").hidden = !WITH_NAV[name];
+  Array.prototype.forEach.call($("nav").querySelectorAll("button"), function (b) {
+    b.setAttribute("aria-selected", String(b.getAttribute("data-go") === name));
+  });
+  if (name === "welcome") { wi = 0; renderSlide(); }
+  if (name === "setup") renderSetup();
+  if (name === "home") renderHome();
+  if (name === "convo") initConvo();
+  if (name === "history") renderHistory();
+  if (name === "settings") renderSettings();
+  var h = document.querySelector("#s-" + name + " h1");
+  if (h && name !== "splash") { try { h.focus({ preventScroll: true }); } catch (e) {} }
+  var b = document.querySelector("#s-" + name + " .body"); if (b) b.scrollTop = 0;
+}
+Array.prototype.forEach.call($("nav").querySelectorAll("button"), function (b) {
+  b.addEventListener("click", function () { go(b.getAttribute("data-go")); });
 });
 
-function cancelAll() {
-  S.run++; S.discard = true;
-  try { if (S.sr) { const sr = S.sr; S.sr = null; sr.abort(); } } catch (e) {}
-  try { if (S.rec && S.rec.state === "recording") S.rec.stop(); } catch (e) {}
-  releaseMic();
-  const p = $("player"); p.pause(); p.removeAttribute("src");
-  try { speechSynthesis.cancel(); } catch (e) {}
+/* ====================== Bienvenida ====================== */
+var wi = 0;
+function renderSlide() {
+  var s = SLIDES[wi];
+  $("wIco").innerHTML = ICONS[s.i];
+  $("wTitle").textContent = s.t; $("wText").textContent = s.p;
+  var d = $("wDots"); d.textContent = "";
+  SLIDES.forEach(function (_, i) { d.appendChild(el("i", i === wi ? "on" : "")); });
+  $("wNext").textContent = wi === SLIDES.length - 1 ? "Empezar" : "Siguiente";
+  $("wSkip").hidden = wi === SLIDES.length - 1;
+}
+$("wNext").addEventListener("click", function () { if (wi < SLIDES.length - 1) { wi++; renderSlide(); } else go("setup"); });
+$("wSkip").addEventListener("click", function () { go("setup"); });
+
+/* ====================== Perfil ====================== */
+function renderSetup() {
+  $("setName").value = DB.name; fillSelect($("setMe"), DB.me); fillSelect($("setOther"), DB.other);
+}
+$("setNext").addEventListener("click", function () {
+  DB.name = $("setName").value.trim(); DB.me = $("setMe").value; DB.other = $("setOther").value; saveDB(); go("signin");
+});
+
+/* ====================== Micrófono ====================== */
+$("micAllow").addEventListener("click", function () {
+  var msg = $("micMsg"); msg.classList.remove("err"); msg.textContent = "Pidiendo permiso…";
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    msg.classList.add("err"); msg.textContent = "Este navegador no permite usar el micrófono. Podés escribir tus mensajes."; return;
+  }
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(function (st) {
+    st.getTracks().forEach(function (t) { t.stop(); });
+    msg.textContent = "Listo, el micrófono quedó activado.";
+    setTimeout(function () { go("signin"); }, 700);
+  }).catch(function () {
+    msg.classList.add("err");
+    msg.textContent = "No se pudo activar. Podés escribir tus mensajes, o activarlo en Ajustes > Safari > Micrófono.";
+  });
+});
+$("micSkip").addEventListener("click", function () { go("signin"); });
+
+/* ====================== Ingreso ====================== */
+$("enter").addEventListener("click", function () { DB.onboarded = true; saveDB(); go("home"); });
+
+/* ====================== Inicio ====================== */
+function fmtDate(ts) { try { return new Date(ts).toLocaleString("es-AR", { dateStyle: "medium", timeStyle: "short" }); } catch (e) { return ""; } }
+function convoRow(c) {
+  var b = el("button", "row"); b.type = "button";
+  var first = c.items && c.items[0] ? c.items[0].orig : "Sin mensajes";
+  b.appendChild(el("strong", null, fmtDate(c.ts)));
+  b.appendChild(el("span", null, langTag(c.me) + " ⇄ " + langTag(c.other) + " · " + first));
+  b.addEventListener("click", function () { openView(c.id); });
+  return b;
+}
+function renderHome() {
+  $("hello").textContent = DB.name ? "Hola, " + DB.name : "Hola";
+  fillSelect($("hMe"), DB.me); fillSelect($("hOther"), DB.other);
+  var box = $("hRecent"); box.textContent = "";
+  var list = DB.history.filter(function (c) { return c.items && c.items.length; }).slice(0, 3);
+  if (!list.length) box.appendChild(el("p", "empty-note", "Todavía no hay conversaciones. Tocá Nueva conversación para empezar."));
+  list.forEach(function (c) { box.appendChild(convoRow(c)); });
+}
+$("hMe").addEventListener("change", function (e) { DB.me = e.target.value; saveDB(); });
+$("hOther").addEventListener("change", function (e) { DB.other = e.target.value; saveDB(); });
+$("newConvo").addEventListener("click", function () { go("convo"); });
+
+/* ====================== Conversación ====================== */
+var S = { turn: "me", phase: "idle", run: 0, sr: null, convo: null, silent: 0, unlocked: false };
+var SR_CLASS = window.SpeechRecognition || window.webkitSpeechRecognition;
+var STANDALONE = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+
+function initConvo() {
+  cancelAll();
+  S.convo = null; S.turn = "me"; S.silent = 0;
+  fillSelect($("cMe"), DB.me); fillSelect($("cOther"), DB.other);
+  $("log").textContent = "";
+  $("log").appendChild(el("li", "empty", "Tocá Hablar y decí algo. Se traduce y se escucha, y el micrófono se abre solo para la respuesta."));
+  syncToggles(); renderTurn(); renderChips();
+  var note = $("cNote");
+  if (!SR_CLASS || STANDALONE) {
+    note.hidden = false;
+    note.textContent = STANDALONE
+      ? "Desde el ícono de la pantalla de inicio el dictado no funciona en iPhone. Abrí la app desde Safari para hablar, o escribí tus mensajes."
+      : "Este navegador no tiene dictado. Abrí la app desde Safari para hablar, o escribí tus mensajes.";
+  } else note.hidden = true;
   setPhase("idle");
 }
-
-function pickMime() {
-  for (const m of ["audio/mp4", "audio/webm;codecs=opus", "audio/webm"]) {
-    if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
-  }
-  return "";
+function syncToggles() {
+  $("pVoice").setAttribute("aria-pressed", String(DB.voice)); $("pVoice").textContent = "Voz: " + (DB.voice ? "sí" : "no");
+  $("pAuto").setAttribute("aria-pressed", String(DB.auto)); $("pAuto").textContent = "Fluida: " + (DB.auto ? "sí" : "no");
 }
-function releaseMic() {
-  clearInterval(S.meter); S.meter = null;
-  try { if (S.srcNode) S.srcNode.disconnect(); } catch (e) {}
-  S.srcNode = null;
-  if (S.stream) { S.stream.getTracks().forEach((t) => t.stop()); S.stream = null; }
-}
-
-async function startListening() {
-  if (S.phase !== "idle") return;
-  if (TEST) return startListeningBrowser();
-  const run = ++S.run;
-  setPhase("listening");
-  let stream;
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
-  } catch (e) {
-    if (run !== S.run) return;
-    setPhase("idle");
-    return setStatus("No hay acceso al micrófono. Habilitalo en Ajustes > Safari > Micrófono.", true);
-  }
-  if (run !== S.run) { stream.getTracks().forEach((t) => t.stop()); return; }
-  S.stream = stream; S.chunks = []; S.discard = false;
-  const mime = pickMime();
-  try { S.rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined); }
-  catch (e) { releaseMic(); setPhase("idle"); return setStatus("Este navegador no puede grabar audio.", true); }
-  S.rec.ondataavailable = (e) => { if (e.data && e.data.size) S.chunks.push(e.data); };
-  S.rec.onstop = () => onRecStop(run, mime);
-  S.rec.start();
-  startMeter();
+$("pVoice").addEventListener("click", function () { DB.voice = !DB.voice; saveDB(); syncToggles(); if (!DB.voice) { try { speechSynthesis.cancel(); } catch (e) {} } });
+$("pAuto").addEventListener("click", function () { DB.auto = !DB.auto; saveDB(); syncToggles(); });
+$("cBack").addEventListener("click", function () { go("home"); });
+$("cMe").addEventListener("change", function (e) { DB.me = e.target.value; saveDB(); renderChips(); setPhase(S.phase); });
+$("cOther").addEventListener("change", function (e) { DB.other = e.target.value; saveDB(); setPhase(S.phase); });
+$("cSwap").addEventListener("click", function () {
+  var t = DB.me; DB.me = DB.other; DB.other = t; saveDB();
+  $("cMe").value = DB.me; $("cOther").value = DB.other; renderChips(); setPhase(S.phase);
+});
+function setTurn(t) { if (S.phase !== "idle") cancelAll(); S.turn = t; S.manual = true; renderTurn(); setPhase("idle"); }
+$("tMe").addEventListener("click", function () { setTurn("me"); });
+$("tOther").addEventListener("click", function () { setTurn("other"); });
+function renderTurn() {
+  $("tMe").setAttribute("aria-checked", String(S.turn === "me"));
+  $("tOther").setAttribute("aria-checked", String(S.turn === "other"));
 }
 
-function startMeter() {
-  if (!S.ctx) S.ctx = new (window.AudioContext || window.webkitAudioContext)();
-  if (S.ctx.state === "suspended") S.ctx.resume();
-  const src = S.ctx.createMediaStreamSource(S.stream);
-  const an = S.ctx.createAnalyser(); an.fftSize = 1024;
-  src.connect(an); S.srcNode = src;
-  const buf = new Uint8Array(an.fftSize);
-  let floor = 0, silentSince = null; const t0 = performance.now();
-  S.heard = false;
-  S.meter = setInterval(() => {
-    an.getByteTimeDomainData(buf);
-    let sum = 0; for (let i = 0; i < buf.length; i++) { const x = (buf[i] - 128) / 128; sum += x * x; }
-    const rms = Math.sqrt(sum / buf.length);
-    $("ring").style.setProperty("--lvl", Math.min(1, rms * 6).toFixed(2));
-    const t = performance.now() - t0;
-    if (t < 400) { floor = Math.max(floor, rms); return; }
-    const thr = Math.min(0.12, Math.max(0.03, floor * 2.5));
-    if (rms > thr) { S.heard = true; silentSince = null; }
-    else if (S.heard) { if (silentSince === null) silentSince = t; if (S.continuous && t - silentSince > 1400) stopListening(); }
-    else if (S.continuous && t > 15000) { S.discard = true; stopListening(); }
-    if (t > 45000) stopListening();
-  }, 100);
-}
-
-function stopListening() {
-  if (S.sr) { try { S.sr.stop(); } catch (e) {} return; }
-  if (S.rec && S.rec.state === "recording") S.rec.stop();
-}
-
-/* ---------- Modo prueba: dictado del navegador + traducción gratuita + voz del teléfono ---------- */
-const LOCALES = {
-  es: "es-AR", en: "en-US", pt: "pt-BR", fr: "fr-FR", it: "it-IT", de: "de-DE", nl: "nl-NL",
-  ru: "ru-RU", tr: "tr-TR", ar: "ar-SA", hi: "hi-IN", ja: "ja-JP", ko: "ko-KR", zh: "zh-CN"
-};
-
-function startListeningBrowser() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return setStatus("Este navegador no tiene dictado. Abrí la app en Safari.", true);
-  const run = ++S.run;
-  const lang = S.speaker === "me" ? S.me : S.other;
-  const sr = new SR();
-  sr.lang = LOCALES[lang] || lang;
-  sr.interimResults = true; sr.continuous = false; sr.maxAlternatives = 1;
-  let fin = "", part = "", err = "";
-  S.sr = sr; S.discard = false;
-  setPhase("listening");
-  sr.onresult = (e) => {
-    let f = "", p = "";
-    for (let i = 0; i < e.results.length; i++) {
-      const r = e.results[i];
-      if (r.isFinal) f += r[0].transcript; else p += r[0].transcript;
-    }
-    fin = f; part = p;
-    if (run === S.run) setStatus("Escuché: " + (f + p));
-  };
-  sr.onerror = (e) => { err = e.error || "error"; };
-  sr.onend = () => {
-    if (S.sr === sr) S.sr = null;
-    if (run !== S.run) return;
-    const text = (fin || part).trim();
-    if (text) return processText(text, run);
-    setPhase("idle");
-    if (err === "not-allowed" || err === "service-not-allowed") {
-      return setStatus("Sin permiso. Activá el micrófono para Safari y el dictado en Ajustes > General > Teclado.", true);
-    }
-    if (err && err !== "no-speech" && err !== "aborted") return setStatus("No se pudo escuchar (" + err + "). Probá de nuevo.", true);
-    setStatus("No se escuchó nada. Probá de nuevo.", true);
-    if (S.continuous && (!err || err === "no-speech")) setTimeout(() => { if (run === S.run && S.phase === "idle" && S.continuous) startListening(); }, 400);
-  };
-  try { sr.start(); }
-  catch (e) { S.sr = null; setPhase("idle"); setStatus("No se pudo iniciar el micrófono. Probá de nuevo.", true); }
-}
-
-async function translateFree(text, from, to) {
-  if (from === to) return text;
-  const code = (c) => (c === "zh" ? "zh-CN" : c);
-  const url = "https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) +
-    "&langpair=" + code(from) + "|" + code(to);
-  let res;
-  try { res = await fetch(url); } catch (e) { throw new ApiError(0, "network"); }
-  if (!res.ok) throw new ApiError(res.status, "translate");
-  const data = await res.json();
-  const out = data && data.responseData && data.responseData.translatedText;
-  if (!out || (data.responseStatus && Number(data.responseStatus) !== 200)) {
-    throw new ApiError(Number(data && data.responseStatus) || 500, "translate");
-  }
-  return out;
-}
-
-async function processText(text, run) {
-  const alive = () => run === S.run;
-  setPhase("working");
-  const spk = S.speaker;
-  const from = spk === "me" ? S.me : S.other;
-  const to = spk === "me" ? S.other : S.me;
-  try {
-    const entry = addEntry(spk, text);
-    const translated = await translateFree(text, from, to);
-    if (!alive()) return;
-    entry.setTrans(translated, to);
-    setPhase("speaking");
-    await speakLocal(translated, to, alive);
-  } catch (e) {
-    if (!alive()) return;
-    setStatus(errorText(e), true);
-    return afterTurn(run, true);
-  }
-  afterTurn(run, false);
-}
-
-function onRecStop(run, mime) {
-  const heard = S.heard;
-  const type = (S.rec && S.rec.mimeType) || mime || "audio/mp4";
-  const blob = new Blob(S.chunks, { type });
-  releaseMic();
-  if (run !== S.run) return;
-  if (S.discard || blob.size < 1000) {
-    setPhase("idle");
-    if (S.continuous && !heard && S.discard) setTimeout(() => { if (S.phase === "idle" && S.continuous) startListening(); }, 200);
-    return;
-  }
-  process(blob, run);
-}
-
-/* ---------- Traducción ---------- */
-class ApiError extends Error { constructor(status, detail) { super(detail || "api"); this.status = status; } }
-
-async function api(path, { json, body, type } = {}) {
-  const token = await auth.currentUser.getIdToken();
-  const headers = { Authorization: "Bearer " + token };
-  let payload = body;
-  if (json) { headers["Content-Type"] = "application/json"; payload = JSON.stringify(json); }
-  else if (type) headers["Content-Type"] = type;
-  let res;
-  try { res = await fetch(CONFIG.API_URL + path, { method: "POST", headers, body: payload }); }
-  catch (e) { throw new ApiError(0, "network"); }
-  if (!res.ok) { let d = ""; try { d = (await res.json()).error || ""; } catch (e) {} throw new ApiError(res.status, d); }
-  return res;
-}
-
-function errorText(e) {
-  if (e.status === 401) return "Tu sesión venció. Cerrá sesión y volvé a entrar.";
-  if (e.status === 413) return "El audio es muy largo. Hablá en frases más cortas.";
-  if (e.status === 429) return "Se agotó el uso gratuito por ahora. Probá más tarde.";
-  if (e.status === 0) return "No hay conexión con el servidor. Revisá tu internet.";
-  return "No se pudo traducir. Probá de nuevo.";
-}
-
-async function process(blob, run) {
-  const alive = () => run === S.run;
-  setPhase("working");
-  const spk = S.speaker;
-  const from = spk === "me" ? S.me : S.other;
-  const to = spk === "me" ? S.other : S.me;
-  try {
-    const r1 = await api("/stt?lang=" + from, { body: blob, type: blob.type || "application/octet-stream" });
-    const { text } = await r1.json();
-    if (!alive()) return;
-    if (!text) { setStatus("No se escuchó nada. Probá de nuevo.", true); return afterTurn(run, true); }
-    const entry = addEntry(spk, text);
-    const r2 = await api("/translate", { json: { text, from, to } });
-    const { translated } = await r2.json();
-    if (!alive()) return;
-    entry.setTrans(translated);
-    setPhase("speaking");
-    await speak(translated, to, alive);
-  } catch (e) {
-    if (!alive()) return;
-    setStatus(errorText(e), true);
-    return afterTurn(run, true);
-  }
-  afterTurn(run, false);
-}
-
-function afterTurn(run, failed) {
-  if (run !== S.run) return;
-  const again = S.continuous && !failed;
-  S.phase = "idle"; $("mic").dataset.phase = "idle"; $("micLabel").textContent = LABELS.idle;
-  if (!failed) setStatus(STATUS.idle);
-  if (again) setTimeout(() => { if (run === S.run && S.phase === "idle" && S.continuous) startListening(); }, 350);
-}
-
-async function speak(text, lang, alive) {
-  try {
-    const r = await api("/tts", { json: { text, lang } });
-    const blob = await r.blob();
-    if (!alive()) return;
-    await playBlob(blob);
-  } catch (e) {
-    if (!alive()) return;
-    if (e.status === 401) throw e;
-    setStatus("La voz en la nube no respondió; uso la voz del teléfono.", true);
-    await speakLocal(text, lang);
-  }
-}
-function playBlob(blob) {
-  return new Promise((resolve, reject) => {
-    const p = $("player"); const url = URL.createObjectURL(blob);
-    const done = (fn, v) => { URL.revokeObjectURL(url); p.onended = p.onerror = null; fn(v); };
-    p.onended = () => done(resolve);
-    p.onerror = () => done(reject, new Error("play"));
-    p.src = url;
-    p.play().catch((e) => done(reject, e));
+function renderChips() {
+  var box = $("chips"); box.textContent = "";
+  var lang = PHRASES[DB.me] ? DB.me : "en";
+  PHRASES[lang].forEach(function (t) {
+    var b = el("button", "chip", t); b.type = "button";
+    b.addEventListener("click", function () { unlockAudio(); sendText(t, "me", lang); });
+    box.appendChild(b);
   });
 }
-function pickVoice(lang) {
-  const vs = speechSynthesis.getVoices() || [];
-  const want = (LOCALES[lang] || lang).toLowerCase();
-  const norm = (v) => v.lang.replace("_", "-").toLowerCase();
-  return vs.find((v) => norm(v) === want) || vs.find((v) => norm(v).startsWith(lang)) || null;
+
+/* ---- estado del botón ---- */
+var LABELS = { idle: "Hablar", listening: "Detener", working: "Traduciendo", speaking: "Parar" };
+function setPhase(p) {
+  S.phase = p;
+  var m = $("mic"); m.setAttribute("data-phase", p);
+  $("micLabel").textContent = LABELS[p];
+  m.setAttribute("aria-label", LABELS[p]);
+  var lang = langName(S.turn === "me" ? DB.me : DB.other);
+  var who = S.turn === "me" ? "vos" : "la otra persona";
+  var txt = {
+    idle: "Habla " + who + " en " + lang + ". Tocá Hablar.",
+    listening: "Escuchando en " + lang + "…",
+    working: "Traduciendo…",
+    speaking: "Reproduciendo…"
+  }[p];
+  setStatus(txt);
+  if (p !== "listening") $("ring").style.setProperty("--lvl", 0);
 }
-function speakLocal(text, lang, alive) {
-  return new Promise((resolve) => {
-    let done = false;
-    const finish = () => { if (!done) { done = true; clearTimeout(guard); resolve(); } };
-    const guard = setTimeout(finish, Math.max(5000, text.length * 140));
+function setStatus(t, err) { var s = $("status"); s.textContent = t; s.classList.toggle("err", !!err); }
+
+/* ---- audio ---- */
+function unlockAudio() {
+  try { var u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+  S.unlocked = true;
+}
+try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function () {}; } catch (e) {}
+
+function pickVoice(lang) {
+  var vs = []; try { vs = speechSynthesis.getVoices() || []; } catch (e) {}
+  var want = (LOCALES[lang] || lang).toLowerCase();
+  var norm = function (v) { return v.lang.replace("_", "-").toLowerCase(); };
+  for (var i = 0; i < vs.length; i++) if (norm(vs[i]) === want) return vs[i];
+  for (var j = 0; j < vs.length; j++) if (norm(vs[j]).indexOf(lang) === 0) return vs[j];
+  return null;
+}
+function speak(text, lang) {
+  return new Promise(function (resolve) {
+    var done = false, guard;
+    function finish() { if (!done) { done = true; clearTimeout(guard); resolve(); } }
+    guard = setTimeout(finish, Math.max(5000, text.length * 140));
     try {
       speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
+      var u = new SpeechSynthesisUtterance(text);
       u.lang = LOCALES[lang] || lang;
-      const v = pickVoice(lang); if (v) u.voice = v;
+      var v = pickVoice(lang); if (v) u.voice = v;
       u.volume = 1; u.rate = 1;
-      u.onend = u.onerror = finish;
+      u.onend = finish; u.onerror = finish;
       speechSynthesis.resume();
       speechSynthesis.speak(u);
     } catch (e) { finish(); }
   });
 }
 
-/* ---------- Conversación en pantalla ---------- */
-function addEntry(spk, orig) {
-  const empty = $("empty"); if (empty) empty.remove();
-  const li = document.createElement("li");
-  li.className = "msg " + (spk === "me" ? "me" : "other");
-  const o = document.createElement("div"); o.className = "orig"; o.textContent = orig;
-  const t = document.createElement("div"); t.className = "trans wait"; t.textContent = "Traduciendo…";
-  li.append(o, t);
-  const log = $("log"); log.appendChild(li); log.scrollTop = log.scrollHeight;
-  return {
-    setTrans(txt, lang) {
-      t.className = "trans"; t.textContent = txt;
-      if (lang) {
-        const b = document.createElement("button");
-        b.type = "button"; b.className = "replay"; b.textContent = "Escuchar de nuevo";
-        b.addEventListener("click", () => { unlockAudio(); speakLocal(txt, lang); });
-        li.appendChild(b);
-      }
-      log.scrollTop = log.scrollHeight;
-    }
-  };
+/* ---- botón principal ---- */
+$("mic").addEventListener("click", function () {
+  unlockAudio();
+  if (S.phase === "idle") listen();
+  else if (S.phase === "listening") { if (S.sr) { try { S.sr.stop(); } catch (e) {} } }
+  else cancelAll();
+});
+
+function cancelAll() {
+  S.run++;
+  try { if (S.sr) { var sr = S.sr; S.sr = null; sr.abort(); } } catch (e) {}
+  try { speechSynthesis.cancel(); } catch (e) {}
+  if (current === "convo") setPhase("idle");
 }
 
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+/* ---- escuchar ---- */
+function listen() {
+  if (S.phase !== "idle") return;
+  if (!SR_CLASS) { setStatus("Este navegador no tiene dictado. Abrí la app desde Safari o escribí tu mensaje.", true); return; }
+  var run = ++S.run;
+  var who = S.turn;
+  var lang = who === "me" ? DB.me : DB.other;
+  var sr = new SR_CLASS();
+  sr.lang = LOCALES[lang] || lang;
+  sr.interimResults = true; sr.continuous = false; sr.maxAlternatives = 1;
+  var fin = "", part = "", err = "";
+  S.sr = sr;
+  setPhase("listening");
+  sr.onresult = function (e) {
+    var f = "", p = "";
+    for (var i = 0; i < e.results.length; i++) { var r = e.results[i]; if (r.isFinal) f += r[0].transcript; else p += r[0].transcript; }
+    fin = f; part = p;
+    if (run === S.run) setStatus("Escuché: " + (f + p));
+  };
+  sr.onerror = function (e) { err = e.error || "error"; };
+  sr.onend = function () {
+    if (S.sr === sr) S.sr = null;
+    if (run !== S.run) return;
+    var text = (fin || part).trim();
+    if (text) { S.silent = 0; sendText(text, who, lang, run); return; }
+    setPhase("idle");
+    if (err === "not-allowed" || err === "service-not-allowed") {
+      setStatus("Sin permiso para el dictado. Activá el micrófono para Safari y el dictado en Ajustes > General > Teclado.", true); return;
+    }
+    if (err && err !== "no-speech" && err !== "aborted") { setStatus("No se pudo escuchar (" + err + "). Probá de nuevo.", true); return; }
+    S.silent++;
+    if (DB.auto && S.silent < 3) { setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(); }, 300); return; }
+    S.silent = 0;
+    setStatus("No se escuchó nada. Tocá Hablar para seguir.", true);
+  };
+  try { sr.start(); }
+  catch (e) { S.sr = null; setPhase("idle"); setStatus("No se pudo iniciar el micrófono. Probá de nuevo.", true); }
+}
+
+/* ---- traducir ---- */
+function ApiError(status, detail) { this.status = status; this.detail = detail; }
+function decodeEntities(s) { var t = document.createElement("textarea"); t.innerHTML = s; return t.value; }
+function translate(text, from, to) {
+  if (from === to) return Promise.resolve(text);
+  var code = function (c) { return c === "zh" ? "zh-CN" : c; };
+  var url = "https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=" + code(from) + "|" + code(to);
+  return fetch(url).catch(function () { throw new ApiError(0, "network"); }).then(function (res) {
+    if (!res.ok) throw new ApiError(res.status, "http");
+    return res.json();
+  }).then(function (d) {
+    var out = d && d.responseData && d.responseData.translatedText;
+    if (!out) throw new ApiError(500, "empty");
+    if (/MYMEMORY WARNING/i.test(out) || Number(d.responseStatus) === 429) throw new ApiError(429, "quota");
+    if (d.responseStatus && Number(d.responseStatus) !== 200) throw new ApiError(Number(d.responseStatus), "bad");
+    return decodeEntities(out);
+  });
+}
+function errText(e) {
+  if (e && e.status === 0) return "Sin conexión. Revisá tu internet e intentá de nuevo.";
+  if (e && e.status === 429) return "Se agotó la traducción gratuita por hoy. Probá más tarde.";
+  return "No se pudo traducir. Probá de nuevo.";
+}
+
+/* ---- mensajes ---- */
+function buildMsg(m) {
+  var li = el("li", "msg " + (m.who === "me" ? "mine" : "theirs"));
+  li.appendChild(el("div", "who", (m.who === "me" ? "Vos" : "Otra persona") + " · " + langTag(m.from) + " → " + langTag(m.to)));
+  var o = el("div", "orig", m.orig); o.lang = m.from; li.appendChild(o);
+  var t = el("div", "trans wait", "Traduciendo…"); li.appendChild(t);
+  var api = {
+    li: li,
+    set: function (tr) {
+      t.className = "trans"; t.textContent = tr; t.lang = m.to;
+      if (!li.querySelector(".replay")) {
+        var b = el("button", "replay", "Escuchar de nuevo"); b.type = "button";
+        b.setAttribute("aria-label", "Escuchar de nuevo: " + tr);
+        b.addEventListener("click", function () { unlockAudio(); speak(tr, m.to); });
+        li.appendChild(b);
+      }
+    },
+    fail: function () { t.className = "trans wait"; t.textContent = "No se pudo traducir"; }
+  };
+  if (m.trans) api.set(m.trans);
+  return api;
+}
+function pushMsg(m) {
+  var log = $("log"); var empty = log.querySelector(".empty"); if (empty) empty.remove();
+  var api = buildMsg(m); var baseSet = api.set;
+  api.set = function (tr) { baseSet(tr); log.scrollTop = log.scrollHeight; };
+  log.appendChild(api.li); log.scrollTop = log.scrollHeight; return api;
+}
+function ensureConvo() {
+  if (!S.convo) {
+    S.convo = { id: Date.now(), ts: Date.now(), me: DB.me, other: DB.other, items: [] };
+    DB.history.unshift(S.convo);
+    if (DB.history.length > 50) DB.history.length = 50;
+  }
+  return S.convo;
+}
+
+function sendText(text, who, fromLang, existingRun) {
+  var run = existingRun || ++S.run;
+  if (!existingRun && S.phase !== "idle") { try { speechSynthesis.cancel(); } catch (e) {} }
+  if (!existingRun) { try { if (S.sr) { var sr = S.sr; S.sr = null; sr.abort(); } } catch (e) {} }
+  S.turn = who; S.manual = false; renderTurn();
+  var alive = function () { return run === S.run && current === "convo"; };
+  var from = fromLang || (who === "me" ? DB.me : DB.other);
+  var to = who === "me" ? DB.other : DB.me;
+  setPhase("working");
+  var msg = { who: who, from: from, to: to, orig: text, ts: Date.now() };
+  var entry = pushMsg(msg);
+  translate(text, from, to).then(function (tr) {
+    if (!alive()) return;
+    msg.trans = tr; entry.set(tr);
+    ensureConvo().items.push(msg); saveDB();
+    S.turn = who === "me" ? "other" : "me"; renderTurn();
+    if (DB.voice) { setPhase("speaking"); return speak(tr, to); }
+  }).then(function () {
+    if (!alive()) return;
+    setPhase("idle");
+    if (DB.auto) setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(); }, DB.voice ? 450 : 900);
+  }).catch(function (e) {
+    if (!alive()) return;
+    entry.fail(); setPhase("idle"); setStatus(errText(e), true);
+  });
+}
+
+$("composer").addEventListener("submit", function (e) {
+  e.preventDefault(); unlockAudio();
+  var t = $("typed").value.trim(); if (!t) return;
+  $("typed").value = "";
+  // Lo escrito sale siempre como "yo", salvo que hayas tocado "Habla la otra persona" a propósito
+  var who = S.manual ? S.turn : "me";
+  S.manual = false;
+  sendText(t, who);
+});
+
+/* ====================== Historial ====================== */
+function renderHistory() {
+  var box = $("hList"); box.textContent = "";
+  var list = DB.history.filter(function (c) { return c.items && c.items.length; });
+  if (!list.length) box.appendChild(el("p", "empty-note", "Todavía no hay conversaciones guardadas."));
+  list.forEach(function (c) { box.appendChild(convoRow(c)); });
+  $("hClear").hidden = !list.length;
+}
+$("hClear").addEventListener("click", function () {
+  if (confirm("¿Borrar todo el historial?")) { DB.history = []; saveDB(); renderHistory(); }
+});
+var viewId = null;
+function openView(id) {
+  var c = DB.history.filter(function (x) { return x.id === id; })[0]; if (!c) return;
+  viewId = id;
+  $("vTitle").textContent = fmtDate(c.ts);
+  var log = $("vLog"); log.textContent = "";
+  c.items.forEach(function (m) { log.appendChild(buildMsg(m).li); });
+  go("view");
+  $("vTitle").textContent = fmtDate(c.ts);
+}
+$("vBack").addEventListener("click", function () { go("history"); });
+$("vDel").addEventListener("click", function () {
+  if (!confirm("¿Borrar esta conversación?")) return;
+  DB.history = DB.history.filter(function (x) { return x.id !== viewId; }); saveDB(); go("history");
+});
+
+/* ====================== Ajustes ====================== */
+function renderSettings() {
+  $("aName").value = DB.name; fillSelect($("aMe"), DB.me); fillSelect($("aOther"), DB.other);
+  $("aVoice").checked = DB.voice; $("aAuto").checked = DB.auto; $("aContrast").checked = DB.contrast;
+  Array.prototype.forEach.call(document.querySelectorAll(".sizes button"), function (b) {
+    b.setAttribute("aria-pressed", String(Number(b.getAttribute("data-size")) === DB.size));
+  });
+}
+$("aName").addEventListener("input", function (e) { DB.name = e.target.value.trim(); saveDB(); });
+$("aMe").addEventListener("change", function (e) { DB.me = e.target.value; saveDB(); });
+$("aOther").addEventListener("change", function (e) { DB.other = e.target.value; saveDB(); });
+$("aVoice").addEventListener("change", function (e) { DB.voice = e.target.checked; saveDB(); });
+$("aAuto").addEventListener("change", function (e) { DB.auto = e.target.checked; saveDB(); });
+$("aContrast").addEventListener("change", function (e) { DB.contrast = e.target.checked; saveDB(); applyPrefs(); });
+Array.prototype.forEach.call(document.querySelectorAll(".sizes button"), function (b) {
+  b.addEventListener("click", function () { DB.size = Number(b.getAttribute("data-size")); saveDB(); applyPrefs(); renderSettings(); });
+});
+$("aWelcome").addEventListener("click", function () { go("welcome"); });
+$("aWipe").addEventListener("click", function () {
+  if (!confirm("Se van a borrar tu perfil, tus ajustes y todas tus conversaciones de este teléfono. ¿Seguro?")) return;
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+});
+
+/* ====================== Arranque ====================== */
+applyPrefs();
+if (location.protocol !== "https:" && location.hostname !== "localhost") $("fileWarn").hidden = false;
+setTimeout(function () { go(DB.onboarded ? "home" : "welcome"); }, 1100);
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
+
+})();
 </script>
 </body>
 </html>
