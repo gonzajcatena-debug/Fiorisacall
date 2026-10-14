@@ -265,6 +265,7 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
       <label class="field" style="margin:0"><span>Yo hablo</span><select id="hMe"></select></label>
       <label class="field" style="margin:0"><span>La otra persona</span><select id="hOther"></select></label>
     </div>
+    <p id="hNote" class="note" style="margin:0 0 18px" hidden>Estás usando la traducción básica gratuita, que a veces se equivoca. En Perfil podés conectar la traducción mejorada.</p>
     <h2 class="sec">Últimas conversaciones</h2>
     <div id="hRecent"></div>
   </div>
@@ -363,6 +364,13 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
       <label class="tg"><span>Alto contraste<small>Fondo negro y letras claras.</small></span><input id="aContrast" type="checkbox"></label>
     </div>
     <div class="card">
+      <h2>Traducción mejorada</h2>
+      <p class="lead" style="font-size:.9rem;margin-bottom:10px">Pegá acá la dirección de tu servidor de Cloudflare. Si la dejás vacía, se usa la traducción básica gratuita, que a veces se equivoca.</p>
+      <label class="field"><span>Dirección del servidor</span><input id="aApi" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://fiorisacall.tunombre.workers.dev"></label>
+      <button id="aApiTest" class="btn ghost" type="button">Guardar y probar conexión</button>
+      <p id="aApiMsg" class="status-msg" role="status"></p>
+    </div>
+    <div class="card">
       <h2>Datos</h2>
       <div class="stack">
         <button id="aWelcome" class="btn ghost" type="button">Ver la bienvenida de nuevo</button>
@@ -435,7 +443,7 @@ var ICONS = {
 };
 
 var KEY = "fc:v2";
-var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, history:[] };
+var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", history:[] };
 var DB = loadDB();
 
 function loadDB() {
@@ -555,6 +563,7 @@ function convoRow(c) {
 function renderHome() {
   $("hello").textContent = DB.name ? "Hola, " + DB.name : "Hola";
   fillSelect($("hMe"), DB.me); fillSelect($("hOther"), DB.other);
+  $("hNote").hidden = !!DB.api;
   var box = $("hRecent"); box.textContent = "";
   var list = DB.history.filter(function (c) { return c.items && c.items.length; }).slice(0, 3);
   if (!list.length) box.appendChild(el("p", "empty-note", "Todavía no hay conversaciones. Tocá Nueva conversación para empezar."));
@@ -738,6 +747,23 @@ function ApiError(status, detail) { this.status = status; this.detail = detail; 
 function decodeEntities(s) { var t = document.createElement("textarea"); t.innerHTML = s; return t.value; }
 function translate(text, from, to) {
   if (from === to) return Promise.resolve(text);
+  return DB.api ? translateCloud(text, from, to) : translateFree(text, from, to);
+}
+/* Traducción mejorada: tu servidor de Cloudflare (Workers AI) */
+function translateCloud(text, from, to) {
+  return fetch(DB.api + "/translate", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: text, from: from, to: to })
+  }).catch(function () { throw new ApiError(0, "network"); }).then(function (res) {
+    if (!res.ok) throw new ApiError(res.status, "cloud");
+    return res.json();
+  }).then(function (d) {
+    if (!d || !d.translated) throw new ApiError(502, "cloud");
+    return d.translated;
+  });
+}
+/* Traducción básica gratuita (MyMemory): a veces se equivoca */
+function translateFree(text, from, to) {
   var code = function (c) { return c === "zh" ? "zh-CN" : c; };
   var url = "https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=" + code(from) + "|" + code(to);
   return fetch(url).catch(function () { throw new ApiError(0, "network"); }).then(function (res) {
@@ -754,6 +780,10 @@ function translate(text, from, to) {
 function errText(e) {
   if (e && e.status === 0) return "Sin conexión. Revisá tu internet e intentá de nuevo.";
   if (e && e.status === 429) return "Se agotó la traducción gratuita por hoy. Probá más tarde.";
+  if (e && e.detail === "cloud") {
+    if (e.status === 403) return "El servidor de traducción no autoriza este sitio. Revisá la configuración del servidor.";
+    return "Falló la traducción mejorada. Puede haberse agotado el uso gratuito de hoy. Probá de nuevo más tarde.";
+  }
   return "No se pudo traducir. Probá de nuevo.";
 }
 
@@ -872,6 +902,7 @@ $("vDel").addEventListener("click", function () {
 function renderSettings() {
   $("aName").value = DB.name; fillSelect($("aMe"), DB.me); fillSelect($("aOther"), DB.other);
   $("aVoice").checked = DB.voice; $("aAuto").checked = DB.auto; $("aContrast").checked = DB.contrast;
+  $("aApi").value = DB.api; $("aApiMsg").textContent = ""; $("aApiMsg").classList.remove("err");
   Array.prototype.forEach.call(document.querySelectorAll(".sizes button"), function (b) {
     b.setAttribute("aria-pressed", String(Number(b.getAttribute("data-size")) === DB.size));
   });
@@ -884,6 +915,32 @@ $("aAuto").addEventListener("change", function (e) { DB.auto = e.target.checked;
 $("aContrast").addEventListener("change", function (e) { DB.contrast = e.target.checked; saveDB(); applyPrefs(); });
 Array.prototype.forEach.call(document.querySelectorAll(".sizes button"), function (b) {
   b.addEventListener("click", function () { DB.size = Number(b.getAttribute("data-size")); saveDB(); applyPrefs(); renderSettings(); });
+});
+/* Servidor de traducción mejorada */
+function apiMsg(t, err) { var m = $("aApiMsg"); m.textContent = t; m.classList.toggle("err", !!err); }
+function saveApi() {
+  var v = $("aApi").value.trim().replace(/\/+$/, "");
+  if (v && !/^https:\/\/[^\s\/]+\.[^\s\/]+/i.test(v)) { apiMsg("La dirección tiene que empezar con https:// y ser algo como https://fiorisacall.tunombre.workers.dev", true); return false; }
+  DB.api = v; saveDB(); $("aApi").value = v; return true;
+}
+$("aApi").addEventListener("change", function () { if (saveApi()) apiMsg(DB.api ? "Guardado. Tocá Guardar y probar conexión para verificar." : "Sin servidor: se usa la traducción básica gratuita."); });
+$("aApiTest").addEventListener("click", function () {
+  if (!saveApi()) return;
+  if (!DB.api) { apiMsg("Sin servidor: se usa la traducción básica gratuita."); return; }
+  apiMsg("Probando…");
+  fetch(DB.api + "/health").then(function (r) { return r.json(); }).catch(function () {
+    throw new ApiError(0, "network");
+  }).then(function (h) {
+    if (!h || !h.ok) throw new ApiError(500, "health");
+    if (!h.ai) { apiMsg("El servidor responde, pero le falta conectar Workers AI (el nombre tiene que ser AI).", true); return null; }
+    return translateCloud("Good morning, how are you?", "en", "es").then(function (t) {
+      apiMsg("Funciona. Prueba: Good morning, how are you? → " + t);
+    });
+  }).catch(function (e) {
+    if (e && e.detail === "cloud" && e.status === 403) apiMsg("El servidor no autoriza este sitio. Revisá que el código tenga la dirección correcta de GitHub Pages.", true);
+    else if (e && e.detail === "cloud") apiMsg("El servidor respondió con un error. Puede haberse agotado el uso gratuito de hoy, o falta conectar Workers AI.", true);
+    else apiMsg("No se pudo conectar. Revisá que la dirección esté bien escrita y que tengas internet.", true);
+  });
 });
 $("aWelcome").addEventListener("click", function () { go("welcome"); });
 $("aWipe").addEventListener("click", function () {
