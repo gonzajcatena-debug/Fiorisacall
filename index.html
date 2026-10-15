@@ -163,6 +163,20 @@ nav.tabs svg{width:24px;height:24px}
 nav.tabs button[aria-selected="true"]{color:var(--accent)}
 
 @media (prefers-reduced-motion:reduce){.ring{transition:none}}
+
+/* foto */
+.ctas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 14px}
+.ctas .cta{flex-direction:column;align-items:flex-start;gap:10px;margin:0;padding:18px 14px}
+.ctas .cta svg{width:36px;height:36px}
+.ctas .cta strong{font-size:1.1rem}
+.ctas .cta span{font-size:.85rem}
+.cta.alt{background:var(--dark);color:var(--on-dark)}
+body.hc .cta.alt{border:2px solid #FFE600}
+.top .beta{font-size:.72rem;border:1.5px solid currentColor;border-radius:99px;padding:2px 9px;letter-spacing:.04em}
+.pimg{display:block;width:100%;max-height:240px;object-fit:contain;border-radius:14px;margin:12px 0;background:#0001}
+textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);padding:12px 14px;font:inherit;font-size:1rem;color:inherit;resize:vertical}
+.pout{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;margin:12px 0;font-size:calc(1.1rem*var(--ts));line-height:1.45;white-space:pre-wrap}
+.pbtns{display:grid;gap:10px;margin:12px 0}
 </style>
 </head>
 <body>
@@ -257,11 +271,18 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
   <div class="body">
     <p id="hello" class="hello"></p>
     <p class="lead" style="margin-bottom:0">¿Con quién hablamos hoy?</p>
-    <button id="newConvo" class="cta" type="button">
-      <svg aria-hidden="true"><use href="#i-mic"/></svg>
-      <div><strong>Nueva conversación</strong><span>Hablá y se traduce en vivo</span></div>
-    </button>
-    <button id="demoConvo" class="btn ghost" type="button" style="margin:10px 0 14px;width:100%">▶ Probar demo interactiva (sin micrófono)</button>
+    <div class="ctas">
+      <button id="newConvo" class="cta" type="button">
+        <svg aria-hidden="true"><use href="#i-mic"/></svg>
+        <div><strong>Nueva conversación</strong><span>Hablá y se traduce en vivo</span></div>
+      </button>
+      <button id="photoGo" class="cta alt" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>
+        <div><strong>Traducir una foto</strong><span>Beta · en desarrollo</span></div>
+      </button>
+    </div>
+    <button id="tourGo" class="btn primary" type="button" style="margin:0 0 10px;width:100%">🧭 Probar todas las funciones</button>
+    <button id="demoConvo" class="btn ghost" type="button" style="margin:0 0 14px;width:100%">▶ Probar demo interactiva (sin micrófono)</button>
     <div class="pair">
       <label class="field" style="margin:0"><span>Yo hablo</span><select id="hMe"></select></label>
       <label class="field" style="margin:0"><span>La otra persona</span><select id="hOther"></select></label>
@@ -311,6 +332,53 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
       <input id="typed" type="text" enterkeyhint="send" placeholder="O escribí tu mensaje" aria-label="Escribí tu mensaje" maxlength="300">
       <button type="submit">Enviar</button>
     </form>
+  </div>
+</section>
+
+<!-- 7b. Traducir una foto (beta) -->
+<section id="s-photo" class="screen" hidden>
+  <header class="top">
+    <button id="pBack" class="icon-btn" type="button" aria-label="Volver al inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <h1 tabindex="-1">Traducir una foto</h1>
+    <span class="beta">BETA</span>
+  </header>
+  <div class="body">
+    <p class="note">Función en desarrollo. Funciona mejor con letra impresa, derecha y con buena luz. La primera vez descarga el lector de idiomas (varios MB): conviene usar wifi.</p>
+    <div class="pbtns">
+      <button id="pCam" class="btn primary" type="button">Sacar una foto</button>
+      <button id="pGal" class="btn ghost" type="button">Elegir de mis fotos</button>
+      <button id="pDemo" class="btn ghost" type="button">▶ Probar con foto de ejemplo</button>
+    </div>
+    <input id="pFileCam" type="file" accept="image/*" capture="environment" hidden>
+    <input id="pFileGal" type="file" accept="image/*" hidden>
+    <img id="pImg" class="pimg" alt="Foto elegida" hidden>
+    <p id="pStatus" class="status-msg" role="status" aria-live="polite"></p>
+    <div id="pRes" hidden>
+      <p id="pDet" class="lead" style="margin-bottom:10px"></p>
+      <label class="field"><span>Idioma del texto (podés corregirlo)</span><select id="pFrom"></select></label>
+      <label class="field"><span>Texto leído (podés corregirlo)</span><textarea id="pText" class="ptext" aria-label="Texto leído de la foto"></textarea></label>
+      <label class="field"><span>Traducir a</span><select id="pTo"></select></label>
+      <button id="pGo" class="btn primary" type="button">Traducir</button>
+      <div id="pOut" class="pout" aria-live="polite" hidden></div>
+      <button id="pSpeak" class="btn ghost" type="button" hidden>Escuchar la traducción</button>
+    </div>
+  </div>
+</section>
+
+<!-- Recorrido -->
+<section id="s-tour" class="screen" hidden>
+  <header class="top">
+    <button id="tBack" class="icon-btn" type="button" aria-label="Volver al inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <h1 tabindex="-1">Probar todas las funciones</h1>
+  </header>
+  <div class="body">
+    <p class="lead">Tocá cada paso para probarlo como si fuera la primera vez. Todo en modo demo, sin micrófono ni cámara.</p>
+    <div id="tList"></div>
+    <button id="tReset" class="btn ghost" type="button" style="margin-top:8px">Empezar de nuevo (tildes en cero)</button>
   </div>
 </section>
 
@@ -374,6 +442,7 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
     <div class="card">
       <h2>Datos</h2>
       <div class="stack">
+        <button id="aTour" class="btn primary" type="button" style="margin-bottom:10px">Volver a probar todas las funciones</button>
         <button id="aWelcome" class="btn ghost" type="button">Ver la bienvenida de nuevo</button>
         <button id="aWipe" class="btn ghost danger" type="button">Borrar todos mis datos</button>
       </div>
@@ -481,12 +550,13 @@ function applyPrefs() {
 }
 
 /* ====================== Navegación ====================== */
-var ROUTES = ["splash","welcome","setup","mic","signin","home","convo","history","view","settings"];
+var ROUTES = ["splash","welcome","setup","mic","signin","home","convo","photo","tour","history","view","settings"];
 var WITH_NAV = { home:1, history:1, settings:1 };
 var current = "splash";
 
 function go(name) {
   if (current === "convo" && name !== "convo") cancelAll();
+  if (current === "photo" && name !== "photo") { try { speechSynthesis.cancel(); } catch (e) {} }
   current = name;
   if (name !== "convo") S.demo = false;
   ROUTES.forEach(function (r) { $("s-" + r).hidden = (r !== name); });
@@ -498,6 +568,8 @@ function go(name) {
   if (name === "setup") renderSetup();
   if (name === "home") renderHome();
   if (name === "convo") initConvo();
+  if (name === "photo") initPhoto();
+  if (name === "tour") renderTour();
   if (name === "history") renderHistory();
   if (name === "settings") renderSettings();
   var h = document.querySelector("#s-" + name + " h1");
@@ -907,6 +979,341 @@ $("composer").addEventListener("submit", function (e) {
   S.manual = false;
   sendText(t, who);
 });
+
+
+/* ====================== Traducir una foto (beta) ====================== */
+var TESS_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+var TESS_LANGPATH = "https://tessdata.projectnaptha.com/4.0.0_fast";
+var LATIN_PACKS = "eng+spa+por+fra+ita+deu+nld+tur";
+var SCRIPT_PACKS = ["rus", "ara", "hin", "jpn", "kor", "chi_sim"];
+var P = { run: 0, tr: "", to: "", demoText: false };
+var SAMPLE_TEXT = "Prohibido fumar.\nSalida de emergencia por la izquierda.";
+var SAMPLE_TR = {
+  en: "No smoking.\nEmergency exit on the left.",
+  pt: "Proibido fumar.\nSaída de emergência pela esquerda.",
+  fr: "Interdit de fumer.\nSortie de secours à gauche.",
+  it: "Vietato fumare.\nUscita di emergenza a sinistra.",
+  de: "Rauchen verboten.\nNotausgang links."
+};
+var STOP = {
+  es: "el la los las de del que y en un una es por con para no se su al lo como más pero sus le ya o este sí porque esta entre cuando muy sin sobre también me hasta hay donde quien desde todo nos durante todos uno les ni contra otros ese eso ante ellos e esto mí antes algunos qué unos yo otro otras otra él tanto esa estos mucho quienes nada muchos cual poco ella estar estas algunas algo nosotros",
+  en: "the of and to in is you that it he was for on are as with his they at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if will up other about out many then them these so some her would make like him into time has look two more write go see number no way could people my than first water been call who oil its now find long down day did get come made may part",
+  pt: "o a os as de do da dos das que e em um uma é por com para não se sua ao como mais mas seu suas já ou este isso porque está entre quando muito sem sobre também me até há onde quem desde tudo nós durante todos uns eles nem contra outros esse ante ela estar são foi tem você",
+  fr: "le la les de des du que et en un une est pour dans qui au avec ne pas sur se son sa ses ce cette il elle nous vous ils elles mais ou où donc car plus par je tu été être avoir fait comme tout aux sont leur leurs très bien aussi entre sans sous",
+  it: "il lo la i gli le di del della dei che e in un una è per con non si su al come più ma suo sua suoi già o questo questa perché sono tra quando molto senza sopra anche mi fino dove chi da tutto noi durante tutti uno loro né contro altri quello essere stato hanno",
+  de: "der die das den dem des und in von zu mit ist ein eine einen einem einer nicht auf für im sich auch es an als nach wie aber aus bei oder wenn noch nur so über um zum zur dass sie er wir ich ihr sind war hat haben wird kann werden vor man durch dieser diese dieses sein",
+  nl: "de het een en van in is dat op te zijn met voor niet aan er ook als maar om bij of uit nog naar wat dan ze die dit zo hij wij ik je u wordt worden heeft hebben kan zal over door tot meer deze geen onder",
+  tr: "ve bir bu da de için ile çok daha olarak gibi ama en var yok ne ben sen o biz siz onlar mi mı mu mü değil kadar sonra önce her şey ya veya çünkü bile hem ki"
+};
+var STOPSET = {};
+Object.keys(STOP).forEach(function (k) { STOPSET[k] = {}; STOP[k].split(" ").forEach(function (w) { STOPSET[k][w] = 1; }); });
+
+function scriptCounts(t) {
+  var c = { latin: 0, cyr: 0, ara: 0, dev: 0, kana: 0, hang: 0, han: 0 };
+  for (var i = 0; i < t.length; i++) {
+    var n = t.charCodeAt(i);
+    if ((n >= 65 && n <= 90) || (n >= 97 && n <= 122) || (n >= 0xC0 && n <= 0x24F)) c.latin++;
+    else if (n >= 0x400 && n <= 0x52F) c.cyr++;
+    else if ((n >= 0x600 && n <= 0x6FF) || (n >= 0x750 && n <= 0x77F)) c.ara++;
+    else if (n >= 0x900 && n <= 0x97F) c.dev++;
+    else if (n >= 0x3040 && n <= 0x30FF) c.kana++;
+    else if ((n >= 0xAC00 && n <= 0xD7AF) || (n >= 0x1100 && n <= 0x11FF)) c.hang++;
+    else if (n >= 0x4E00 && n <= 0x9FFF) c.han++;
+  }
+  c.total = c.latin + c.cyr + c.ara + c.dev + c.kana + c.hang + c.han;
+  return c;
+}
+/* Adivina el idioma de un texto. Devuelve un código de LANGS o null. */
+function detectLang(text) {
+  var t = String(text || ""); var c = scriptCounts(t);
+  if (c.total < 2) return null;
+  if (c.kana > 0 && c.kana + c.han >= c.total * 0.4) return "ja";
+  if (c.hang >= c.total * 0.4) return "ko";
+  if (c.han >= c.total * 0.4) return "zh";
+  if (c.cyr >= c.total * 0.5) return "ru";
+  if (c.ara >= c.total * 0.5) return "ar";
+  if (c.dev >= c.total * 0.5) return "hi";
+  if (c.latin < c.total * 0.5) return null;
+  var words = t.toLowerCase().replace(/[^a-zà-ɏ\s']/g, " ").split(/\s+/).filter(Boolean);
+  var score = {}; Object.keys(STOPSET).forEach(function (k) { score[k] = 0; });
+  words.forEach(function (w) { Object.keys(STOPSET).forEach(function (k) { if (STOPSET[k][w]) score[k]++; }); });
+  var low = t.toLowerCase();
+  if (/[ñ¿¡]/.test(low)) score.es += 3;
+  if (/[ãõ]/.test(low)) score.pt += 3;
+  if (/ç/.test(low)) { score.pt += 1; score.fr += 1; score.tr += 1; }
+  if (/[ß]/.test(low)) score.de += 3;
+  if (/[äöü]/.test(low)) { score.de += 1; score.tr += 1; }
+  if (/[ğşı]/.test(low)) score.tr += 3;
+  if (/[œêèàù]/.test(low)) score.fr += 1;
+  var best = null, bv = 0;
+  Object.keys(score).forEach(function (k) { if (score[k] > bv) { bv = score[k]; best = k; } });
+  return bv >= 1 ? best : null;
+}
+/* Parte un texto largo en pedazos chicos para el traductor */
+function chunkText(text, max) {
+  var paras = text.replace(/\r/g, "").split(/\n{2,}/), out = [];
+  paras.forEach(function (p) {
+    p = p.replace(/\n/g, " ").replace(/\s+/g, " ").trim(); if (!p) return;
+    var sents = p.match(/[^.!?。！？]+[.!?。！？]*\s*/g) || [p], cur = "";
+    sents.forEach(function (s) {
+      while (s.length > max) { if (cur) { out.push(cur.trim()); cur = ""; } out.push(s.slice(0, max)); s = s.slice(max); }
+      if ((cur + s).length > max) { out.push(cur.trim()); cur = s; } else cur += s;
+    });
+    if (cur.trim()) out.push(cur.trim());
+    out.push("\n");
+  });
+  if (out.length && out[out.length - 1] === "\n") out.pop();
+  return out;
+}
+function translateLong(text, from, to) {
+  if (from === to) return Promise.resolve(text);
+  if (P.demoText && text === SAMPLE_TEXT && from === "es" && SAMPLE_TR[to]) return new Promise(function (r) { setTimeout(function () { r(SAMPLE_TR[to]); }, 500); });
+  var parts = chunkText(text, 400), res = [], i = 0;
+  function next() {
+    if (i >= parts.length) return Promise.resolve(res.join("").replace(/ ?\n ?/g, "\n"));
+    var part = parts[i++];
+    if (part === "\n") { res.push("\n\n"); return next(); }
+    return translate(part, from, to).then(function (t) { res.push((res.length && res[res.length - 1].slice(-1) !== "\n" ? " " : "") + t); return next(); });
+  }
+  return next();
+}
+
+window.fcTest = { detectLang: detectLang, chunkText: chunkText };
+function pStatus(t, err) { var s = $("pStatus"); s.textContent = t; s.classList.toggle("err", !!err); }
+function initPhoto() {
+  P.run++; P.demoText = false;
+  fillSelect($("pFrom"), "en"); fillSelect($("pTo"), DB.me);
+  $("pRes").hidden = true; $("pImg").hidden = true; $("pOut").hidden = true; $("pSpeak").hidden = true;
+  $("pText").value = ""; pStatus("");
+  ["pCam", "pGal", "pDemo"].forEach(function (id) { $(id).disabled = false; });
+}
+function loadTess() {
+  if (window.Tesseract) return Promise.resolve();
+  return new Promise(function (res, rej) {
+    var s = document.createElement("script"); s.src = TESS_URL; s.onload = res;
+    s.onerror = function () { rej(new Error("net")); }; document.head.appendChild(s);
+  });
+}
+var TESS = { es:"spa", en:"eng", pt:"por", fr:"fra", it:"ita", de:"deu", nl:"nld", tr:"tur", ru:"rus", ar:"ara", hi:"hin", ja:"jpn", ko:"kor", zh:"chi_sim" };
+function withTimeout(pr, ms) {
+  return new Promise(function (res, rej) {
+    var t = setTimeout(function () { rej(new Error("timeout")); }, ms);
+    pr.then(function (v) { clearTimeout(t); res(v); }, function (e) { clearTimeout(t); rej(e); });
+  });
+}
+function ocrRun(canvas, langs, label) {
+  var names = langs.split("+").map(function (c) { for (var k in TESS) if (TESS[k] === c) return langName(k); return c; }).join(", ");
+  pStatus("Preparando el lector (" + names + ")…");
+  return withTimeout(window.Tesseract.createWorker(langs, 1, {
+    langPath: TESS_LANGPATH,
+    logger: function (m) {
+      if (!m || typeof m.progress !== "number") return;
+      var pct = Math.round(m.progress * 100);
+      if (/loading|language|initializ/i.test(m.status)) pStatus("Descargando el lector de idiomas (" + names + ")" + label + "… " + pct + "%");
+      else if (/recogni/i.test(m.status)) pStatus("Leyendo el texto de la foto" + label + "… " + pct + "%");
+    }
+  }).then(function (w) {
+    return w.recognize(canvas).then(function (r) { return w.terminate().then(function () { return r.data; }); },
+      function (e) { try { w.terminate(); } catch (x) {} throw e; });
+  }), 150000);
+}
+function readPhoto(canvas, run) {
+  var best = null, tried = {};
+  function mark(langs) { langs.split("+").forEach(function (c) { tried[c] = 1; }); }
+  function consider(d) {
+    var txt = String(d.text || "").trim(), c = scriptCounts(txt);
+    var cand = { text: txt, conf: d.confidence || 0, letters: c.total, lang: detectLang(txt) };
+    if (!best || (cand.letters >= 3 && cand.conf > best.conf)) best = cand;
+    return cand;
+  }
+  var first = ["eng"];
+  [DB.me, DB.other].forEach(function (l) { if (TESS[l] && first.indexOf(TESS[l]) < 0) first.push(TESS[l]); });
+  var firstStr = first.join("+"); mark(firstStr);
+  return ocrRun(canvas, firstStr, "").then(function (d) {
+    var c = consider(d);
+    if (c.letters >= 3 && c.lang && !tried[TESS[c.lang]] && c.conf >= 30) {
+      // Se leyó con otros idiomas: repetir con el idioma que se detectó
+      var again = TESS[c.lang] + "+eng"; mark(again);
+      return ocrRun(canvas, again, " (2.ª pasada)").then(function (d2) { consider(d2); return best; }, function () { return best; });
+    }
+    if (c.letters >= 3 && c.conf >= 50) return best;
+    var rest = ["spa", "por", "fra", "ita", "deu", "nld", "tur", "rus", "ara", "hin", "jpn", "kor", "chi_sim"].filter(function (x) { return !tried[x]; });
+    var i = 0;
+    function step() {
+      if (run !== P.run || i >= rest.length) return Promise.resolve(best);
+      var pack = rest[i++]; mark(pack);
+      return ocrRun(canvas, pack, " (" + i + "/" + rest.length + ")").then(function (d2) {
+        var c2 = consider(d2);
+        return (c2.letters >= 3 && c2.conf >= 55) ? best : step();
+      }, function () { return step(); });
+    }
+    return step();
+  });
+}
+function showPhotoResult(text, run) {
+  if (run !== P.run) return;
+  var lang = detectLang(text);
+  $("pRes").hidden = false; $("pText").value = text;
+  if (lang) { fillSelect($("pFrom"), lang); $("pDet").textContent = "Detecté este idioma: " + langTag(lang); }
+  else { fillSelect($("pFrom"), "en"); $("pDet").textContent = "No pude adivinar el idioma. Elegilo abajo."; }
+  var to = $("pTo").value || DB.me;
+  if (lang && lang === to) to = DB.other === lang ? "en" : DB.other;
+  fillSelect($("pTo"), to);
+  pStatus("");
+  doPhotoTranslate();
+}
+function doPhotoTranslate() {
+  var text = $("pText").value.trim(), from = $("pFrom").value, to = $("pTo").value, run = ++P.run;
+  $("pSpeak").hidden = true;
+  if (!text) { pStatus("No hay texto para traducir.", true); return; }
+  pStatus("Traduciendo de " + langName(from) + " a " + langName(to) + "…");
+  $("pGo").disabled = true;
+  translateLong(text, from, to).then(function (tr) {
+    if (run !== P.run) return;
+    P.tr = tr; P.to = to;
+    var o = $("pOut"); o.hidden = false; o.textContent = tr; o.lang = to;
+    $("pSpeak").hidden = false; pStatus(from === to ? "El texto ya está en ese idioma." : "");
+    $("pGo").disabled = false;
+  }).catch(function (e) {
+    if (run !== P.run) return;
+    $("pGo").disabled = false; pStatus(errText(e), true);
+  });
+}
+function loadImageFrom(file) {
+  // Prueba 3 maneras de abrir la foto, por si el navegador no soporta alguna
+  function viaUrl() {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () { res({ src: img, w: img.naturalWidth, h: img.naturalHeight, url: url }); };
+      img.onerror = function () { rej(new Error("img")); };
+      img.src = url;
+    });
+  }
+  function viaReader() {
+    return new Promise(function (res, rej) {
+      var fr = new FileReader();
+      fr.onerror = function () { rej(new Error("img")); };
+      fr.onload = function () {
+        var img = new Image();
+        img.onload = function () { res({ src: img, w: img.naturalWidth, h: img.naturalHeight, url: fr.result }); };
+        img.onerror = function () { rej(new Error("img")); };
+        img.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  function viaBitmap() {
+    if (!window.createImageBitmap) return Promise.reject(new Error("img"));
+    return createImageBitmap(file).then(function (bm) { return { src: bm, w: bm.width, h: bm.height, url: null }; });
+  }
+  return viaUrl().catch(viaReader).catch(viaBitmap);
+}
+function photoToCanvas(file) {
+  return loadImageFrom(file).then(function (im) {
+    var max = 1600, w = im.w, h = im.h, k = Math.min(max / Math.max(w, h), Math.max(1, 1000 / Math.max(w, h)));
+    var cv = document.createElement("canvas"); cv.width = Math.max(1, Math.round(w * k)); cv.height = Math.max(1, Math.round(h * k));
+    var g = cv.getContext("2d");
+    g.drawImage(im.src, 0, 0, cv.width, cv.height);
+    try {
+      var id = g.getImageData(0, 0, cv.width, cv.height), d = id.data;
+      for (var i = 0; i < d.length; i += 4) {
+        var y = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        y = (y - 128) * 1.35 + 128; y = y < 0 ? 0 : y > 255 ? 255 : y;
+        d[i] = d[i + 1] = d[i + 2] = y;
+      }
+      g.putImageData(id, 0, 0);
+    } catch (e) {}
+    $("pImg").src = im.url || cv.toDataURL("image/jpeg", 0.7); $("pImg").hidden = false;
+    return cv;
+  });
+}
+function openManual(msg, detail) {
+  // Si no se pudo leer la foto, se puede escribir o pegar el texto a mano
+  $("pRes").hidden = false; $("pDet").textContent = "Escribí o pegá el texto acá y lo traduzco.";
+  $("pOut").hidden = true; $("pSpeak").hidden = true; $("pText").value = "";
+  fillSelect($("pFrom"), $("pFrom").value || "en");
+  pStatus(msg + (detail ? " (Detalle técnico: " + detail + ")" : ""), true);
+}
+function handlePhotoFile(file) {
+  if (!file) return;
+  var run = ++P.run; P.demoText = false;
+  $("pRes").hidden = true; $("pOut").hidden = true; $("pSpeak").hidden = true;
+  pStatus("Preparando la foto…");
+  ["pCam", "pGal", "pDemo"].forEach(function (id) { $(id).disabled = true; });
+  var free = function () { ["pCam", "pGal", "pDemo"].forEach(function (id) { $(id).disabled = false; }); };
+  photoToCanvas(file).then(function (cv) {
+    pStatus("Cargando el lector de texto…");
+    return withTimeout(loadTess(), 30000).then(function () { return readPhoto(cv, run); });
+  }).then(function (best) {
+    free(); if (run !== P.run) return;
+    if (!best || best.letters < 3) { openManual("No encontré texto en la foto. Probá con más luz, más cerca y derecha, o escribilo vos."); return; }
+    showPhotoResult(best.text, run);
+  }).catch(function (e) {
+    free(); if (run !== P.run) return;
+    var m = e && e.message;
+    var detail = String(m || e).slice(0, 80);
+    if (m === "net") openManual("No se pudo descargar el lector de texto. Revisá tu internet.", detail);
+    else if (m === "timeout") openManual("Tardó demasiado en leer la foto. Probá con wifi o con una foto más chica.", detail);
+    else if (m === "img") openManual("No se pudo abrir esa foto. Probá con otra.", detail);
+    else openManual("No se pudo leer la foto.", detail);
+  });
+}
+function drawSample() {
+  var cv = document.createElement("canvas"); cv.width = 640; cv.height = 300;
+  var g = cv.getContext("2d");
+  g.fillStyle = "#fff"; g.fillRect(0, 0, 640, 300);
+  g.lineWidth = 10; g.strokeStyle = "#c62828"; g.strokeRect(10, 10, 620, 280);
+  g.fillStyle = "#c62828"; g.font = "bold 54px sans-serif"; g.textAlign = "center";
+  g.fillText("Prohibido fumar.", 320, 130);
+  g.fillStyle = "#1b5e20"; g.font = "bold 30px sans-serif";
+  g.fillText("Salida de emergencia por la izquierda.", 320, 210);
+  return cv.toDataURL("image/png");
+}
+$("photoGo").addEventListener("click", function () { go("photo"); });
+$("pBack").addEventListener("click", function () { go("home"); });
+$("pCam").addEventListener("click", function () { $("pFileCam").value = ""; $("pFileCam").click(); });
+$("pGal").addEventListener("click", function () { $("pFileGal").value = ""; $("pFileGal").click(); });
+$("pFileCam").addEventListener("change", function (e) { handlePhotoFile(e.target.files && e.target.files[0]); });
+$("pFileGal").addEventListener("change", function (e) { handlePhotoFile(e.target.files && e.target.files[0]); });
+$("pDemo").addEventListener("click", function () {
+  var run = ++P.run; P.demoText = true; unlockAudio();
+  $("pImg").src = drawSample(); $("pImg").hidden = false;
+  $("pRes").hidden = true; $("pOut").hidden = true; $("pSpeak").hidden = true;
+  pStatus("DEMO: leyendo el texto de la foto de ejemplo…");
+  setTimeout(function () { showPhotoResult(SAMPLE_TEXT, run); }, 900);
+});
+$("pGo").addEventListener("click", function () { unlockAudio(); doPhotoTranslate(); });
+$("pTo").addEventListener("change", function () { if ($("pText").value.trim()) doPhotoTranslate(); });
+$("pSpeak").addEventListener("click", function () {
+  unlockAudio(); var to = P.to, tr = P.tr; if (!tr) return;
+  speak(tr, to).then(function (ok) { if (!ok) pStatus("No se pudo reproducir la voz en " + langName(to) + ". Revisá el volumen y el modo silencio.", true); });
+});
+
+
+/* ====================== Recorrido de todas las funciones ====================== */
+var TOUR_DONE = {};
+var TOUR = [
+  { id: "welcome", t: "1. Bienvenida y perfil", d: "Las pantallas que ve alguien que abre la app por primera vez.", run: function () { go("welcome"); } },
+  { id: "convo", t: "2. Conversación en vivo (demo)", d: "Tocá una frase: se traduce, se escucha y la otra persona responde.", run: function () { $("demoConvo").click(); } },
+  { id: "photo", t: "3. Traducir una foto (demo)", d: "Lee el texto de una foto de ejemplo, detecta el idioma y lo traduce.", run: function () { go("photo"); $("pDemo").click(); } },
+  { id: "history", t: "4. Historial", d: "Tus conversaciones guardadas.", run: function () { go("history"); } },
+  { id: "access", t: "5. Accesibilidad", d: "Texto grande y alto contraste, en Perfil.", run: function () { go("settings"); } },
+  { id: "api", t: "6. Traducción mejorada", d: "Cómo conectar el servidor propio, en Perfil.", run: function () { go("settings"); } }
+];
+function renderTour() {
+  var box = $("tList"); box.textContent = "";
+  TOUR.forEach(function (st) {
+    var b = el("button", "btn ghost", ""); b.type = "button"; b.style.cssText = "justify-content:flex-start;text-align:left;height:auto;padding:14px 16px;margin-bottom:10px;flex-direction:column;align-items:flex-start;gap:4px";
+    b.appendChild(el("strong", "", (TOUR_DONE[st.id] ? "✅ " : "⬜ ") + st.t));
+    b.appendChild(el("span", "", st.d)).style.cssText = "font-weight:400;font-size:.9rem;opacity:.8";
+    b.addEventListener("click", function () { TOUR_DONE[st.id] = true; unlockAudio(); st.run(); });
+    box.appendChild(b);
+  });
+}
+$("tourGo").addEventListener("click", function () { go("tour"); });
+$("aTour").addEventListener("click", function () { go("tour"); });
+$("tBack").addEventListener("click", function () { go("home"); });
+$("tReset").addEventListener("click", function () { TOUR_DONE = {}; renderTour(); });
 
 /* ====================== Historial ====================== */
 function renderHistory() {
