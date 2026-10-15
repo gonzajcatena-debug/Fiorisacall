@@ -345,9 +345,8 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     <span class="beta">BETA</span>
   </header>
   <div class="body">
-    <p class="note">Función en desarrollo. Elegí a qué idioma traducir y sacá la foto. Funciona mejor con letra impresa, derecha y con buena luz. La primera vez descarga el lector (unos MB): conviene usar wifi.</p>
+    <p class="note">Función en desarrollo. Elegí a qué idioma traducir, sacá la foto y listo. Funciona mejor con letra impresa, derecha y con buena luz. La primera vez descarga el lector (unos MB): conviene usar wifi.</p>
     <label class="field"><span>Traducir a</span><select id="pTo"></select></label>
-    <label class="field"><span>Idioma del texto de la foto</span><select id="pSrc"></select></label>
     <div class="pbtns">
       <button id="pCam" class="btn primary" type="button">Sacar una foto</button>
       <button id="pGal" class="btn ghost" type="button">Elegir de mis fotos</button>
@@ -358,11 +357,14 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     <img id="pImg" class="pimg" alt="Foto elegida" hidden>
     <p id="pStatus" class="status-msg" role="status" aria-live="polite"></p>
     <div id="pRes" hidden>
-      <p id="pDet" class="lead" style="margin-bottom:10px"></p>
-      <label class="field"><span>Texto leído (podés corregirlo)</span><textarea id="pText" class="ptext" aria-label="Texto leído de la foto"></textarea></label>
-      <button id="pGo" class="btn primary" type="button">Traducir</button>
       <div id="pOut" class="pout" aria-live="polite" hidden></div>
-      <button id="pSpeak" class="btn ghost" type="button" hidden>Escuchar la traducción</button>
+      <button id="pSpeak" class="btn primary" type="button" hidden>Escuchar la traducción</button>
+      <details class="pfix" style="margin-top:14px">
+        <summary style="cursor:pointer;padding:8px 0;font-weight:600">Ver o corregir el texto leído</summary>
+        <textarea id="pText" class="ptext" aria-label="Texto leído de la foto"></textarea>
+        <button id="pGo" class="btn ghost" type="button" style="margin-top:10px">Traducir de nuevo</button>
+      </details>
+      <p id="pDet" hidden></p>
     </div>
   </div>
 </section>
@@ -1065,6 +1067,14 @@ function chunkText(text, max) {
   if (out.length && out[out.length - 1] === "\n") out.pop();
   return out;
 }
+/* Textos en MAYÚSCULAS se traducen mucho peor: se pasan a minúsculas con la inicial en mayúscula */
+function normCaps(t) {
+  var letters = t.replace(/[^A-Za-zÀ-ÿ]/g, "");
+  if (letters.length < 6) return t;
+  var up = letters.replace(/[^A-ZÀ-Þ]/g, "").length;
+  if (up / letters.length < 0.8) return t;
+  return t.toLowerCase().replace(/(^|[.!?¿¡]\s*)([a-zà-ÿ])/g, function (m, a, b) { return a + b.toUpperCase(); });
+}
 function translateLong(text, from, to) {
   if (from === to) return Promise.resolve(text);
   if (P.demoText && text === SAMPLE_TEXT && from === "es" && SAMPLE_TR[to]) return new Promise(function (r) { setTimeout(function () { r(SAMPLE_TR[to]); }, 500); });
@@ -1073,24 +1083,18 @@ function translateLong(text, from, to) {
     if (i >= parts.length) return Promise.resolve(res.join("").replace(/ ?\n ?/g, "\n"));
     var part = parts[i++];
     if (part === "\n") { res.push("\n\n"); return next(); }
-    return translate(part, from, to).then(function (t) { res.push((res.length && res[res.length - 1].slice(-1) !== "\n" ? " " : "") + t); return next(); });
+    return translate(normCaps(part), from, to).then(function (t) { res.push((res.length && res[res.length - 1].slice(-1) !== "\n" ? " " : "") + t); return next(); });
   }
   return next();
 }
 
 window.fcTest = { detectLang: detectLang, chunkText: chunkText };
-function fillSrc(val) {
-  var sel = $("pSrc"); sel.textContent = "";
-  var o = document.createElement("option"); o.value = "auto"; o.textContent = "Automático (mis idiomas)"; sel.appendChild(o);
-  LANGS.forEach(function (l) { var o2 = document.createElement("option"); o2.value = l[0]; o2.textContent = l[2] + "  " + l[1]; sel.appendChild(o2); });
-  sel.value = val;
-}
-function srcLang(text) { var v = $("pSrc").value; return v !== "auto" ? v : (detectLang(text) || DB.other || "en"); }
+function srcLang(text) { var d = detectLang(text); if (d) P.last = d; return d || P.last || DB.other || "en"; }
 function cleanOcr(d) {
   var lines = [];
   if (d.lines && d.lines.length) d.lines.forEach(function (l) { if ((l.confidence || 0) >= 55) lines.push(l.text); });
   else lines = String(d.text || "").split("\n");
-  return lines.map(function (l) { return l.trim(); }).filter(function (l) {
+  return lines.map(function (l) { return l.replace(/^[^A-Za-z0-9À-ÿ\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF¿¡]+|[^A-Za-z0-9À-ÿ\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF.!?]+$/g, "").trim(); }).filter(function (l) {
     var c = scriptCounts(l), n = l.replace(/\s/g, "").length;
     return c.total >= 3 && c.total / Math.max(1, n) >= 0.6;
   }).join("\n");
@@ -1098,7 +1102,7 @@ function cleanOcr(d) {
 function pStatus(t, err) { var s = $("pStatus"); s.textContent = t; s.classList.toggle("err", !!err); }
 function initPhoto() {
   P.run++; P.demoText = false;
-  fillSelect($("pTo"), DB.me); fillSrc("auto");
+  fillSelect($("pTo"), DB.me);
   $("pRes").hidden = true; $("pImg").hidden = true; $("pOut").hidden = true; $("pSpeak").hidden = true;
   $("pText").value = ""; pStatus("");
   ["pCam", "pGal", "pDemo"].forEach(function (id) { $(id).disabled = false; });
@@ -1134,10 +1138,9 @@ function ocrRun(canvas, langs, label) {
   }), 150000);
 }
 function readPhoto(canvas, run) {
-  // Una sola pasada, sin probar otros idiomas: o el idioma que elegiste, o inglés + tus dos idiomas
-  var src = $("pSrc").value, packs = [];
-  if (src !== "auto" && TESS[src]) packs = [TESS[src]];
-  else { packs = ["eng"]; [DB.me, DB.other].forEach(function (l) { if (TESS[l] && packs.indexOf(TESS[l]) < 0) packs.push(TESS[l]); }); }
+  // Una sola pasada: inglés + tus dos idiomas
+  var packs = ["eng"];
+  [DB.me, DB.other].forEach(function (l) { if (TESS[l] && packs.indexOf(TESS[l]) < 0) packs.push(TESS[l]); });
   return ocrRun(canvas, packs.join("+"), "").then(function (d) {
     var txt = cleanOcr(d), c = scriptCounts(txt);
     return { text: txt, conf: d.confidence || 0, letters: c.total };
@@ -1146,12 +1149,12 @@ function readPhoto(canvas, run) {
 function showPhotoResult(text, run) {
   if (run !== P.run) return;
   $("pRes").hidden = false; $("pText").value = text;
+  var dt = document.querySelector("#pRes details"); if (dt) dt.open = false;
   pStatus("");
   doPhotoTranslate();
 }
 function doPhotoTranslate() {
   var text = $("pText").value.trim(), to = $("pTo").value, from = srcLang(text), run = ++P.run;
-  $("pDet").textContent = "Texto en: " + langTag(from) + "  →  " + langTag(to);
   $("pSpeak").hidden = true;
   if (!text) { pStatus("No hay texto para traducir.", true); return; }
   pStatus("Traduciendo de " + langName(from) + " a " + langName(to) + "…");
@@ -1203,9 +1206,12 @@ function photoToCanvas(file) {
     var g = cv.getContext("2d");
     g.drawImage(im.src, 0, 0, cv.width, cv.height);
     try {
-      var id = g.getImageData(0, 0, cv.width, cv.height), d = id.data;
-      for (var i = 0; i < d.length; i += 4) {
+      var id = g.getImageData(0, 0, cv.width, cv.height), d = id.data, sum = 0, i;
+      for (i = 0; i < d.length; i += 4) { sum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]; }
+      var dark = (sum / (d.length / 4)) < 115;   // fondo oscuro con letras claras: se invierte
+      for (i = 0; i < d.length; i += 4) {
         var y = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        if (dark) y = 255 - y;
         y = (y - 128) * 1.35 + 128; y = y < 0 ? 0 : y > 255 ? 255 : y;
         d[i] = d[i + 1] = d[i + 2] = y;
       }
@@ -1217,7 +1223,7 @@ function photoToCanvas(file) {
 }
 function openManual(msg, detail) {
   // Si no se pudo leer la foto, se puede escribir o pegar el texto a mano
-  $("pRes").hidden = false; $("pDet").textContent = "Escribí o pegá el texto acá y lo traduzco.";
+  $("pRes").hidden = false; var dt = document.querySelector("#pRes details"); if (dt) dt.open = true;
   $("pOut").hidden = true; $("pSpeak").hidden = true; $("pText").value = "";
   pStatus(msg + (detail ? " (Detalle técnico: " + detail + ")" : ""), true);
 }
@@ -1270,7 +1276,6 @@ $("pDemo").addEventListener("click", function () {
   setTimeout(function () { showPhotoResult(SAMPLE_TEXT, run); }, 900);
 });
 $("pGo").addEventListener("click", function () { unlockAudio(); doPhotoTranslate(); });
-$("pSrc").addEventListener("change", function () { if ($("pText").value.trim()) doPhotoTranslate(); });
 $("pTo").addEventListener("change", function () { if ($("pText").value.trim()) doPhotoTranslate(); });
 $("pSpeak").addEventListener("click", function () {
   unlockAudio(); var to = P.to, tr = P.tr; if (!tr) return;
