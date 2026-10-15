@@ -345,7 +345,9 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     <span class="beta">BETA</span>
   </header>
   <div class="body">
-    <p class="note">Función en desarrollo. Funciona mejor con letra impresa, derecha y con buena luz. La primera vez descarga el lector de idiomas (varios MB): conviene usar wifi.</p>
+    <p class="note">Función en desarrollo. Elegí a qué idioma traducir y sacá la foto. Funciona mejor con letra impresa, derecha y con buena luz. La primera vez descarga el lector (unos MB): conviene usar wifi.</p>
+    <label class="field"><span>Traducir a</span><select id="pTo"></select></label>
+    <label class="field"><span>Idioma del texto de la foto</span><select id="pSrc"></select></label>
     <div class="pbtns">
       <button id="pCam" class="btn primary" type="button">Sacar una foto</button>
       <button id="pGal" class="btn ghost" type="button">Elegir de mis fotos</button>
@@ -357,9 +359,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     <p id="pStatus" class="status-msg" role="status" aria-live="polite"></p>
     <div id="pRes" hidden>
       <p id="pDet" class="lead" style="margin-bottom:10px"></p>
-      <label class="field"><span>Idioma del texto (podés corregirlo)</span><select id="pFrom"></select></label>
       <label class="field"><span>Texto leído (podés corregirlo)</span><textarea id="pText" class="ptext" aria-label="Texto leído de la foto"></textarea></label>
-      <label class="field"><span>Traducir a</span><select id="pTo"></select></label>
       <button id="pGo" class="btn primary" type="button">Traducir</button>
       <div id="pOut" class="pout" aria-live="polite" hidden></div>
       <button id="pSpeak" class="btn ghost" type="button" hidden>Escuchar la traducción</button>
@@ -1079,10 +1079,26 @@ function translateLong(text, from, to) {
 }
 
 window.fcTest = { detectLang: detectLang, chunkText: chunkText };
+function fillSrc(val) {
+  var sel = $("pSrc"); sel.textContent = "";
+  var o = document.createElement("option"); o.value = "auto"; o.textContent = "Automático (mis idiomas)"; sel.appendChild(o);
+  LANGS.forEach(function (l) { var o2 = document.createElement("option"); o2.value = l[0]; o2.textContent = l[2] + "  " + l[1]; sel.appendChild(o2); });
+  sel.value = val;
+}
+function srcLang(text) { var v = $("pSrc").value; return v !== "auto" ? v : (detectLang(text) || DB.other || "en"); }
+function cleanOcr(d) {
+  var lines = [];
+  if (d.lines && d.lines.length) d.lines.forEach(function (l) { if ((l.confidence || 0) >= 55) lines.push(l.text); });
+  else lines = String(d.text || "").split("\n");
+  return lines.map(function (l) { return l.trim(); }).filter(function (l) {
+    var c = scriptCounts(l), n = l.replace(/\s/g, "").length;
+    return c.total >= 3 && c.total / Math.max(1, n) >= 0.6;
+  }).join("\n");
+}
 function pStatus(t, err) { var s = $("pStatus"); s.textContent = t; s.classList.toggle("err", !!err); }
 function initPhoto() {
   P.run++; P.demoText = false;
-  fillSelect($("pFrom"), "en"); fillSelect($("pTo"), DB.me);
+  fillSelect($("pTo"), DB.me); fillSrc("auto");
   $("pRes").hidden = true; $("pImg").hidden = true; $("pOut").hidden = true; $("pSpeak").hidden = true;
   $("pText").value = ""; pStatus("");
   ["pCam", "pGal", "pDemo"].forEach(function (id) { $(id).disabled = false; });
@@ -1118,52 +1134,24 @@ function ocrRun(canvas, langs, label) {
   }), 150000);
 }
 function readPhoto(canvas, run) {
-  var best = null, tried = {};
-  function mark(langs) { langs.split("+").forEach(function (c) { tried[c] = 1; }); }
-  function consider(d) {
-    var txt = String(d.text || "").trim(), c = scriptCounts(txt);
-    var cand = { text: txt, conf: d.confidence || 0, letters: c.total, lang: detectLang(txt) };
-    if (!best || (cand.letters >= 3 && cand.conf > best.conf)) best = cand;
-    return cand;
-  }
-  var first = ["eng"];
-  [DB.me, DB.other].forEach(function (l) { if (TESS[l] && first.indexOf(TESS[l]) < 0) first.push(TESS[l]); });
-  var firstStr = first.join("+"); mark(firstStr);
-  return ocrRun(canvas, firstStr, "").then(function (d) {
-    var c = consider(d);
-    if (c.letters >= 3 && c.lang && !tried[TESS[c.lang]] && c.conf >= 30) {
-      // Se leyó con otros idiomas: repetir con el idioma que se detectó
-      var again = TESS[c.lang] + "+eng"; mark(again);
-      return ocrRun(canvas, again, " (2.ª pasada)").then(function (d2) { consider(d2); return best; }, function () { return best; });
-    }
-    if (c.letters >= 3 && c.conf >= 50) return best;
-    var rest = ["spa", "por", "fra", "ita", "deu", "nld", "tur", "rus", "ara", "hin", "jpn", "kor", "chi_sim"].filter(function (x) { return !tried[x]; });
-    var i = 0;
-    function step() {
-      if (run !== P.run || i >= rest.length) return Promise.resolve(best);
-      var pack = rest[i++]; mark(pack);
-      return ocrRun(canvas, pack, " (" + i + "/" + rest.length + ")").then(function (d2) {
-        var c2 = consider(d2);
-        return (c2.letters >= 3 && c2.conf >= 55) ? best : step();
-      }, function () { return step(); });
-    }
-    return step();
+  // Una sola pasada, sin probar otros idiomas: o el idioma que elegiste, o inglés + tus dos idiomas
+  var src = $("pSrc").value, packs = [];
+  if (src !== "auto" && TESS[src]) packs = [TESS[src]];
+  else { packs = ["eng"]; [DB.me, DB.other].forEach(function (l) { if (TESS[l] && packs.indexOf(TESS[l]) < 0) packs.push(TESS[l]); }); }
+  return ocrRun(canvas, packs.join("+"), "").then(function (d) {
+    var txt = cleanOcr(d), c = scriptCounts(txt);
+    return { text: txt, conf: d.confidence || 0, letters: c.total };
   });
 }
 function showPhotoResult(text, run) {
   if (run !== P.run) return;
-  var lang = detectLang(text);
   $("pRes").hidden = false; $("pText").value = text;
-  if (lang) { fillSelect($("pFrom"), lang); $("pDet").textContent = "Detecté este idioma: " + langTag(lang); }
-  else { fillSelect($("pFrom"), "en"); $("pDet").textContent = "No pude adivinar el idioma. Elegilo abajo."; }
-  var to = $("pTo").value || DB.me;
-  if (lang && lang === to) to = DB.other === lang ? "en" : DB.other;
-  fillSelect($("pTo"), to);
   pStatus("");
   doPhotoTranslate();
 }
 function doPhotoTranslate() {
-  var text = $("pText").value.trim(), from = $("pFrom").value, to = $("pTo").value, run = ++P.run;
+  var text = $("pText").value.trim(), to = $("pTo").value, from = srcLang(text), run = ++P.run;
+  $("pDet").textContent = "Texto en: " + langTag(from) + "  →  " + langTag(to);
   $("pSpeak").hidden = true;
   if (!text) { pStatus("No hay texto para traducir.", true); return; }
   pStatus("Traduciendo de " + langName(from) + " a " + langName(to) + "…");
@@ -1231,7 +1219,6 @@ function openManual(msg, detail) {
   // Si no se pudo leer la foto, se puede escribir o pegar el texto a mano
   $("pRes").hidden = false; $("pDet").textContent = "Escribí o pegá el texto acá y lo traduzco.";
   $("pOut").hidden = true; $("pSpeak").hidden = true; $("pText").value = "";
-  fillSelect($("pFrom"), $("pFrom").value || "en");
   pStatus(msg + (detail ? " (Detalle técnico: " + detail + ")" : ""), true);
 }
 function handlePhotoFile(file) {
@@ -1283,6 +1270,7 @@ $("pDemo").addEventListener("click", function () {
   setTimeout(function () { showPhotoResult(SAMPLE_TEXT, run); }, 900);
 });
 $("pGo").addEventListener("click", function () { unlockAudio(); doPhotoTranslate(); });
+$("pSrc").addEventListener("change", function () { if ($("pText").value.trim()) doPhotoTranslate(); });
 $("pTo").addEventListener("change", function () { if ($("pText").value.trim()) doPhotoTranslate(); });
 $("pSpeak").addEventListener("click", function () {
   unlockAudio(); var to = P.to, tr = P.tr; if (!tr) return;
