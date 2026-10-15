@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fiorisacall</title>
+<title>Fiorisacall · Beta 1.1</title>
 <meta name="theme-color" content="#241238">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -172,6 +172,11 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
 .ctas .cta span{font-size:.85rem}
 .cta.alt{background:var(--dark);color:var(--on-dark)}
 body.hc .cta.alt{border:2px solid #FFE600}
+.ver{margin:10px 0 0;font-size:.95rem;font-weight:700;letter-spacing:.12em;opacity:.8}
+.checks{margin:6px 0 0;padding-left:20px;line-height:1.5}
+.checks li{margin:4px 0}
+details.help{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 14px;margin:10px 0}
+details.help summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center}
 .top .beta{font-size:.72rem;border:1.5px solid currentColor;border-radius:99px;padding:2px 9px;letter-spacing:.04em}
 .pimg{display:block;width:100%;max-height:240px;object-fit:contain;border-radius:14px;margin:12px 0;background:#0001}
 textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);padding:12px 14px;font:inherit;font-size:1rem;color:inherit;resize:vertical}
@@ -207,6 +212,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <div class="center">
     <svg class="big" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
+    <p class="ver">Beta 1.1</p>
   </div>
 </section>
 
@@ -248,6 +254,57 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   </div>
 </section>
 
+<!-- 4b. Sonido -->
+<section id="s-sound" class="screen" hidden>
+  <header class="top">
+    <button id="sBack" class="icon-btn" type="button" aria-label="Volver" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <h1 tabindex="-1">Sonido</h1>
+  </header>
+  <div class="body">
+    <p class="lead">Fiorisacall lee las traducciones en voz alta. Subí el volumen y tocá <strong>Probar sonido</strong>.</p>
+    <button id="sTest" class="btn primary" type="button">🔊 Probar sonido</button>
+    <p id="sMsg" class="status-msg" role="status"></p>
+    <div id="sAsk" class="stack" hidden>
+      <p class="lead" style="margin:6px 0">¿Lo escuchaste?</p>
+      <button id="sYes" class="btn primary" type="button">Sí, se escucha</button>
+      <button id="sNo" class="btn ghost" type="button">No se escucha</button>
+    </div>
+    <details class="help" id="sHelp">
+      <summary>Si no se escucha: paso a paso</summary>
+      <p><strong>📱 iPhone</strong></p>
+      <ol class="checks">
+        <li>Sacá el modo silencio: el botón del costado (o el botón de Acción) en modo sonido. Si ves la campanita tachada, está en silencio.</li>
+        <li>Subí el volumen con los botones del costado mientras suena la prueba.</li>
+        <li>Abrí la app en <strong>Safari</strong> (no desde WhatsApp ni Instagram): tocá los tres puntos o el ícono de compartir y elegí <strong>Abrir en Safari</strong>.</li>
+        <li>Si tenés auriculares Bluetooth conectados, el sonido sale por ahí.</li>
+      </ol>
+      <p><strong>🤖 Android</strong></p>
+      <ol class="checks">
+        <li>Abrí la app en <strong>Chrome</strong>.</li>
+        <li>Subí el volumen de <strong>multimedia</strong> (no el del timbre).</li>
+        <li>Si sigue sin sonar: Ajustes del teléfono → Sistema → Idiomas → <strong>Salida de texto a voz</strong>, y elegí el motor de Google.</li>
+      </ol>
+      <p><strong>💻 Computadora</strong></p>
+      <ol class="checks">
+        <li>Usá Chrome, Edge o Safari, y subí el volumen de la compu.</li>
+        <li>Fijate que la pestaña no esté silenciada (clic derecho sobre la pestaña → Activar sonido del sitio).</li>
+        <li>Si usás Linux, la voz del sistema suele no estar instalada: elegí abajo <strong>Voz en la nube</strong>.</li>
+      </ol>
+      <p>Si nada de esto funciona, probá cambiar el tipo de voz:</p>
+    </details>
+    <label class="field"><span>Tipo de voz</span>
+      <select id="sMode">
+        <option value="auto">Automática (recomendada)</option>
+        <option value="device">Voz del teléfono</option>
+        <option value="cloud">Voz en la nube (suena aunque el iPhone esté en silencio)</option>
+      </select>
+    </label>
+    <button id="sNext" class="btn primary" type="button">Continuar</button>
+  </div>
+</section>
+
 <!-- 5. Ingreso -->
 <section id="s-signin" class="screen dark" hidden>
   <svg class="bloom" aria-hidden="true"><use href="#flower"/></svg>
@@ -267,6 +324,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <header class="top">
     <svg class="logo" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
+    <span class="beta">BETA 1.1</span>
   </header>
   <div class="body">
     <p id="hello" class="hello"></p>
@@ -287,7 +345,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
       <label class="field" style="margin:0"><span>Yo hablo</span><select id="hMe"></select></label>
       <label class="field" style="margin:0"><span>La otra persona</span><select id="hOther"></select></label>
     </div>
-    <p id="hNote" class="note" style="margin:0 0 18px" hidden>Estás usando la traducción básica gratuita, que a veces se equivoca. En Perfil podés conectar la traducción mejorada.</p>
+    <p id="hNote" class="note" style="margin:0 0 18px" hidden>Estás usando la traducción gratuita. En Perfil podés conectar tu servidor de traducción mejorada.</p>
     <h2 class="sec">Últimas conversaciones</h2>
     <div id="hRecent"></div>
   </div>
@@ -420,6 +478,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     <div class="card">
       <h2>Conversación</h2>
       <label class="tg"><span>Reproducir la voz<small>Si lo apagás, solo se muestra el texto.</small></span><input id="aVoice" type="checkbox"></label>
+      <button id="aSound" class="btn ghost" type="button" style="margin:8px 0">🔊 Probar sonido y tipo de voz</button>
       <label class="tg"><span>Conversación fluida<small>El micrófono se abre solo después de cada turno.</small></span><input id="aAuto" type="checkbox"></label>
     </div>
     <div class="card">
@@ -436,10 +495,14 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     </div>
     <div class="card">
       <h2>Traducción mejorada</h2>
-      <p class="lead" style="font-size:.9rem;margin-bottom:10px">Pegá acá la dirección de tu servidor de Cloudflare. Si la dejás vacía, se usa la traducción básica gratuita, que a veces se equivoca.</p>
+      <p class="lead" style="font-size:.9rem;margin-bottom:10px">Pegá acá la dirección de tu servidor de Cloudflare. Si la dejás vacía, se usa la traducción gratuita.</p>
       <label class="field"><span>Dirección del servidor</span><input id="aApi" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://fiorisacall.tunombre.workers.dev"></label>
       <button id="aApiTest" class="btn ghost" type="button">Guardar y probar conexión</button>
       <p id="aApiMsg" class="status-msg" role="status"></p>
+    </div>
+    <div class="card">
+      <h2>Acerca de</h2>
+      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.1</strong> · versión de prueba</p>
     </div>
     <div class="card">
       <h2>Datos</h2>
@@ -515,7 +578,7 @@ var ICONS = {
 };
 
 var KEY = "fc:v2";
-var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", history:[] };
+var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", tts:"auto", soundOk:false, history:[] };
 var DB = loadDB();
 
 function loadDB() {
@@ -552,13 +615,13 @@ function applyPrefs() {
 }
 
 /* ====================== Navegación ====================== */
-var ROUTES = ["splash","welcome","setup","mic","signin","home","convo","photo","tour","history","view","settings"];
+var ROUTES = ["splash","welcome","setup","mic","sound","signin","home","convo","photo","tour","history","view","settings"];
 var WITH_NAV = { home:1, history:1, settings:1 };
 var current = "splash";
 
 function go(name) {
   if (current === "convo" && name !== "convo") cancelAll();
-  if (current === "photo" && name !== "photo") { try { speechSynthesis.cancel(); } catch (e) {} }
+  if (current === "photo" && name !== "photo") { stopVoice(); }
   current = name;
   if (name !== "convo") S.demo = false;
   ROUTES.forEach(function (r) { $("s-" + r).hidden = (r !== name); });
@@ -574,6 +637,7 @@ function go(name) {
   if (name === "tour") renderTour();
   if (name === "history") renderHistory();
   if (name === "settings") renderSettings();
+  if (name === "sound") renderSound();
   var h = document.querySelector("#s-" + name + " h1");
   if (h && name !== "splash") { try { h.focus({ preventScroll: true }); } catch (e) {} }
   var b = document.querySelector("#s-" + name + " .body"); if (b) b.scrollTop = 0;
@@ -603,7 +667,7 @@ function renderSetup() {
 $("setNext").addEventListener("click", function () {
   DB.name = $("setName").value.trim(); DB.me = $("setMe").value; DB.other = $("setOther").value;
   if (DB.me === DB.other) DB.other = DB.me === "en" ? "es" : "en";
-  saveDB(); go("signin");
+  saveDB(); go("sound");
 });
 
 /* ====================== Micrófono ====================== */
@@ -615,13 +679,13 @@ $("micAllow").addEventListener("click", function () {
   navigator.mediaDevices.getUserMedia({ audio: true }).then(function (st) {
     st.getTracks().forEach(function (t) { t.stop(); });
     msg.textContent = "Listo, el micrófono quedó activado.";
-    setTimeout(function () { go("signin"); }, 700);
+    setTimeout(function () { go("sound"); }, 700);
   }).catch(function () {
     msg.classList.add("err");
     msg.textContent = "No se pudo activar. Podés escribir tus mensajes, o activarlo en Ajustes > Safari > Micrófono.";
   });
 });
-$("micSkip").addEventListener("click", function () { go("signin"); });
+$("micSkip").addEventListener("click", function () { go("sound"); });
 
 /* ====================== Ingreso ====================== */
 $("enter").addEventListener("click", function () { DB.onboarded = true; saveDB(); go("home"); });
@@ -688,7 +752,7 @@ function syncToggles() {
   $("pVoice").setAttribute("aria-pressed", String(DB.voice)); $("pVoice").textContent = "Voz: " + (DB.voice ? "sí" : "no");
   $("pAuto").setAttribute("aria-pressed", String(DB.auto)); $("pAuto").textContent = "Fluida: " + (DB.auto ? "sí" : "no");
 }
-$("pVoice").addEventListener("click", function () { DB.voice = !DB.voice; saveDB(); syncToggles(); if (!DB.voice) { try { speechSynthesis.cancel(); } catch (e) {} } });
+$("pVoice").addEventListener("click", function () { DB.voice = !DB.voice; saveDB(); syncToggles(); if (!DB.voice) { stopVoice(); } });
 $("pAuto").addEventListener("click", function () { DB.auto = !DB.auto; saveDB(); syncToggles(); });
 $("cBack").addEventListener("click", function () { go("home"); });
 $("cMe").addEventListener("change", function (e) { chooseLang("me", e.target.value); renderChips(); setPhase(S.phase); });
@@ -736,37 +800,160 @@ function setPhase(p) {
 function setStatus(t, err) { var s = $("status"); s.textContent = t; s.classList.toggle("err", !!err); }
 
 /* ---- audio ---- */
+/* Dos formas de hablar:
+   - "device": la voz del teléfono o la compu (speechSynthesis). En iPhone no suena si está en modo silencio.
+   - "cloud": una voz que llega por internet y se reproduce como audio (suena aunque el iPhone esté en silencio).
+   "auto" usa la del teléfono y, si no arranca, pasa sola a la de la nube. */
+var HAS_TTS = ("speechSynthesis" in window) && ("SpeechSynthesisUtterance" in window);
+var AUD = null, AUD_UNLOCKED = false;
+var SILENT = "data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
+function getAud() { if (!AUD) { AUD = new Audio(); AUD.preload = "auto"; AUD.setAttribute("playsinline", ""); } return AUD; }
 function unlockAudio() {
-  try { var u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+  if (HAS_TTS) { try { var u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} }
+  if (!AUD_UNLOCKED) {
+    try { var a = getAud(); a.src = SILENT; var p = a.play(); if (p && p.then) p.then(function () { AUD_UNLOCKED = true; }).catch(function () {}); else AUD_UNLOCKED = true; } catch (e) {}
+  }
   S.unlocked = true;
 }
-try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function () {}; } catch (e) {}
+function stopVoice() {
+  if (HAS_TTS) { try { speechSynthesis.cancel(); } catch (e) {} }
+  if (AUD) { try { AUD.onended = AUD.onerror = null; AUD.pause(); } catch (e) {} }
+  VOICE_RUN++;
+}
+var VOICE_RUN = 0;
+var VOICES = [];
+function loadVoices() { try { VOICES = speechSynthesis.getVoices() || []; } catch (e) { VOICES = []; } }
+if (HAS_TTS) { loadVoices(); try { speechSynthesis.onvoiceschanged = loadVoices; } catch (e) {} }
 
-/* Voces del teléfono: se usan idiomas que el iPhone trae instalados de fábrica.
-   No se elige una voz puntual (en iPhone la lista incluye voces de juguete); el sistema usa la suya por idioma. */
+/* Voces del teléfono: se usan idiomas que el iPhone trae instalados de fábrica. */
 var TTS_LOCALES = {
   es:"es-MX", en:"en-US", pt:"pt-BR", fr:"fr-FR", it:"it-IT", de:"de-DE", nl:"nl-NL",
   ru:"ru-RU", tr:"tr-TR", ar:"ar-SA", hi:"hi-IN", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN"
 };
-function speak(text, lang) {
-  // Devuelve true si la voz llegó a sonar y false si el teléfono no la reprodujo
+var IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+function pickVoice(lang) {
+  // En iPhone no se elige voz (la lista trae voces de juguete): el sistema usa la suya.
+  if (IS_IOS || !VOICES.length) return null;
+  var loc = (TTS_LOCALES[lang] || lang).toLowerCase(), base = lang.toLowerCase();
+  var same = VOICES.filter(function (v) { return (v.lang || "").toLowerCase().replace("_", "-").indexOf(base) === 0; });
+  if (!same.length) return null;
+  var exact = same.filter(function (v) { return (v.lang || "").toLowerCase().replace("_", "-") === loc; });
+  var pool = exact.length ? exact : same;
+  var good = pool.filter(function (v) { return /google|natural|online|premium|enhanced/i.test(v.name); });
+  return (good[0] || pool[0]);
+}
+function hasDeviceVoice(lang) {
+  if (!HAS_TTS) return false;
+  if (IS_IOS || !VOICES.length) return true; // no se puede saber: se prueba
+  return !!pickVoice(lang);
+}
+function speakDevice(text, lang) {
   return new Promise(function (resolve) {
+    if (!HAS_TTS) { resolve(false); return; }
     var done = false, started = false, guard;
     function finish(ok) { if (!done) { done = true; clearTimeout(guard); resolve(ok); } }
+    // Si en 2,5 s no empezó a hablar, se considera que no sonó
+    var startGuard = setTimeout(function () { if (!started) { try { speechSynthesis.cancel(); } catch (e) {} finish(false); } }, 2500);
     guard = setTimeout(function () { finish(started); }, Math.max(6000, text.length * 160));
     try {
       speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text);
       u.lang = TTS_LOCALES[lang] || lang;
+      var v = pickVoice(lang); if (v) u.voice = v;
       u.volume = 1; u.rate = 1;
-      u.onstart = function () { started = true; };
-      u.onend = function () { finish(true); };
-      u.onerror = function () { finish(false); };
+      u.onstart = function () { started = true; clearTimeout(startGuard); };
+      u.onend = function () { clearTimeout(startGuard); finish(started); };
+      u.onerror = function (e) { clearTimeout(startGuard); finish(false); };
       speechSynthesis.resume();
       speechSynthesis.speak(u);
     } catch (e) { finish(false); }
   });
 }
+/* Voz en la nube: se parte el texto en pedazos cortos y se reproducen uno detrás del otro */
+function chunks(text, max) {
+  var out = [], parts = text.replace(/\s+/g, " ").trim().match(/[^.!?¿¡,;:。！？]+[.!?¿¡,;:。！？]*\s*/g) || [text];
+  parts = parts.map(function (x) { return x.trim(); });
+  parts.forEach(function (p) {
+    while (p.length > max) {
+      var cut = p.lastIndexOf(" ", max); if (cut < 20) cut = max;
+      out.push(p.slice(0, cut)); p = p.slice(cut).trim();
+    }
+    if (!p) return;
+    if (out.length && (out[out.length - 1] + " " + p).length <= max) out[out.length - 1] += " " + p; else out.push(p);
+  });
+  return out;
+}
+function speakCloud(text, lang) {
+  var run = ++VOICE_RUN;
+  var tl = lang === "zh" ? "zh-CN" : lang;
+  var list = chunks(text, 180);
+  var a = getAud();
+  return new Promise(function (resolve) {
+    var i = 0, played = false;
+    function next() {
+      if (run !== VOICE_RUN) { resolve(played); return; }
+      if (i >= list.length) { resolve(played); return; }
+      var q = list[i++], done = false;
+      var guard = setTimeout(function () { if (!done) { done = true; resolve(played); } }, 15000 + q.length * 120);
+      a.onended = function () { if (done) return; done = true; clearTimeout(guard); played = true; next(); };
+      a.onerror = function () { if (done) return; done = true; clearTimeout(guard); resolve(played); };
+      a.src = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=" + encodeURIComponent(tl) + "&q=" + encodeURIComponent(q);
+      try {
+        var p = a.play();
+        if (p && p.catch) p.catch(function () { if (done) return; done = true; clearTimeout(guard); resolve(played); });
+      } catch (e) { done = true; clearTimeout(guard); resolve(played); }
+    }
+    next();
+  });
+}
+function speak(text, lang) {
+  // Devuelve true si la voz llegó a sonar y false si no se pudo reproducir
+  if (HAS_TTS) { try { speechSynthesis.cancel(); } catch (e) {} }
+  var mode = DB.tts || "auto";
+  if (mode === "cloud") return speakCloud(text, lang);
+  if (mode === "device") return speakDevice(text, lang);
+  if (!hasDeviceVoice(lang)) return speakCloud(text, lang);
+  return speakDevice(text, lang).then(function (ok) { return ok ? true : speakCloud(text, lang); });
+}
+
+/* ---- pantalla Sonido ---- */
+var SOUND_FROM = null;
+var SOUND_PHRASE = { es:"Hola, el sonido funciona.", en:"Hello, the sound works.", pt:"Olá, o som funciona.", fr:"Bonjour, le son fonctionne.", it:"Ciao, l'audio funziona.", de:"Hallo, der Ton funktioniert." };
+function renderSound() {
+  $("sMode").value = DB.tts || "auto";
+  $("sAsk").hidden = true; $("sMsg").textContent = ""; $("sMsg").classList.remove("err");
+  $("sBack").hidden = !SOUND_FROM;
+  $("sNext").textContent = SOUND_FROM ? "Listo" : "Continuar";
+  $("sHelp").open = false;
+}
+function soundMsg(t, err) { var m = $("sMsg"); m.textContent = t; m.classList.toggle("err", !!err); }
+function soundTest() {
+  unlockAudio(); stopVoice();
+  var lang = SOUND_PHRASE[DB.me] ? DB.me : "es";
+  soundMsg("Reproduciendo…"); $("sAsk").hidden = true;
+  speak(SOUND_PHRASE[lang], lang).then(function (ok) {
+    if (current !== "sound") return;
+    $("sAsk").hidden = false;
+    soundMsg(ok ? "Se reprodujo la prueba." : "No se pudo reproducir. Mirá el paso a paso de abajo.", !ok);
+    if (!ok) $("sHelp").open = true;
+  });
+}
+function soundDone() { var back = SOUND_FROM; SOUND_FROM = null; go(back || "signin"); }
+$("sTest").addEventListener("click", soundTest);
+$("sMode").addEventListener("change", function (e) { DB.tts = e.target.value; saveDB(); soundTest(); });
+$("sYes").addEventListener("click", function () { DB.soundOk = true; saveDB(); soundMsg("¡Perfecto! El sonido quedó listo."); $("sAsk").hidden = true; setTimeout(function () { if (current === "sound") soundDone(); }, 900); });
+$("sNo").addEventListener("click", function () {
+  $("sHelp").open = true;
+  if ((DB.tts || "auto") !== "cloud") {
+    DB.tts = "cloud"; saveDB(); $("sMode").value = "cloud";
+    soundMsg("Probemos con la voz en la nube…");
+    setTimeout(soundTest, 400);
+  } else {
+    soundMsg("Seguí el paso a paso de abajo y volvé a tocar Probar sonido.", true);
+  }
+});
+$("sNext").addEventListener("click", soundDone);
+$("sBack").addEventListener("click", soundDone);
 
 /* ---- botón principal ---- */
 $("mic").addEventListener("click", function () {
@@ -779,7 +966,7 @@ $("mic").addEventListener("click", function () {
 function cancelAll() {
   S.run++;
   try { if (S.sr) { var sr = S.sr; S.sr = null; sr.abort(); } } catch (e) {}
-  try { speechSynthesis.cancel(); } catch (e) {}
+  stopVoice();
   if (current === "convo") setPhase("idle");
 }
 
@@ -849,7 +1036,8 @@ function translate(text, from, to) {
     var d = demoTranslate(text, from, to);
     if (d) return new Promise(function (r) { setTimeout(function () { r(d); }, 600); });
   }
-  return DB.api ? translateCloud(text, from, to) : translateFree(text, from, to);
+  if (DB.api) return translateCloud(text, from, to).catch(function () { return translateFree(text, from, to); });
+  return translateFree(text, from, to);
 }
 /* Traducción mejorada: tu servidor de Cloudflare (Workers AI) */
 function translateCloud(text, from, to) {
@@ -864,8 +1052,26 @@ function translateCloud(text, from, to) {
     return d.translated;
   });
 }
-/* Traducción básica gratuita (MyMemory): a veces se equivoca */
+/* Traducción gratuita: primero Google (mucho más precisa); si falla, MyMemory */
+function gcode(c) { return c === "zh" ? "zh-CN" : c; }
+function translateGoogle(text, from, to) {
+  var url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=" + gcode(from) + "&tl=" + gcode(to) + "&q=" + encodeURIComponent(text);
+  return fetch(url).catch(function () { throw new ApiError(0, "network"); }).then(function (res) {
+    if (!res.ok) throw new ApiError(res.status, "http");
+    return res.json();
+  }).then(function (d) {
+    var out = "";
+    if (d && Array.isArray(d[0])) d[0].forEach(function (s) { if (s && typeof s[0] === "string") out += s[0]; });
+    out = out.trim();
+    if (!out) throw new ApiError(500, "empty");
+    return out;
+  });
+}
 function translateFree(text, from, to) {
+  return translateGoogle(text, from, to).catch(function () { return translateMyMemory(text, from, to); });
+}
+/* Respaldo (MyMemory): a veces se equivoca */
+function translateMyMemory(text, from, to) {
   var code = function (c) { return c === "zh" ? "zh-CN" : c; };
   var url = "https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=" + code(from) + "|" + code(to);
   return fetch(url).catch(function () { throw new ApiError(0, "network"); }).then(function (res) {
@@ -933,7 +1139,7 @@ function ensureConvo() {
 
 function sendText(text, who, fromLang, existingRun) {
   var run = existingRun || ++S.run;
-  if (!existingRun && S.phase !== "idle") { try { speechSynthesis.cancel(); } catch (e) {} }
+  if (!existingRun && S.phase !== "idle") { stopVoice(); }
   if (!existingRun) { try { if (S.sr) { var sr = S.sr; S.sr = null; sr.abort(); } } catch (e) {} }
   S.turn = who; S.manual = false; renderTurn();
   var alive = function () { return run === S.run && current === "convo"; };
@@ -962,7 +1168,7 @@ function sendText(text, who, fromLang, existingRun) {
       return;
     }
     if (voiceOk === false) {
-      setStatus("No se pudo reproducir la voz en " + langName(to) + ". Revisá el volumen y el modo silencio, o tocá Escuchar de nuevo.", true);
+      setStatus("No se pudo reproducir la voz en " + langName(to) + ". Revisá el volumen y el modo silencio, o andá a Perfil → Probar sonido.", true);
       return;
     }
     if (DB.auto) setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(); }, DB.voice ? 450 : 900);
@@ -1562,6 +1768,7 @@ $("aApiTest").addEventListener("click", function () {
   });
 });
 $("aWelcome").addEventListener("click", function () { go("welcome"); });
+$("aSound").addEventListener("click", function () { SOUND_FROM = "settings"; go("sound"); });
 $("aWipe").addEventListener("click", function () {
   if (!confirm("Se van a borrar tu perfil, tus ajustes y todas tus conversaciones de este teléfono. ¿Seguro?")) return;
   try { localStorage.removeItem(KEY); } catch (e) {}
@@ -1569,6 +1776,12 @@ $("aWipe").addEventListener("click", function () {
 });
 
 /* ====================== Arranque ====================== */
+var DEFAULT_API = ""; // Pegá acá la dirección de tu servidor de Cloudflare para que todos la usen
+try {
+  var qApi = new URLSearchParams(location.search).get("api");
+  if (qApi && /^https:\/\/[^\s\/]+\.[^\s\/]+/i.test(qApi)) { DB.api = qApi.replace(/\/+$/, ""); saveDB(); }
+} catch (e) {}
+if (!DB.api && DEFAULT_API) { DB.api = DEFAULT_API; saveDB(); }
 applyPrefs();
 if (location.protocol !== "https:" && location.hostname !== "localhost") $("fileWarn").hidden = false;
 setTimeout(function () { go(DB.onboarded ? "home" : "welcome"); }, 1100);
