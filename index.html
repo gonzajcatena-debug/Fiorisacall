@@ -261,6 +261,7 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
       <svg aria-hidden="true"><use href="#i-mic"/></svg>
       <div><strong>Nueva conversación</strong><span>Hablá y se traduce en vivo</span></div>
     </button>
+    <button id="demoConvo" class="btn ghost" type="button" style="margin:10px 0 14px;width:100%">▶ Probar demo interactiva (sin micrófono)</button>
     <div class="pair">
       <label class="field" style="margin:0"><span>Yo hablo</span><select id="hMe"></select></label>
       <label class="field" style="margin:0"><span>La otra persona</span><select id="hOther"></select></label>
@@ -487,6 +488,7 @@ var current = "splash";
 function go(name) {
   if (current === "convo" && name !== "convo") cancelAll();
   current = name;
+  if (name !== "convo") S.demo = false;
   ROUTES.forEach(function (r) { $("s-" + r).hidden = (r !== name); });
   $("nav").hidden = !WITH_NAV[name];
   Array.prototype.forEach.call($("nav").querySelectorAll("button"), function (b) {
@@ -578,7 +580,14 @@ function chooseLang(which, val) {
 }
 $("hMe").addEventListener("change", function (e) { chooseLang("me", e.target.value); });
 $("hOther").addEventListener("change", function (e) { chooseLang("other", e.target.value); });
-$("newConvo").addEventListener("click", function () { go("convo"); });
+$("newConvo").addEventListener("click", function () { S.demo = false; go("convo"); });
+$("demoConvo").addEventListener("click", function () {
+  unlockAudio();
+  DB.me = "es"; DB.other = "en"; saveDB();
+  go("convo"); S.demo = true;
+  $("log").textContent = "";
+  $("log").appendChild(el("li", "empty", "DEMO: tocá una frase de abajo. Se traduce, se escucha, y la otra persona te responde sola."));
+});
 
 /* ====================== Conversación ====================== */
 var S = { turn: "me", phase: "idle", run: 0, sr: null, convo: null, silent: 0, unlocked: false };
@@ -745,8 +754,27 @@ function listen() {
 /* ---- traducir ---- */
 function ApiError(status, detail) { this.status = status; this.detail = detail; }
 function decodeEntities(s) { var t = document.createElement("textarea"); t.innerHTML = s; return t.value; }
+var DEMO_REPLIES = [
+  { es: "¡Hola! Encantado de conocerte.", en: "Hello! Nice to meet you." },
+  { es: "¡De nada!", en: "You're welcome!" },
+  { es: "Al fondo del pasillo, a la derecha.", en: "Down the hall, on the right." },
+  { es: "Claro, ¿en qué te ayudo?", en: "Of course, how can I help?" },
+  { es: "Sí, no hay problema.", en: "Sure, no problem." },
+  { es: "Claro, hablaré más despacio.", en: "Sure, I'll speak slower." }
+];
+function demoIndex(text, lang) { var l = PHRASES[lang] || []; return l.indexOf(text); }
+function demoTranslate(text, from, to) {
+  var i = demoIndex(text, from);
+  if (i >= 0 && PHRASES[to]) return PHRASES[to][i];
+  for (var k = 0; k < DEMO_REPLIES.length; k++) if (DEMO_REPLIES[k][from] === text && DEMO_REPLIES[k][to]) return DEMO_REPLIES[k][to];
+  return null;
+}
 function translate(text, from, to) {
   if (from === to) return Promise.resolve(text);
+  if (S.demo) {
+    var d = demoTranslate(text, from, to);
+    if (d) return new Promise(function (r) { setTimeout(function () { r(d); }, 600); });
+  }
   return DB.api ? translateCloud(text, from, to) : translateFree(text, from, to);
 }
 /* Traducción mejorada: tu servidor de Cloudflare (Workers AI) */
@@ -850,6 +878,15 @@ function sendText(text, who, fromLang, existingRun) {
   }).then(function (voiceOk) {
     if (!alive()) return;
     setPhase("idle");
+    if (S.demo) {
+      if (who === "me") {
+        var di = demoIndex(text, from);
+        if (di >= 0 && DEMO_REPLIES[di]) setTimeout(function () {
+          if (run === S.run && S.demo && current === "convo") sendText(DEMO_REPLIES[di][DB.other], "other", DB.other);
+        }, 900);
+      }
+      return;
+    }
     if (voiceOk === false) {
       setStatus("No se pudo reproducir la voz en " + langName(to) + ". Revisá el volumen y el modo silencio, o tocá Escuchar de nuevo.", true);
       return;
