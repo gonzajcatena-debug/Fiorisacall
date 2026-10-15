@@ -1076,8 +1076,9 @@ function normCaps(t) {
   return t.toLowerCase().replace(/(^|[.!?¿¡]\s*)([a-zà-ÿ])/g, function (m, a, b) { return a + b.toUpperCase(); });
 }
 function translateLong(text, from, to) {
+  if (P.demoText && text === SAMPLE_TEXT && to === "es") return Promise.resolve(text);
   if (from === to) return Promise.resolve(text);
-  if (P.demoText && text === SAMPLE_TEXT && from === "es" && SAMPLE_TR[to]) return new Promise(function (r) { setTimeout(function () { r(SAMPLE_TR[to]); }, 500); });
+  if (P.demoText && text === SAMPLE_TEXT && SAMPLE_TR[to]) return new Promise(function (r) { setTimeout(function () { r(SAMPLE_TR[to]); }, 500); });
   var parts = chunkText(text, 400), res = [], i = 0;
   function next() {
     if (i >= parts.length) return Promise.resolve(res.join("").replace(/ ?\n ?/g, "\n"));
@@ -1089,14 +1090,24 @@ function translateLong(text, from, to) {
 }
 
 window.fcTest = { detectLang: detectLang, chunkText: chunkText };
-function srcLang(text) { var d = detectLang(text); if (d) P.last = d; return d || P.last || DB.other || "en"; }
+function srcLang() {
+  // Sin adivinar idiomas: el texto se supone en el idioma tuyo que no es el de destino
+  var to = $("pTo").value;
+  return to === DB.other ? DB.me : DB.other;
+}
 function cleanOcr(d) {
   var lines = [];
   if (d.lines && d.lines.length) d.lines.forEach(function (l) { if ((l.confidence || 0) >= 55) lines.push(l.text); });
   else lines = String(d.text || "").split("\n");
-  return lines.map(function (l) { return l.replace(/^[^A-Za-z0-9À-ÿ\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF¿¡]+|[^A-Za-z0-9À-ÿ\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF.!?]+$/g, "").trim(); }).filter(function (l) {
+  return lines.map(function (l) {
+    return l.replace(/[|=_~^<>{}\[\]\\]+/g, " ").replace(/\s+/g, " ").replace(/^[^A-Za-z0-9\u00C0-\u00FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF\u00BF\u00A1]+|[^A-Za-z0-9\u00C0-\u00FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF.!?]+$/g, "").trim();
+  }).filter(function (l) {
     var c = scriptCounts(l), n = l.replace(/\s/g, "").length;
-    return c.total >= 3 && c.total / Math.max(1, n) >= 0.6;
+    if (c.total < 3 || c.total / Math.max(1, n) < 0.6) return false;
+    if (c.latin < c.total * 0.5) return true;            // otros alfabetos: no se aplica el filtro de palabras
+    var toks = l.split(" "), good = 0;
+    toks.forEach(function (t) { if (t.replace(/[^A-Za-z\u00C0-\u00FF]/g, "").length >= 3) good++; });
+    return good >= 1 && good / toks.length >= 0.6;       // descarta restos como "z ate DD PL Ed a d i"
   }).join("\n");
 }
 function pStatus(t, err) { var s = $("pStatus"); s.textContent = t; s.classList.toggle("err", !!err); }
@@ -1270,6 +1281,7 @@ $("pFileCam").addEventListener("change", function (e) { handlePhotoFile(e.target
 $("pFileGal").addEventListener("change", function (e) { handlePhotoFile(e.target.files && e.target.files[0]); });
 $("pDemo").addEventListener("click", function () {
   var run = ++P.run; P.demoText = true; unlockAudio();
+  if ($("pTo").value === "es") fillSelect($("pTo"), "en");
   $("pImg").src = drawSample(); $("pImg").hidden = false;
   $("pRes").hidden = true; $("pOut").hidden = true; $("pSpeak").hidden = true;
   pStatus("DEMO: leyendo el texto de la foto de ejemplo…");
