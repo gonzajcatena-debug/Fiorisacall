@@ -361,10 +361,10 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
       <button id="pSpeak" class="btn primary" type="button" hidden>Escuchar la traducción</button>
       <details class="pfix" style="margin-top:14px">
         <summary style="cursor:pointer;padding:8px 0;font-weight:600">Ver o corregir el texto leído</summary>
+        <p id="pDet" class="note" style="margin:6px 0 10px" hidden></p>
         <textarea id="pText" class="ptext" aria-label="Texto leído de la foto"></textarea>
         <button id="pGo" class="btn ghost" type="button" style="margin-top:10px">Traducir de nuevo</button>
       </details>
-      <p id="pDet" hidden></p>
     </div>
   </div>
 </section>
@@ -1089,7 +1089,7 @@ function translateLong(text, from, to) {
   return next();
 }
 
-window.fcTest = { detectLang: detectLang, chunkText: chunkText, makeVariants: makeVariants, cleanOcr: cleanOcr, ocrScore: ocrScore };
+window.fcTest = { cleanLines: cleanOcrLines, detectLang: detectLang, chunkText: chunkText, makeVariants: makeVariants, cleanOcr: cleanOcr, ocrScore: ocrScore };
 function srcLang() {
   // Sin adivinar idiomas: el texto se supone en el idioma tuyo que no es el de destino
   var to = $("pTo").value;
@@ -1097,25 +1097,68 @@ function srcLang() {
 }
 function cleanOcrLines(d) {
   var raw = [];
-  if (d.lines && d.lines.length) d.lines.forEach(function (l) { if ((l.confidence || 0) >= 40) raw.push({ t: l.text, c: l.confidence || 0 }); });
-  else String(d.text || "").split("\n").forEach(function (t) { raw.push({ t: t, c: d.confidence || 60 }); });
+  if (d.lines && d.lines.length) d.lines.forEach(function (l) {
+    var t = l.text, c = l.confidence || 0;
+    if (l.words && l.words.length) {                     // se quedan solo las palabras que el lector vio con seguridad
+      var kept = l.words.filter(function (w) { return (w.confidence || 0) >= 40 && String(w.text).trim(); });
+      if (!kept.length) return;
+      t = kept.map(function (w) { return String(w.text).trim(); }).join(" ");
+      c = kept.reduce(function (a, w) { return a + (w.confidence || 0); }, 0) / kept.length;
+    }
+    var h = l.bbox ? Math.abs((l.bbox.y1 || 0) - (l.bbox.y0 || 0)) : 0;
+    if (c >= 40) raw.push({ t: t, c: c, h: h, box: l.bbox || null });
+  });
+  else String(d.text || "").split("\n").forEach(function (t) { raw.push({ t: t, c: d.confidence || 60, h: 0 }); });
   var out = [];
   raw.forEach(function (r) {
-    var l = r.t.replace(/[|=_~^<>{}\[\]\\]+/g, " ").replace(/(\S)[:;](?=[A-Za-z\u00C0-\u00FF])/g, "$1 ").split(" ").filter(function (t) { return !(t.length <= 2 && /[^A-Za-z0-9\u00C0-\u00FF\u00BF\u00A1]/.test(t) && !/^[\u00BF\u00A1]/.test(t)); }).join(" ").replace(/\s+/g, " ").replace(/^[^A-Za-z0-9À-ÿЀ-ӿ؀-ۿऀ-ॿ぀-ヿ一-鿿가-힯¿¡]+|[^A-Za-z0-9À-ÿЀ-ӿ؀-ۿऀ-ॿ぀-ヿ一-鿿가-힯.!?]+$/g, "").trim();
+    var l = r.t.replace(/[|=_~^<>{}\[\]\\]+/g, " ").replace(/(\S)[:;](?=[A-Za-zÀ-ÿ])/g, "$1 ").split(" ").filter(function (t) { return !(t.length <= 2 && /[^A-Za-z0-9À-ÿ¿¡]/.test(t) && !/^[¿¡]/.test(t)); }).join(" ").replace(/\s+/g, " ").replace(/^[^A-Za-z0-9À-ÿЀ-ӿ؀-ۿऀ-ॿ぀-ヿ一-鿿가-힯¿¡]+|[^A-Za-z0-9À-ÿЀ-ӿ؀-ۿऀ-ॿ぀-ヿ一-鿿가-힯.!?]+$/g, "").trim();
+    l = l.replace(/(^|\s)[\u2018\u2019`\u00B4]+/g, "$1");
+    var tk = l.split(" ");                                  // resto suelto en minúsculas al lado de un renglón en MAYÚSCULAS ("i NUESTRO", "in, LUGAR")
+    if (tk.length >= 2) {
+      var isUp = function (t) { return t.replace(/[^A-Za-z\u00C0-\u00FF]/g, "").length >= 3 && t === t.toUpperCase(); };
+      var isLowJunk = function (t) { return t.length <= 3 && t === t.toLowerCase() && !/\d/.test(t); };
+      if (isLowJunk(tk[0]) && tk.slice(1).every(isUp)) tk.shift();
+      else if (isLowJunk(tk[tk.length - 1]) && tk.slice(0, -1).every(isUp)) tk.pop();
+      l = tk.join(" ");
+    }
     var c = scriptCounts(l), n = l.replace(/\s/g, "").length;
     if (c.total < 3 || c.total / Math.max(1, n) < 0.6) return;
     if (c.latin >= c.total * 0.5) {                        // descarta restos como "z ate DD PL Ed a d i"
       var toks = l.split(" "), good = 0, junk = 0;
       toks.forEach(function (t) {
-        var lt = t.replace(/[^A-Za-z\u00C0-\u00FF]/g, "");
+        var lt = t.replace(/[^A-Za-zÀ-ÿ]/g, "");
         if (lt.length >= 3) good++;
         if (lt.length === 1 && !/[aeiouyAEIOUY0-9]/.test(lt) && !/\d/.test(t)) junk++;
       });
       if (good < 1 || junk / toks.length >= 0.25 || c.total / toks.length < 2.8) return;
     }
-    out.push({ text: l, conf: r.c, letters: c.total });
+    out.push({ text: l, conf: r.c, letters: c.total, h: r.h, box: r.box });
   });
+  if (out.length > 1) out = out.filter(function (x) { return !(x.text.split(" ").length === 1 && x.letters <= 3 && x.conf < 85); });
+  // El texto principal es el de letra más grande: lo chico y dudoso (graffitis, carteles lejanos, reflejos) se descarta
+  var H = 0;
+  out.forEach(function (x) { if (x.h > H && x.conf >= 70 && x.letters >= 6) H = x.h; });
+  if (!H) out.forEach(function (x) { if (x.h > H) H = x.h; });
+  if (H) out = out.filter(function (x) { return !x.h || (x.h >= H * 0.4 && (x.conf >= 55 || x.h >= H * 0.55)); });
   return out;
+}
+/* Une las lecturas de varios intentos: en cada renglón de la foto se queda con la mejor lectura */
+function mergeLines(list) {
+  var cl = [];
+  list.slice().sort(function (a, b) { return b.conf * b.letters - a.conf * a.letters; }).forEach(function (l) {
+    if (!l.box) { cl.push({ best: l, box: null }); return; }
+    var cy = (l.box.y0 + l.box.y1) / 2, found = null;
+    cl.forEach(function (c) {
+      if (found || !c.box) return;
+      var cy2 = (c.box.y0 + c.box.y1) / 2, h = Math.max(l.box.y1 - l.box.y0, c.box.y1 - c.box.y0);
+      var ov = Math.min(l.box.x1, c.box.x1) - Math.max(l.box.x0, c.box.x0), mn = Math.min(l.box.x1 - l.box.x0, c.box.x1 - c.box.x0);
+      if (Math.abs(cy - cy2) <= h * 0.5 && ov >= mn * 0.3) found = c;
+    });
+    if (!found) cl.push({ best: l, box: l.box });
+  });
+  return cl.map(function (c) { return c.best; }).sort(function (a, b) {
+    var ay = a.box ? a.box.y0 : 0, by = b.box ? b.box.y0 : 0; return ay - by;
+  });
 }
 function cleanOcr(d) { return cleanOcrLines(d).map(function (x) { return x.text; }).join("\n"); }
 function ocrScore(d) { var sc = 0; cleanOcrLines(d).forEach(function (x) { sc += x.letters * x.conf / 100; }); return sc; }
@@ -1219,10 +1262,10 @@ function makeVariants(cv) {
   ];
 }
 
-/* ---- leer el texto: se prueban hasta 3 versiones de la imagen y se queda la mejor ---- */
+/* ---- leer el texto: se prueban hasta 4 versiones de la imagen; después se hace zoom al texto principal y se lee de nuevo ---- */
 function ocrBest(cv, langs) {
   var names = langs.split("+").map(function (c) { for (var k in TESS) if (TESS[k] === c) return langName(k); return c; }).join(", ");
-  var makers = makeVariants(cv), tryNo = 0, best = null;
+  var tryNo = 0, tryMax = 4, phase = "";
   pStatus("Preparando el lector (" + names + ")…");
   return withTimeout(window.Tesseract.createWorker(langs, 1, {
     langPath: TESS_LANGPATH,
@@ -1230,22 +1273,64 @@ function ocrBest(cv, langs) {
       if (!m || typeof m.progress !== "number") return;
       var pct = Math.round(m.progress * 100);
       if (/loading|language|initializ/i.test(m.status)) pStatus("Descargando el lector de idiomas (" + names + ")… " + pct + "%");
-      else if (/recogni/i.test(m.status)) pStatus("Leyendo el texto de la foto" + (tryNo > 1 ? " (intento " + tryNo + " de 4)" : "") + "… " + pct + "%");
+      else if (/recogni/i.test(m.status)) pStatus("Leyendo el texto de la foto" + phase + (tryNo > 1 ? " (intento " + tryNo + " de " + tryMax + ")" : "") + "… " + pct + "%");
     }
   }).then(function (w) {
-    function step(i) {
-      if (i >= makers.length) return Promise.resolve();
-      tryNo = i + 1;
-      return w.recognize(makers[i]()).then(function (r) {
-        var d = r.data, sc = ocrScore(d), txt = cleanOcr(d);
-        if (!best || sc > best.score) best = { text: txt, score: sc, conf: d.confidence || 0, letters: scriptCounts(txt).total };
-        var avg = cleanOcrLines(d).reduce(function (a, x) { return a + x.conf; }, 0) / Math.max(1, cleanOcrLines(d).length);
-        if (sc >= 20 && avg >= 80) return;                   // ya se leyó bien: no hace falta probar más
-        return step(i + 1);
-      });
+    function runVariants(canvas, order) {
+      var allMk = makeVariants(canvas), best = null, all = [];
+      var makers = (order || [0, 1, 2, 3]).map(function (ix) { return allMk[ix]; });
+      function finish() {
+        if (!best) return best;
+        var ran = all.length;
+        if (ran > 1 && all.some(function (x) { return x.box; })) {
+          var m = mergeLines(all), sc2 = 0, cs2 = 0;
+          m.forEach(function (x) { sc2 += x.letters * x.conf / 100; cs2 += x.conf; });
+          if (sc2 > best.score) {
+            var t2 = m.map(function (x) { return x.text; }).join("\n");
+            best = { text: t2, score: sc2, avg: cs2 / Math.max(1, m.length), letters: scriptCounts(t2).total, lines: m, variant: best.variant, merged: true };
+          }
+        }
+        return best;
+      }
+      function step(i) {
+        if (i >= makers.length) return Promise.resolve(finish());
+        tryNo = i + 1; tryMax = makers.length;
+        return w.recognize(makers[i]()).then(function (r) {
+          var d = r.data, lines = cleanOcrLines(d), sc = 0, cs = 0;
+          lines.forEach(function (x) { sc += x.letters * x.conf / 100; cs += x.conf; });
+          var txt = lines.map(function (x) { return x.text; }).join("\n"), avg = cs / Math.max(1, lines.length);
+          lines.forEach(function (x) { all.push(x); });
+          if (!best || sc > best.score) best = { text: txt, score: sc, avg: avg, letters: scriptCounts(txt).total, lines: lines, variant: i + 1 };
+          if (sc >= 20 && avg >= 80) return finish();           // ya se leyó bien: no hace falta probar más
+          return step(i + 1);
+        });
+      }
+      return step(0);
     }
-    return step(0).then(function () { return w.terminate(); }, function (e) { try { w.terminate(); } catch (x) {} throw e; });
-  }), 240000).then(function () { return best; });
+    return runVariants(cv).then(function (p1) {
+      if (!p1 || !p1.lines.length) return p1;
+      // Zoom al texto principal: se recorta alrededor de las letras grandes y se vuelve a leer más grande
+      var x0 = 1e9, y0 = 1e9, x1 = 0, y1 = 0, H = 0;
+      p1.lines.forEach(function (l) { if (l.box) { x0 = Math.min(x0, l.box.x0); y0 = Math.min(y0, l.box.y0); x1 = Math.max(x1, l.box.x1); y1 = Math.max(y1, l.box.y1); H = Math.max(H, l.h); } });
+      if (!H || x1 <= x0) return p1;
+      var m = Math.round(H * 0.6); x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(cv.width, x1 + m); y1 = Math.min(cv.height, y1 + m);
+      var cw = x1 - x0, ch = y1 - y0;
+      if (cw * ch > cv.width * cv.height * 0.7 || cw < 40 || ch < 20) return p1;
+      var k = Math.min(Math.max(1, 90 / H), 2.5, 2400 / Math.max(cw, ch));
+      var c2 = document.createElement("canvas"); c2.width = Math.round(cw * k); c2.height = Math.round(ch * k);
+      c2.getContext("2d").drawImage(cv, x0, y0, cw, ch, 0, 0, c2.width, c2.height);
+      phase = " (zoom al texto)";
+      var ord2 = [0]; if (p1.variant > 1) ord2.push(p1.variant - 1);
+      return runVariants(c2, ord2).then(function (p2) {
+        var win = (p2 && p2.score >= p1.score * 0.9) ? p2 : p1;
+        win.info = "intento " + win.variant + (win === p2 ? ", con zoom" : "") + " · seguridad " + Math.round(win.avg) + "%";
+        return win;
+      }, function () { return p1; });
+    }).then(function (res) {
+      if (res && !res.info) res.info = "intento " + res.variant + " · seguridad " + Math.round(res.avg) + "%";
+      return w.terminate().then(function () { return res; });
+    }, function (e) { try { w.terminate(); } catch (x) {} throw e; });
+  }), 300000);
 }
 function readPhoto(canvas, run) {
   // Inglés + tus dos idiomas, sin adivinar nada
@@ -1253,8 +1338,9 @@ function readPhoto(canvas, run) {
   [DB.me, DB.other].forEach(function (l) { if (TESS[l] && packs.indexOf(TESS[l]) < 0) packs.push(TESS[l]); });
   return ocrBest(canvas, packs.join("+"));
 }
-function showPhotoResult(text, run) {
+function showPhotoResult(text, run, info, warn) {
   if (run !== P.run) return;
+  P.warn = warn || ""; $("pDet").textContent = info ? "Detalle de la lectura: " + info : ""; $("pDet").hidden = !info;
   $("pRes").hidden = false; $("pText").value = text;
   var dt = document.querySelector("#pRes details"); if (dt) dt.open = false;
   pStatus("");
@@ -1270,7 +1356,7 @@ function doPhotoTranslate() {
     if (run !== P.run) return;
     P.tr = tr; P.to = to;
     var o = $("pOut"); o.hidden = false; o.textContent = tr; o.lang = to;
-    $("pSpeak").hidden = false; pStatus(from === to ? "El texto ya está en ese idioma." : "");
+    $("pSpeak").hidden = false; pStatus(from === to ? "El texto ya está en ese idioma." : (P.warn || ""));
     $("pGo").disabled = false;
   }).catch(function (e) {
     if (run !== P.run) return;
@@ -1330,11 +1416,12 @@ function handlePhotoFile(file) {
   var free = function () { ["pCam", "pGal", "pDemo"].forEach(function (id) { $(id).disabled = false; }); };
   photoToCanvas(file).then(function (cv) {
     pStatus("Cargando el lector de texto…");
-    return withTimeout(loadTess(), 30000).then(function () { return readPhoto(cv, run); });
+    return withTimeout(loadTess(), 30000).then(function () { return readPhoto(cv, run); }).then(function (b) { if (b) { b.w = cv.width; b.h = cv.height; } return b; });
   }).then(function (best) {
     free(); if (run !== P.run) return;
     if (!best || best.letters < 3) { openManual("No encontré texto en la foto. Probá con más luz, más cerca y derecha, o escribilo vos."); return; }
-    showPhotoResult(best.text, run);
+    var warn = best.avg < 65 ? "Leí esta foto con poca seguridad. Mirá el texto en “Ver o corregir el texto leído” y corregilo si hace falta." : "";
+    showPhotoResult(best.text, run, best.info + " · foto " + best.w + "×" + best.h, warn);
   }).catch(function (e) {
     free(); if (run !== P.run) return;
     var m = e && e.message;
