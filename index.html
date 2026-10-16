@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fiorisacall · Beta 1.1</title>
+<title>Fiorisacall · Beta 1.2</title>
 <meta name="theme-color" content="#241238">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -212,7 +212,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <div class="center">
     <svg class="big" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <p class="ver">Beta 1.1</p>
+    <p class="ver">Beta 1.2</p>
   </div>
 </section>
 
@@ -324,7 +324,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <header class="top">
     <svg class="logo" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <span class="beta">BETA 1.1</span>
+    <span class="beta">BETA 1.2</span>
   </header>
   <div class="body">
     <p id="hello" class="hello"></p>
@@ -502,7 +502,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     </div>
     <div class="card">
       <h2>Acerca de</h2>
-      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.1</strong> · versión de prueba</p>
+      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.2</strong> · versión de prueba</p>
     </div>
     <div class="card">
       <h2>Datos</h2>
@@ -718,7 +718,7 @@ function chooseLang(which, val) {
 }
 $("hMe").addEventListener("change", function (e) { chooseLang("me", e.target.value); });
 $("hOther").addEventListener("change", function (e) { chooseLang("other", e.target.value); });
-$("newConvo").addEventListener("click", function () { S.demo = false; go("convo"); });
+$("newConvo").addEventListener("click", function () { unlockAudio(); S.demo = false; go("convo"); });
 $("demoConvo").addEventListener("click", function () {
   unlockAudio();
   DB.me = "es"; DB.other = "en"; saveDB();
@@ -814,6 +814,9 @@ function unlockAudio() {
     try { var a = getAud(); a.src = SILENT; var p = a.play(); if (p && p.then) p.then(function () { AUD_UNLOCKED = true; }).catch(function () {}); else AUD_UNLOCKED = true; } catch (e) {}
   }
   S.unlocked = true;
+}
+function releaseAudio() {
+  if (AUD) { try { AUD.onended = AUD.onerror = null; AUD.pause(); AUD.removeAttribute("src"); AUD.load(); } catch (e) {} }
 }
 function stopVoice() {
   if (HAS_TTS) { try { speechSynthesis.cancel(); } catch (e) {} }
@@ -957,8 +960,7 @@ $("sBack").addEventListener("click", soundDone);
 
 /* ---- botón principal ---- */
 $("mic").addEventListener("click", function () {
-  unlockAudio();
-  if (S.phase === "idle") listen();
+  if (S.phase === "idle") { stopVoice(); releaseAudio(); listen(); return; }
   else if (S.phase === "listening") { if (S.sr) { try { S.sr.stop(); } catch (e) {} } }
   else cancelAll();
 });
@@ -977,12 +979,14 @@ function listen() {
   var run = ++S.run;
   var who = S.turn;
   var lang = who === "me" ? DB.me : DB.other;
+  releaseAudio();
   var sr = new SR_CLASS();
   sr.lang = LOCALES[lang] || lang;
   sr.interimResults = true; sr.continuous = false; sr.maxAlternatives = 1;
-  var fin = "", part = "", err = "";
+  var fin = "", part = "", err = "", heard = false;
   S.sr = sr;
   setPhase("listening");
+  sr.onaudiostart = function () { heard = true; if (run === S.run && !(fin || part)) setStatus("Te escucho: hablá ahora en " + langName(lang) + "…"); };
   sr.onresult = function (e) {
     var f = "", p = "";
     for (var i = 0; i < e.results.length; i++) { var r = e.results[i]; if (r.isFinal) f += r[0].transcript; else p += r[0].transcript; }
@@ -999,10 +1003,17 @@ function listen() {
     if (err === "not-allowed" || err === "service-not-allowed") {
       setStatus("Sin permiso para el dictado. Activá el micrófono para Safari y el dictado en Ajustes > General > Teclado.", true); return;
     }
+    if (err === "audio-capture") {
+      setStatus("El micrófono está ocupado. Cerrá otras apps que usen audio (música, llamadas, grabador) y tocá Hablar de nuevo.", true); return;
+    }
+    if (err === "network") {
+      setStatus("El dictado necesita internet. Revisá la conexión y tocá Hablar de nuevo.", true); return;
+    }
     if (err === "language-not-supported") {
       setStatus("Este teléfono no tiene el dictado en " + langName(lang) + ". Podés escribir tu mensaje o elegir otro idioma.", true); return;
     }
-    if (err && err !== "no-speech" && err !== "aborted") { setStatus("No se pudo escuchar (" + err + "). Probá de nuevo.", true); return; }
+    if (err && err !== "no-speech" && err !== "aborted") { setStatus("No se pudo escuchar (código: " + err + "). Probá de nuevo y, si sigue, mandá una captura de este mensaje.", true); return; }
+    if (!heard && !err) { S.silent = 0; setStatus("No llegó sonido del micrófono. Revisá que Safari tenga permiso (Ajustes > Safari > Micrófono) y tocá Hablar de nuevo.", true); return; }
     S.silent++;
     if (DB.auto && S.silent < 3) { setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(); }, 300); return; }
     S.silent = 0;
