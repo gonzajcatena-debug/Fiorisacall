@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fiorisacall · Beta 1.3</title>
+<title>Fiorisacall · Beta 1.4</title>
 <meta name="theme-color" content="#241238">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -84,6 +84,25 @@ select,input[type=text]{width:100%;min-height:50px;border-radius:14px;border:1.5
 select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);
   background-position:calc(100% - 20px) 22px,calc(100% - 15px) 22px;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
 .status-msg{min-height:1.4em;margin-top:12px;font-size:.95rem;color:var(--mute);line-height:1.4}
+.pbar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin:0 0 18px}
+.pbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.perm-ico{font-size:2.6rem;line-height:1;margin:4px 0 10px}
+.ptitle{margin:0 0 8px;font-size:1.35rem}
+.status-msg.ok{color:var(--ok);font-weight:700}
+.sumrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.sumrow strong{display:block}
+.sumrow span{color:var(--mute);font-size:.9rem}
+.sumrow .btn{width:auto;min-height:40px;padding:0 14px;margin:0;flex:none}
+.pthumb{max-width:160px;max-height:120px;border-radius:12px;display:block;margin-top:10px}
+.clist{list-style:none;margin:0 0 10px;padding:0}
+.clist li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.clist li div{min-width:0}
+.clist li small{display:block;color:var(--mute)}
+.clist button{border:0;background:transparent;color:var(--accent-d);font-weight:700;cursor:pointer;min-height:36px}
+.mic.open{box-shadow:0 0 0 6px var(--accent),0 6px 16px rgba(0,0,0,.25);animation:micpulse 1.4s ease-in-out infinite}
+@keyframes micpulse{50%{box-shadow:0 0 0 12px var(--accent),0 6px 16px rgba(0,0,0,.25)}}
+@media (prefers-reduced-motion:reduce){.mic.open{animation:none}}
+.msg.live{border-style:dashed}
 .status-msg.err{color:var(--accent-d);font-weight:600}
 .dark .status-msg{color:#E9DDF3}
 
@@ -212,7 +231,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <div class="center">
     <svg class="big" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <p class="ver">Beta 1.3</p>
+    <p class="ver">Beta 1.4</p>
   </div>
 </section>
 
@@ -305,6 +324,17 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   </div>
 </section>
 
+<!-- 4c. Preparar el teléfono -->
+<section id="s-perm" class="screen" hidden>
+  <header class="top"><h1 tabindex="-1">Preparar tu teléfono</h1><span id="permCount" class="beta"></span></header>
+  <div class="body">
+    <div class="pbar" aria-hidden="true"><i id="permBar"></i></div>
+    <div id="permStep"></div>
+    <input id="pwCam" type="file" accept="image/*" capture="environment" hidden>
+    <input id="pwVcf" type="file" accept=".vcf,text/vcard,text/x-vcard,text/directory" multiple hidden>
+  </div>
+</section>
+
 <!-- 5. Ingreso -->
 <section id="s-signin" class="screen dark" hidden>
   <svg class="bloom" aria-hidden="true"><use href="#flower"/></svg>
@@ -324,7 +354,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <header class="top">
     <svg class="logo" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <span class="beta">BETA 1.3</span>
+    <span class="beta">BETA 1.4</span>
   </header>
   <div class="body">
     <p id="hello" class="hello"></p>
@@ -477,6 +507,12 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
       <label class="field" style="margin-bottom:0"><span>La otra persona habla</span><select id="aOther"></select></label>
     </div>
     <div class="card">
+      <h2>Contactos</h2>
+      <p id="aContactsInfo" class="lead" style="font-size:.95rem;margin:0 0 8px"></p>
+      <ul id="aContacts" class="clist"></ul>
+      <button id="aContactsAdd" class="btn ghost" type="button">Agregar contactos</button>
+    </div>
+    <div class="card">
       <h2>Conversación</h2>
       <label class="tg"><span>Reproducir la voz<small>Si lo apagás, solo se muestra el texto.</small></span><input id="aVoice" type="checkbox"></label>
       <button id="aSound" class="btn ghost" type="button" style="margin:8px 0">🔊 Probar sonido y tipo de voz</button>
@@ -503,13 +539,14 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     </div>
     <div class="card">
       <h2>Acerca de</h2>
-      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.3</strong> · versión de prueba</p>
+      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.4</strong> · versión de prueba</p>
       <p id="aDiag" class="lead" style="font-size:.8rem;margin:8px 0 0"></p>
     </div>
     <div class="card">
       <h2>Datos</h2>
       <div class="stack">
-        <button id="aTour" class="btn primary" type="button" style="margin-bottom:10px">Volver a probar todas las funciones</button>
+        <button id="aPerms" class="btn primary" type="button" style="margin-bottom:10px">Revisar permisos del teléfono</button>
+        <button id="aTour" class="btn ghost" type="button" style="margin-bottom:10px">Volver a probar todas las funciones</button>
         <button id="aWelcome" class="btn ghost" type="button">Ver la bienvenida de nuevo</button>
         <button id="aWipe" class="btn ghost danger" type="button">Borrar todos mis datos</button>
       </div>
@@ -580,7 +617,7 @@ var ICONS = {
 };
 
 var KEY = "fc:v2";
-var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", tts:"auto", soundOk:false, history:[] };
+var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", tts:"auto", soundOk:false, perms:{}, permsDone:false, contacts:[], history:[] };
 var DB = loadDB();
 
 function loadDB() {
@@ -617,11 +654,12 @@ function applyPrefs() {
 }
 
 /* ====================== Navegación ====================== */
-var ROUTES = ["splash","welcome","setup","mic","sound","signin","home","convo","photo","tour","history","view","settings"];
+var ROUTES = ["splash","welcome","setup","mic","sound","perm","signin","home","convo","photo","tour","history","view","settings"];
 var WITH_NAV = { home:1, history:1, settings:1 };
 var current = "splash";
 
 function go(name) {
+  if (current === "perm" && name !== "perm") permStopTest();
   if (current === "convo" && name !== "convo") cancelAll();
   if (current === "photo" && name !== "photo") { stopVoice(); }
   current = name;
@@ -640,6 +678,7 @@ function go(name) {
   if (name === "history") renderHistory();
   if (name === "settings") renderSettings();
   if (name === "sound") renderSound();
+  if (name === "perm") renderPerm();
   var h = document.querySelector("#s-" + name + " h1");
   if (h && name !== "splash") { try { h.focus({ preventScroll: true }); } catch (e) {} }
   var b = document.querySelector("#s-" + name + " .body"); if (b) b.scrollTop = 0;
@@ -669,7 +708,7 @@ function renderSetup() {
 $("setNext").addEventListener("click", function () {
   DB.name = $("setName").value.trim(); DB.me = $("setMe").value; DB.other = $("setOther").value;
   if (DB.me === DB.other) DB.other = DB.me === "en" ? "es" : "en";
-  saveDB(); go("mic");
+  saveDB(); startPerms(null, 0);
 });
 
 /* ====================== Micrófono ====================== */
@@ -791,9 +830,10 @@ function renderChips() {
 }
 
 /* ---- estado del botón ---- */
-var LABELS = { idle: "Hablar", listening: "Detener", working: "Traduciendo", speaking: "Parar" };
+var LABELS = { idle: "Hablar", listening: "Listo", working: "Traduciendo", speaking: "Parar" };
 function setPhase(p) {
   S.phase = p;
+  if (p !== "listening") $("mic").classList.remove("open");
   var m = $("mic"); m.setAttribute("data-phase", p);
   $("micLabel").textContent = LABELS[p];
   m.setAttribute("aria-label", LABELS[p]);
@@ -977,18 +1017,33 @@ $("sBack").addEventListener("click", soundDone);
 /* ---- botón principal ---- */
 $("mic").addEventListener("click", function () {
   if (S.phase === "idle") { stopVoice(); releaseAudio(); listen(); return; }
-  else if (S.phase === "listening") { if (S.sr) { try { S.sr.stop(); } catch (e) {} } }
+  else if (S.phase === "listening") { stopListening(); }
   else cancelAll();
 });
 
 function cancelAll() {
   S.run++;
+  if (S.listen) { if (S.listen.li) S.listen.li.remove(); S.listen = null; }
   try { if (S.sr) { var sr = S.sr; S.sr = null; sr.abort(); } } catch (e) {}
   stopVoice();
   if (current === "convo") setPhase("idle");
 }
 
 /* ---- escuchar ---- */
+/* Une los resultados del dictado sin repetir texto (en iPhone a veces llegan repetidos) */
+function mergeResults(results) {
+  var acc = "";
+  for (var i = 0; i < results.length; i++) {
+    var t = (results[i][0] && results[i][0].transcript || "").trim(); if (!t) continue;
+    var a = acc.toLowerCase(), b = t.toLowerCase();
+    if (!acc) acc = t;
+    else if (b.indexOf(a) === 0) acc = t;
+    else if (a.slice(-b.length) === b) continue;
+    else acc += " " + t;
+  }
+  return acc.trim();
+}
+/* Tocás Hablar, hablás todo lo que quieras (aunque hagas pausas) y tocás Listo para terminar */
 function listen() {
   if (S.phase !== "idle") return;
   if (!SR_CLASS) { setStatus("Este navegador no tiene dictado. Abrí la app desde Safari o escribí tu mensaje.", true); return; }
@@ -996,47 +1051,81 @@ function listen() {
   var who = S.turn;
   var lang = who === "me" ? DB.me : DB.other;
   releaseAudio();
-  var sr = new SR_CLASS();
-  sr.lang = LOCALES[lang] || lang;
-  sr.interimResults = true; sr.continuous = false; sr.maxAlternatives = 1;
-  var fin = "", part = "", err = "", heard = false;
-  S.sr = sr;
+  var L = { done: "", cur: "", err: "", open: false, stop: false, restarts: 0, li: null, ended: false };
+  S.listen = L;
   setPhase("listening");
-  sr.onaudiostart = function () { heard = true; if (run === S.run && !(fin || part)) setStatus("Te escucho: hablá ahora en " + langName(lang) + "…"); };
-  sr.onresult = function (e) {
-    var f = "", p = "";
-    for (var i = 0; i < e.results.length; i++) { var r = e.results[i]; if (r.isFinal) f += r[0].transcript; else p += r[0].transcript; }
-    fin = f; part = p;
-    if (run === S.run) setStatus("Escuché: " + (f + p));
-  };
-  sr.onerror = function (e) { err = e.error || "error"; };
-  sr.onend = function () {
-    if (S.sr === sr) S.sr = null;
-    if (run !== S.run) return;
-    var text = (fin || part).trim();
-    if (text) { S.silent = 0; sendText(text, who, lang, run); return; }
+  $("micLabel").textContent = "Abriendo…";
+  setStatus("Abriendo el micrófono… esperá a que diga «Hablá ahora».");
+  function text() { return (L.done + " " + L.cur).replace(/\s+/g, " ").trim(); }
+  function showLive() {
+    var log = $("log");
+    if (!L.li) {
+      var e = log.querySelector(".empty"); if (e) e.remove();
+      L.li = el("li", "msg live " + (who === "me" ? "mine" : "theirs"));
+      L.li.appendChild(el("div", "who", (who === "me" ? "Vos" : "Otra persona") + " · " + langTag(lang) + " · hablando…"));
+      L.li.appendChild(el("div", "orig"));
+      log.appendChild(L.li);
+    }
+    L.li.querySelector(".orig").textContent = text() || "…";
+    log.scrollTop = log.scrollHeight;
+  }
+  function finish() {
+    if (run !== S.run || L.ended) return;
+    L.ended = true; S.listen = null;
+    var t = text();
+    if (L.li) { L.li.remove(); L.li = null; }
+    if (t) { S.silent = 0; sendText(t, who, lang, run); return; }
     setPhase("idle");
-    if (err === "not-allowed" || err === "service-not-allowed") {
-      setStatus("Sin permiso para el dictado. Activá el micrófono para Safari y el dictado en Ajustes > General > Teclado.", true); return;
-    }
-    if (err === "audio-capture") {
-      setStatus("El micrófono quedó trabado. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return;
-    }
-    if (err === "network") {
-      setStatus("El dictado necesita internet. Revisá la conexión y tocá Hablar de nuevo.", true); return;
-    }
-    if (err === "language-not-supported") {
-      setStatus("Este teléfono no tiene el dictado en " + langName(lang) + ". Podés escribir tu mensaje o elegir otro idioma.", true); return;
-    }
+    var err = L.err;
+    if (err === "not-allowed" || err === "service-not-allowed") { setStatus("Sin permiso para el dictado. Andá a Perfil → Revisar permisos del teléfono.", true); return; }
+    if (err === "audio-capture") { setStatus("El micrófono quedó trabado. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return; }
+    if (err === "network") { setStatus("El dictado necesita internet. Revisá la conexión y tocá Hablar de nuevo.", true); return; }
+    if (err === "language-not-supported") { setStatus("Este teléfono no tiene el dictado en " + langName(lang) + ". Podés escribir tu mensaje o elegir otro idioma.", true); return; }
     if (err && err !== "no-speech" && err !== "aborted") { setStatus("No se pudo escuchar (código: " + err + "). Probá de nuevo y, si sigue, mandá una captura de este mensaje.", true); return; }
-    if (!heard && !err) { S.silent = 0; setStatus("No llegó sonido del micrófono. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return; }
-    S.silent++;
-    if (DB.auto && S.silent < 3) { setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(); }, 300); return; }
-    S.silent = 0;
-    setStatus("No se escuchó nada. Tocá Hablar para seguir.", true);
-  };
-  try { sr.start(); }
-  catch (e) { S.sr = null; setPhase("idle"); setStatus("No se pudo iniciar el micrófono. Probá de nuevo.", true); }
+    if (!L.open) { setStatus("No llegó sonido del micrófono. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return; }
+    setStatus("No escuché nada. Tocá Hablar y hablá cuando diga «Hablá ahora».", true);
+  }
+  L.finish = finish;
+  function startOne() {
+    var sr = new SR_CLASS(), serr = "", t0 = Date.now();
+    sr.lang = LOCALES[lang] || lang;
+    sr.interimResults = true; sr.continuous = true; sr.maxAlternatives = 1;
+    S.sr = sr;
+    sr.onaudiostart = function () {
+      if (run !== S.run) return;
+      L.open = true; $("mic").classList.add("open"); $("micLabel").textContent = "Listo";
+      if (!text()) setStatus("Hablá ahora en " + langName(lang) + ". Cuando termines, tocá Listo.");
+    };
+    sr.onresult = function (e) {
+      if (run !== S.run) return;
+      L.open = true; L.cur = mergeResults(e.results); showLive();
+      setStatus("Escuchando… cuando termines, tocá Listo.");
+    };
+    sr.onerror = function (e) { serr = e.error || "error"; };
+    sr.onend = function () {
+      if (S.sr === sr) S.sr = null;
+      if (run !== S.run || L.ended) return;
+      if (L.cur) { L.done = (L.done + " " + L.cur).trim(); L.cur = ""; }
+      if (L.stop) { finish(); return; }
+      var fatal = serr && serr !== "no-speech" && serr !== "aborted";
+      if (fatal || L.restarts >= 60 || (serr && Date.now() - t0 < 300 && L.restarts > 3)) { L.err = serr || L.err; finish(); return; }
+      /* el teléfono cerró el micrófono solo: se vuelve a abrir y se sigue sumando el texto */
+      L.restarts++;
+      setTimeout(function () { if (run !== S.run || L.ended) return; if (L.stop) finish(); else startOne(); }, 60);
+    };
+    try { sr.start(); }
+    catch (e) { if (S.sr === sr) S.sr = null; L.err = L.err || "start"; finish(); }
+  }
+  startOne();
+}
+function stopListening() {
+  var L = S.listen; if (!L) return;
+  L.stop = true;
+  $("micLabel").textContent = "…";
+  if (S.sr) { try { S.sr.stop(); } catch (e) {} }
+  else L.finish();
+  /* si el teléfono tarda en cerrar, se envía igual lo que se escuchó */
+  setTimeout(function () { if (S.listen === L && !L.ended) { if (S.sr) { var s = S.sr; S.sr = null; try { s.abort(); } catch (e) {} } L.finish(); } }, 2500);
 }
 
 /* ---- traducir ---- */
@@ -1750,8 +1839,296 @@ $("vDel").addEventListener("click", function () {
   DB.history = DB.history.filter(function (x) { return x.id !== viewId; }); saveDB(); go("history");
 });
 
+/* ====================== Preparar el teléfono ====================== */
+var PERM_KEYS = ["browser", "mic", "sound", "camera", "contacts"];
+var PERM_NAMES = { browser:"Navegador", mic:"Micrófono y dictado", sound:"Sonido", camera:"Cámara", contacts:"Contactos" };
+var PW = { i: 0, tries: {}, from: null, sr: null, timer: null };
+function permGet(k) { return (DB.perms || {})[k]; }
+function permSet(k, v) { var p = {}; for (var x in (DB.perms || {})) p[x] = DB.perms[x]; p[k] = v; DB.perms = p; saveDB(); }
+function startPerms(from, idx) { PW.i = idx || 0; PW.tries = {}; PW.from = from || null; go("perm"); }
+function permStopTest() {
+  clearTimeout(PW.timer);
+  if (PW.sr) { var s = PW.sr; PW.sr = null; try { s.onend = null; s.abort(); } catch (e) {} }
+}
+function onIOS() { return IS_IOS; }
+function inAppBrowser() { return /FBAN|FBAV|Instagram|WhatsApp|Line\/|Twitter|Snapchat|TikTok|musical_ly|Bytedance|GSA\//i.test(navigator.userAgent); }
+function otherIOSBrowser() { return IS_IOS && /CriOS|FxiOS|EdgiOS|OPiOS/.test(navigator.userAgent); }
+function helpList(items) { return "<ol class=\"checks\">" + items.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ol>"; }
+
+function renderPerm() {
+  permStopTest();
+  var total = PERM_KEYS.length + 1, n = PW.i + 1;
+  $("permCount").textContent = "Paso " + n + " de " + total;
+  $("permBar").style.width = Math.round(n / total * 100) + "%";
+  var box = $("permStep"); box.textContent = "";
+  if (PW.i >= PERM_KEYS.length) { renderPermSummary(box); return; }
+  var key = PERM_KEYS[PW.i];
+  var ui = {};
+  ui.key = key;
+  ui.ico = el("div", "perm-ico"); ui.title = el("h2", "ptitle"); ui.why = el("p", "lead");
+  ui.act = el("div", "stack"); ui.msg = el("p", "status-msg"); ui.msg.setAttribute("role", "status");
+  ui.help = el("details", "help"); ui.help.hidden = true;
+  ui.helpSum = el("summary", null, "Cómo arreglarlo: paso a paso"); ui.helpBody = el("div");
+  ui.help.appendChild(ui.helpSum); ui.help.appendChild(ui.helpBody);
+  ui.extra = el("div", "stack");
+  var foot = el("div", "stack"); foot.style.marginTop = "16px";
+  ui.next = el("button", "btn primary", "Siguiente"); ui.next.type = "button"; ui.next.disabled = true;
+  ui.skip = el("button", "btn ghost", "Seguir sin esta función"); ui.skip.type = "button"; ui.skip.hidden = true;
+  foot.appendChild(ui.next); foot.appendChild(ui.skip);
+  [ui.ico, ui.title, ui.why, ui.act, ui.msg, ui.help, ui.extra, foot].forEach(function (x) { box.appendChild(x); });
+  ui.next.addEventListener("click", function () { PW.i++; renderPerm(); });
+  ui.skip.addEventListener("click", function () { permSet(key, "skip"); PW.i++; renderPerm(); });
+  ui.ok = function (t) {
+    permStopTest(); permSet(key, "ok");
+    ui.msg.className = "status-msg ok"; ui.msg.textContent = "✓ " + t;
+    ui.next.disabled = false; ui.skip.hidden = true; ui.help.hidden = true;
+  };
+  ui.fail = function (t, helpHtml) {
+    permStopTest();
+    PW.tries[key] = (PW.tries[key] || 0) + 1;
+    if (permGet(key) === "ok") permSet(key, "");
+    ui.msg.className = "status-msg err"; ui.msg.textContent = t;
+    if (helpHtml) { ui.helpBody.innerHTML = helpHtml; ui.help.hidden = false; ui.help.open = true; }
+    ui.next.disabled = true;
+    ui.skip.hidden = PW.tries[key] < 2;
+  };
+  ui.info = function (t) { ui.msg.className = "status-msg"; ui.msg.textContent = t; };
+  ui.btn = function (label, cls, fn) { var b = el("button", "btn " + (cls || "primary"), label); b.type = "button"; b.addEventListener("click", fn); return b; };
+  PERM_STEP[key](ui);
+  if (permGet(key) === "ok" && !ui.msg.textContent) { ui.msg.className = "status-msg ok"; ui.msg.textContent = "✓ Ya estaba listo. Podés probar de nuevo o seguir."; ui.next.disabled = false; }
+}
+
+var PERM_STEP = {
+  browser: function (ui) {
+    ui.ico.textContent = "🧭"; ui.title.textContent = "Abrí la app en el navegador correcto";
+    ui.why.textContent = onIOS() ? "En iPhone, el micrófono y el dictado funcionan solo en Safari." : "El micrófono y el dictado funcionan en Chrome.";
+    function check(first) {
+      var ok = !!SR_CLASS && !STANDALONE && !inAppBrowser() && !otherIOSBrowser();
+      if (ok) { ui.ok(onIOS() ? "Estás en Safari. Todo bien." : "Tu navegador tiene dictado. Todo bien."); return; }
+      var why = STANDALONE ? "La abriste desde el ícono de la pantalla de inicio, y así el dictado no funciona."
+        : inAppBrowser() ? "La abriste desde otra app (por ejemplo WhatsApp o Instagram)."
+        : otherIOSBrowser() ? "Estás en otro navegador. En iPhone tiene que ser Safari."
+        : "Este navegador no tiene dictado.";
+      ui.fail(why, onIOS() ? helpList([
+        "Tocá <strong>Copiar el link</strong> (acá abajo).",
+        "Si estás dentro de WhatsApp u otra app: tocá los tres puntos <strong>⋯</strong> o el ícono de compartir y elegí <strong>Abrir en Safari</strong>. Si no aparece, seguí con el paso 3.",
+        "Abrí <strong>Safari</strong>, tocá la barra de direcciones, mantené apretado y elegí <strong>Pegar y visitar</strong>.",
+        "Si la tenías como ícono en la pantalla de inicio, para hablar usala desde Safari."
+      ]) : helpList([
+        "Tocá <strong>Copiar el link</strong> (acá abajo).",
+        "Abrí <strong>Chrome</strong> y pegá el link en la barra de direcciones."
+      ]));
+    }
+    ui.act.appendChild(ui.btn("Volver a comprobar", "ghost", function () { check(false); }));
+    ui.extra.appendChild(ui.btn("📋 Copiar el link", "ghost", function (e) {
+      var link = location.origin + location.pathname, b = e.currentTarget;
+      var done = function () { b.textContent = "✓ Link copiado"; };
+      try { navigator.clipboard.writeText(link).then(done, function () { prompt("Copiá este link:", link); }); }
+      catch (err) { prompt("Copiá este link:", link); }
+    }));
+    check(true);
+  },
+
+  mic: function (ui) {
+    ui.ico.textContent = "🎙️"; ui.title.textContent = "Micrófono y dictado";
+    ui.why.textContent = "Para que la app te escuche y pase lo que decís a texto. El iPhone te va a pedir permiso: tocá Permitir.";
+    var help = helpList([
+      "Abrí <strong>Ajustes</strong> → <strong>Apps</strong> → <strong>Safari</strong> (en iPhone más viejos: Ajustes → Safari) → <strong>Micrófono</strong> → <strong>Permitir</strong>.",
+      "En <strong>Ajustes</strong> → <strong>General</strong> → <strong>Teclado</strong>, activá <strong>Activar dictado</strong>.",
+      "Si en algún momento tocaste <strong>No permitir</strong>: cerrá Safari del todo (deslizá hacia arriba) y volvé a abrir la app.",
+      "Volvé acá y tocá <strong>Probar micrófono</strong>."
+    ]);
+    var go1 = ui.btn("Probar micrófono", "primary", function () {
+      permStopTest();
+      if (!SR_CLASS) { ui.fail("Este navegador no tiene dictado. Volvé al paso 1.", help); return; }
+      var sr = new SR_CLASS(), err = "", got = "";
+      PW.sr = sr;
+      sr.lang = LOCALES[DB.me] || DB.me; sr.interimResults = true; sr.continuous = true;
+      ui.info("Pidiendo permiso…");
+      sr.onaudiostart = function () { ui.info("Ahora decí «hola» en voz alta…"); };
+      sr.onresult = function (e) { got = mergeResults(e.results); if (got) { ui.ok("Te escuché: «" + got + "». El micrófono funciona."); } };
+      sr.onerror = function (e) { err = e.error || "error"; };
+      sr.onend = function () {
+        if (PW.sr !== sr) return; PW.sr = null;
+        if (got) return;
+        if (err === "not-allowed" || err === "service-not-allowed") ui.fail("No se dio el permiso del micrófono o del dictado.", help);
+        else ui.fail("No te escuché. Fijate que no esté tapado el micrófono y probá de nuevo.", help);
+      };
+      PW.timer = setTimeout(function () { if (PW.sr === sr) { try { sr.stop(); } catch (e) {} } }, 9000);
+      try { sr.start(); } catch (e) { PW.sr = null; ui.fail("No se pudo abrir el micrófono.", help); }
+    });
+    ui.act.appendChild(go1);
+  },
+
+  sound: function (ui) {
+    ui.ico.textContent = "🔊"; ui.title.textContent = "Sonido";
+    ui.why.textContent = "Las traducciones se leen en voz alta. Sacá el modo silencio, subí el volumen y tocá Probar sonido.";
+    var help = helpList([
+      "Sacá el <strong>modo silencio</strong>: el botón del costado (o el botón de Acción). Si ves la campanita tachada, está en silencio.",
+      "Subí el volumen con los botones del costado <strong>mientras suena</strong> la prueba.",
+      "Si tenés auriculares Bluetooth conectados, el sonido sale por ahí.",
+      "Tocá <strong>Probar sonido</strong> de nuevo."
+    ]);
+    var ask = el("div", "stack"); ask.hidden = true;
+    var lang = SOUND_PHRASE[DB.me] ? DB.me : "es";
+    function play() {
+      ask.hidden = true; ui.info("Reproduciendo…");
+      unlockAudio(); stopVoice();
+      speak(SOUND_PHRASE[lang], lang).then(function () { if (current !== "perm") return; ui.info("¿Escuchaste la voz?"); ask.hidden = false; });
+    }
+    ui.act.appendChild(ui.btn("Probar sonido", "primary", play));
+    ask.appendChild(ui.btn("Sí, la escuché", "primary", function () { DB.soundOk = true; saveDB(); ask.hidden = true; ui.ok("El sonido funciona."); }));
+    ask.appendChild(ui.btn("No se escuchó", "ghost", function () {
+      ask.hidden = true;
+      ui.fail("No se escuchó la voz. Seguí estos pasos y probá de nuevo.", help);
+      if (PW.tries.sound >= 2 && !ui.extra.querySelector(".cloudtry")) {
+        var c = ui.btn("Probar con la voz en la nube", "ghost cloudtry", function () { DB.tts = "cloud"; saveDB(); play(); });
+        ui.extra.appendChild(c);
+      }
+    }));
+    ui.act.appendChild(ask);
+  },
+
+  camera: function (ui) {
+    ui.ico.textContent = "📷"; ui.title.textContent = "Cámara";
+    ui.why.textContent = "Para traducir carteles, menús o cajas con una foto. Sacá una foto de prueba de cualquier cosa.";
+    var help = helpList([
+      "Abrí <strong>Ajustes</strong> → <strong>Apps</strong> → <strong>Safari</strong> (o Ajustes → Safari) → <strong>Cámara</strong> → <strong>Permitir</strong>.",
+      "Volvé acá y tocá <strong>Abrir la cámara</strong>.",
+      "Cuando se abra, sacá la foto y tocá <strong>Usar foto</strong>."
+    ]);
+    ui.act.appendChild(ui.btn("Abrir la cámara", "primary", function () {
+      var inp = $("pwCam"); inp.value = "";
+      inp.onchange = function () {
+        var f = inp.files && inp.files[0]; if (!f) return;
+        var img = el("img", "pthumb"); img.alt = "Foto de prueba";
+        try { img.src = URL.createObjectURL(f); } catch (e) {}
+        var old = ui.extra.querySelector(".pthumb"); if (old) old.remove();
+        ui.extra.appendChild(img);
+        ui.ok("La cámara funciona.");
+      };
+      inp.click();
+      ui.info("Se abre la cámara. Sacá la foto y tocá Usar foto.");
+    }));
+    ui.act.appendChild(ui.btn("No se abrió la cámara", "ghost", function () { ui.fail("La cámara no se abrió.", help); }));
+  },
+
+  contacts: function (ui) {
+    ui.ico.textContent = "👥"; ui.title.textContent = "Contactos";
+    ui.why.textContent = "Para elegir con quién hablar. Cargá los contactos con los que vas a usar Fiorisacall.";
+    var picker = ("contacts" in navigator) && ("ContactsManager" in window);
+    var count = el("p", "lead"); count.style.margin = "0";
+    function showCount() { var n = (DB.contacts || []).length; count.textContent = n ? "Tenés " + n + " contacto" + (n === 1 ? "" : "s") + " cargado" + (n === 1 ? "" : "s") + "." : ""; }
+    var steps = helpList(picker ? [
+      "Tocá <strong>Elegir de mi agenda</strong>.",
+      "Marcá los contactos y tocá <strong>Listo</strong>."
+    ] : [
+      "Abrí la app <strong>Contactos</strong> del iPhone.",
+      "Para uno: tocá el contacto → bajá y tocá <strong>Compartir contacto</strong> → <strong>Guardar en Archivos</strong> → <strong>Guardar</strong>.",
+      "Para varios: en Contactos tocá <strong>&lt; Listas</strong>, mantené apretada la lista (por ejemplo <strong>Todos los contactos</strong>) → <strong>Exportar</strong> → <strong>Guardar en Archivos</strong>.",
+      "Volvé acá, tocá <strong>Elegir archivo de contactos</strong> y elegí el archivo que guardaste."
+    ]);
+    var how = el("div"); how.innerHTML = steps;
+    ui.act.appendChild(how);
+    if (picker) {
+      ui.act.appendChild(ui.btn("Elegir de mi agenda", "primary", function () {
+        navigator.contacts.select(["name", "tel"], { multiple: true }).then(function (list) {
+          var add = (list || []).map(function (c) { return { name: (c.name && c.name[0]) || (c.tel && c.tel[0]) || "", tel: (c.tel && c.tel[0]) || "" }; });
+          var n = addContacts(add); showCount();
+          if ((DB.contacts || []).length) ui.ok(n ? "Se cargaron " + n + " contactos." : "Los contactos ya estaban cargados.");
+          else ui.fail("No se eligió ningún contacto.", steps);
+        }).catch(function () { ui.fail("No se pudo abrir la agenda.", steps); });
+      }));
+    }
+    ui.act.appendChild(ui.btn("Elegir archivo de contactos", picker ? "ghost" : "primary", function () {
+      var inp = $("pwVcf"); inp.value = "";
+      inp.onchange = function () {
+        var files = Array.prototype.slice.call(inp.files || []); if (!files.length) return;
+        Promise.all(files.map(function (f) { return f.text ? f.text() : new Promise(function (r) { var fr = new FileReader(); fr.onload = function () { r(String(fr.result)); }; fr.readAsText(f); }); }))
+          .then(function (texts) {
+            var list = []; texts.forEach(function (t) { list = list.concat(parseVcf(t)); });
+            if (!list.length) { ui.fail("Ese archivo no tiene contactos. Elegí el archivo .vcf que guardaste desde Contactos.", steps); return; }
+            var n = addContacts(list); showCount();
+            ui.ok(n ? "Se cargaron " + n + " contacto" + (n === 1 ? "" : "s") + "." : "Esos contactos ya estaban cargados.");
+          }).catch(function () { ui.fail("No se pudo leer el archivo.", steps); });
+      };
+      inp.click();
+    }));
+    ui.act.appendChild(ui.btn("No me sale", "ghost", function () { ui.fail("Seguí el paso a paso de arriba. Si no te sale, después de dos intentos podés seguir sin contactos.", ""); }));
+    ui.act.appendChild(count); showCount();
+  }
+};
+
+function renderPermSummary(box) {
+  $("permCount").textContent = "Listo";
+  box.appendChild(el("div", "perm-ico", "✅"));
+  box.appendChild(el("h2", "ptitle", "Tu teléfono quedó preparado"));
+  box.appendChild(el("p", "lead", "Esto es lo que quedó funcionando. Lo que tenga ⚠ lo podés arreglar ahora o después desde Perfil → Revisar permisos del teléfono."));
+  PERM_KEYS.forEach(function (k, idx) {
+    var ok = permGet(k) === "ok";
+    var row = el("div", "sumrow"); var t = el("div");
+    t.appendChild(el("strong", null, (ok ? "✓ " : "⚠ ") + PERM_NAMES[k]));
+    t.appendChild(el("span", null, ok ? "Listo" : "Pendiente"));
+    row.appendChild(t);
+    if (!ok) { var b = el("button", "btn ghost", "Arreglar"); b.type = "button"; b.addEventListener("click", function () { PW.i = idx; PW.tries[k] = 0; renderPerm(); }); row.appendChild(b); }
+    box.appendChild(row);
+  });
+  var end = el("button", "btn primary", PW.from === "settings" ? "Volver a Perfil" : "Empezar a usar Fiorisacall"); end.type = "button"; end.style.marginTop = "20px";
+  end.addEventListener("click", function () { DB.permsDone = true; saveDB(); go(PW.from === "settings" ? "settings" : "signin"); });
+  box.appendChild(end);
+}
+
+/* contactos */
+function qpDecode(s) {
+  try { return decodeURIComponent(s.replace(/=\r?\n/g, "").replace(/%/g, "%25").replace(/=([0-9A-F]{2})/gi, "%$1")); } catch (e) { return s; }
+}
+function parseVcf(txt) {
+  txt = String(txt || "").replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, "");
+  var out = [];
+  txt.split(/BEGIN:VCARD/i).slice(1).forEach(function (card) {
+    var fn = "", nm = "", tels = [];
+    card.split(/\r?\n/).forEach(function (line) {
+      var i = line.indexOf(":"); if (i < 0) return;
+      var key = line.slice(0, i).toUpperCase(), val = line.slice(i + 1).trim();
+      if (/QUOTED-PRINTABLE/.test(key)) val = qpDecode(val);
+      var base = key.split(";")[0].replace(/^ITEM\d+\./, "");
+      if (base === "FN") fn = val;
+      else if (base === "N") nm = val.split(";").filter(Boolean).reverse().join(" ");
+      else if (base === "TEL") tels.push(val);
+    });
+    var name = (fn || nm).replace(/\\([,;])/g, "$1").trim();
+    if (name || tels.length) out.push({ name: name || tels[0], tel: tels[0] || "" });
+  });
+  return out;
+}
+function addContacts(list) {
+  var cur = (DB.contacts || []).slice(), seen = {}, added = 0;
+  cur.forEach(function (c) { seen[(c.name + "|" + c.tel).toLowerCase()] = 1; });
+  list.forEach(function (c) {
+    if (!c || !(c.name || c.tel)) return;
+    var k = (c.name + "|" + c.tel).toLowerCase(); if (seen[k]) return;
+    seen[k] = 1; cur.push({ name: String(c.name).slice(0, 80), tel: String(c.tel || "").slice(0, 40) }); added++;
+  });
+  cur.sort(function (a, b) { return a.name.localeCompare(b.name, "es"); });
+  DB.contacts = cur; saveDB(); return added;
+}
+
 /* ====================== Ajustes ====================== */
+function renderContactsCard() {
+  var list = DB.contacts || [], ul = $("aContacts"); ul.textContent = "";
+  $("aContactsInfo").textContent = list.length ? list.length + " contacto" + (list.length === 1 ? "" : "s") + " cargado" + (list.length === 1 ? "" : "s") + "." : "Todavía no cargaste contactos.";
+  list.forEach(function (c, i) {
+    var li = el("li"), d = el("div");
+    d.appendChild(el("strong", null, c.name)); if (c.tel) d.appendChild(el("small", null, c.tel));
+    var b = el("button", null, "Quitar"); b.type = "button"; b.setAttribute("aria-label", "Quitar a " + c.name);
+    b.addEventListener("click", function () { var a = DB.contacts.slice(); a.splice(i, 1); DB.contacts = a; saveDB(); renderContactsCard(); });
+    li.appendChild(d); li.appendChild(b); ul.appendChild(li);
+  });
+}
+$("aContactsAdd").addEventListener("click", function () { startPerms("settings", 4); });
+$("aPerms").addEventListener("click", function () { startPerms("settings", 0); });
 function renderSettings() {
+  renderContactsCard();
   var ua = navigator.userAgent, br = /CriOS/.test(ua) ? "Chrome iPhone" : /FxiOS/.test(ua) ? "Firefox iPhone" : /Instagram|FBAN|FBAV|WhatsApp|Line\//.test(ua) ? "navegador de otra app" : /Safari/.test(ua) && /iPhone|iPad/.test(ua) ? "Safari iPhone" : /Android/.test(ua) ? "Android" : "computadora";
   $("aDiag").textContent = "Diagnóstico: " + br + " · dictado " + (SR_CLASS ? "sí" : "no") + " · ícono de inicio " + (STANDALONE ? "sí" : "no") + " · voz " + (DB.tts || "auto");
   $("aName").value = DB.name; fillSelect($("aMe"), DB.me); fillSelect($("aOther"), DB.other);
