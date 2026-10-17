@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fiorisacall · Beta 1.5</title>
+<title>Fiorisacall · Beta 1.6</title>
 <meta name="theme-color" content="#241238">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -25,6 +25,26 @@ body.hc{
 }
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
+
+/* ---- buscador de idiomas ---- */
+.lp-btn{display:flex;align-items:center;gap:8px;width:100%;min-height:50px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);padding:0 32px 0 14px;font-size:1rem;text-align:left;cursor:pointer;position:relative;color:var(--text)}
+.lp-btn .lp-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lp-btn::after{content:"";position:absolute;right:16px;top:50%;width:8px;height:8px;margin-top:-6px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(45deg)}
+.lp{position:fixed;inset:0;z-index:80;background:rgba(20,8,32,.45);display:flex;align-items:flex-end;justify-content:center}
+.lp-card{background:var(--bg);width:100%;max-width:560px;height:88%;border-radius:22px 22px 0 0;display:flex;flex-direction:column;padding:14px 16px 0;box-shadow:0 -8px 30px rgba(0,0,0,.2)}
+.lp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.lp-head h2{font-size:1.15rem}
+.lp-close{border:0;background:transparent;color:var(--accent);font-weight:600;font-size:1rem;padding:10px 4px;cursor:pointer}
+.lp-q{width:100%;min-height:52px;border-radius:14px;border:2px solid var(--accent);background:var(--card);padding:0 14px;font-size:1.05rem;color:var(--text)}
+.lp-q:focus{outline:none;box-shadow:0 0 0 4px var(--mine-line)}
+.lp-list{list-style:none;padding:8px 0 30px;margin:0;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.lp-list li button{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;padding:8px 6px;cursor:pointer;color:var(--text)}
+.lp-list li button[aria-selected="true"]{background:var(--mine)}
+.lp-flag{font-size:1.6rem;line-height:1}
+.lp-txt{display:flex;flex-direction:column;min-width:0}
+.lp-txt strong{font-size:1.05rem}
+.lp-txt small{color:var(--mute);font-size:.85rem}
+.lp-none{color:var(--mute);padding:18px 6px;line-height:1.4}
 html{font-size:calc(100% * var(--ts));height:100%}
 body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%;overscroll-behavior:none}
 button,select,input{font:inherit;color:inherit}
@@ -235,7 +255,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <div class="center">
     <svg class="big" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <p class="ver">Beta 1.5</p>
+    <p class="ver">Beta 1.6</p>
   </div>
 </section>
 
@@ -358,7 +378,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <header class="top">
     <svg class="logo" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <span class="beta">BETA 1.5</span>
+    <span class="beta">BETA 1.6</span>
   </header>
   <div class="body">
     <p id="hello" class="hello"></p>
@@ -456,7 +476,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
       <details class="pfix" style="margin-top:14px">
         <summary style="cursor:pointer;padding:8px 0;font-weight:600">Ver o corregir el texto leído</summary>
         <p id="pDet" class="note" style="margin:6px 0 10px" hidden></p>
-        <textarea id="pText" class="ptext" aria-label="Texto leído de la foto"></textarea>
+        <textarea id="pText" class="ptext" dir="auto" aria-label="Texto leído de la foto"></textarea>
         <button id="pGo" class="btn ghost" type="button" style="margin-top:10px">Traducir de nuevo</button>
       </details>
     </div>
@@ -548,7 +568,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     </div>
     <div class="card">
       <h2>Acerca de</h2>
-      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.5</strong> · versión de prueba</p>
+      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.6</strong> · versión de prueba</p>
       <p id="aDiag" class="lead" style="font-size:.8rem;margin:8px 0 0"></p>
     </div>
     <div class="card">
@@ -577,6 +597,14 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
 
 </div>
 
+<div id="lp" class="lp" hidden role="dialog" aria-modal="true" aria-labelledby="lpTitle">
+  <div class="lp-card">
+    <div class="lp-head"><h2 id="lpTitle">Elegí un idioma</h2><button id="lpClose" class="lp-close" type="button">Cerrar</button></div>
+    <input id="lpQ" class="lp-q" type="search" placeholder="Escribí un idioma o un país (ej: arg)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Buscar idioma o país" aria-controls="lpList">
+    <ul id="lpList" class="lp-list" role="listbox" aria-labelledby="lpTitle"></ul>
+  </div>
+</div>
+
 <script>
 /* Si algo falla, se muestra un cartel en pantalla en vez de dejarla en blanco */
 function showFatal(msg) {
@@ -599,12 +627,49 @@ window.addEventListener("unhandledrejection", function (e) { showFatal(String((e
 var $ = function (id) { return document.getElementById(id); };
 var LANGS = [
   ["es","Español","🇪🇸"],["en","English","🇺🇸"],["pt","Português","🇧🇷"],["fr","Français","🇫🇷"],["it","Italiano","🇮🇹"],
-  ["de","Deutsch","🇩🇪"],["nl","Nederlands","🇳🇱"],["ru","Русский","🇷🇺"],["tr","Türkçe","🇹🇷"],["ar","العربية","🇸🇦"],
-  ["hi","हिन्दी","🇮🇳"],["ja","日本語","🇯🇵"],["ko","한국어","🇰🇷"],["zh","中文","🇨🇳"]
+  ["de","Deutsch","🇩🇪"],["nl","Nederlands","🇳🇱"],["pl","Polski","🇵🇱"],["ru","Русский","🇷🇺"],["uk","Українська","🇺🇦"],
+  ["ro","Română","🇷🇴"],["el","Ελληνικά","🇬🇷"],["cs","Čeština","🇨🇿"],["hu","Magyar","🇭🇺"],["sv","Svenska","🇸🇪"],
+  ["da","Dansk","🇩🇰"],["nb","Norsk","🇳🇴"],["fi","Suomi","🇫🇮"],["tr","Türkçe","🇹🇷"],["ar","العربية","🇸🇦"],
+  ["he","עברית","🇮🇱"],["hi","हिन्दी","🇮🇳"],["id","Bahasa Indonesia","🇮🇩"],["vi","Tiếng Việt","🇻🇳"],["th","ไทย","🇹🇭"],
+  ["ja","日本語","🇯🇵"],["ko","한국어","🇰🇷"],["zh","中文","🇨🇳"]
 ];
+/* Nombre en castellano y países donde se habla: así el buscador encuentra «arg» → Español */
+var LANG_INFO = {
+  es:["Español (castellano)","España,Argentina,México,Colombia,Chile,Perú,Uruguay,Paraguay,Bolivia,Ecuador,Venezuela,Cuba,República Dominicana,Puerto Rico,Costa Rica,Panamá,Guatemala,Honduras,El Salvador,Nicaragua,spanish"],
+  en:["Inglés","Estados Unidos,EEUU,USA,Reino Unido,Inglaterra,Escocia,Irlanda,Canadá,Australia,Nueva Zelanda,Sudáfrica,Jamaica,english"],
+  pt:["Portugués","Brasil,Portugal,Angola,Mozambique,portuguese"],
+  fr:["Francés","Francia,Bélgica,Suiza,Canadá,Quebec,Mónaco,Senegal,Costa de Marfil,Haití,french"],
+  it:["Italiano","Italia,San Marino,Vaticano,Suiza,italian"],
+  de:["Alemán","Alemania,Austria,Suiza,Liechtenstein,german"],
+  nl:["Neerlandés (holandés)","Países Bajos,Holanda,Bélgica,Surinam,flamenco,dutch"],
+  pl:["Polaco","Polonia,polish"],
+  ru:["Ruso","Rusia,Bielorrusia,Kazajistán,Kirguistán,russian"],
+  uk:["Ucraniano","Ucrania,ukrainian"],
+  ro:["Rumano","Rumania,Moldavia,romanian"],
+  el:["Griego","Grecia,Chipre,greek"],
+  cs:["Checo","República Checa,Chequia,czech"],
+  hu:["Húngaro","Hungría,hungarian"],
+  sv:["Sueco","Suecia,swedish"],
+  da:["Danés","Dinamarca,danish"],
+  nb:["Noruego","Noruega,norwegian"],
+  fi:["Finlandés","Finlandia,finnish"],
+  tr:["Turco","Turquía,Chipre,turkish"],
+  ar:["Árabe","Arabia Saudita,Emiratos Árabes,Egipto,Marruecos,Argelia,Túnez,Líbano,Jordania,Irak,Siria,Qatar,Kuwait,arabic"],
+  he:["Hebreo","Israel,hebrew"],
+  hi:["Hindi","India,hindi"],
+  id:["Indonesio","Indonesia,indonesian"],
+  vi:["Vietnamita","Vietnam,vietnamese"],
+  th:["Tailandés","Tailandia,thai"],
+  ja:["Japonés","Japón,japanese"],
+  ko:["Coreano","Corea,Corea del Sur,korean"],
+  zh:["Chino (mandarín)","China,Taiwán,Hong Kong,Singapur,chinese"]
+};
+var RTL = { ar:1, he:1 };
 var LOCALES = {
   es:"es-AR", en:"en-US", pt:"pt-BR", fr:"fr-FR", it:"it-IT", de:"de-DE", nl:"nl-NL",
-  ru:"ru-RU", tr:"tr-TR", ar:"ar-SA", hi:"hi-IN", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN"
+  pl:"pl-PL", ru:"ru-RU", uk:"uk-UA", ro:"ro-RO", el:"el-GR", cs:"cs-CZ", hu:"hu-HU", sv:"sv-SE",
+  da:"da-DK", nb:"nb-NO", fi:"fi-FI", tr:"tr-TR", ar:"ar-SA", he:"he-IL", hi:"hi-IN", id:"id-ID",
+  vi:"vi-VN", th:"th-TH", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN"
 };
 var PHRASES = {
   es:["Hola","Gracias","¿Dónde está el baño?","Necesito ayuda","¿Podés repetir, por favor?","Hablá más despacio, por favor"],
@@ -612,7 +677,29 @@ var PHRASES = {
   pt:["Olá","Obrigado","Onde fica o banheiro?","Preciso de ajuda","Pode repetir, por favor?","Fale mais devagar, por favor"],
   fr:["Bonjour","Merci","Où sont les toilettes ?","J'ai besoin d'aide","Pouvez-vous répéter, s'il vous plaît ?","Parlez plus lentement, s'il vous plaît"],
   it:["Ciao","Grazie","Dov'è il bagno?","Ho bisogno di aiuto","Può ripetere, per favore?","Parli più lentamente, per favore"],
-  de:["Hallo","Danke","Wo ist die Toilette?","Ich brauche Hilfe","Können Sie das bitte wiederholen?","Bitte sprechen Sie langsamer"]
+  de:["Hallo","Danke","Wo ist die Toilette?","Ich brauche Hilfe","Können Sie das bitte wiederholen?","Bitte sprechen Sie langsamer"],
+  nl:["Hallo","Dank je","Waar is het toilet?","Ik heb hulp nodig","Kunt u dat herhalen, alstublieft?","Wilt u langzamer praten, alstublieft?"],
+  pl:["Cześć","Dziękuję","Gdzie jest toaleta?","Potrzebuję pomocy","Czy możesz powtórzyć, proszę?","Mów wolniej, proszę"],
+  ru:["Привет","Спасибо","Где туалет?","Мне нужна помощь","Повторите, пожалуйста","Говорите медленнее, пожалуйста"],
+  uk:["Привіт","Дякую","Де туалет?","Мені потрібна допомога","Повторіть, будь ласка","Говоріть повільніше, будь ласка"],
+  ro:["Bună","Mulțumesc","Unde este toaleta?","Am nevoie de ajutor","Puteți repeta, vă rog?","Vorbiți mai rar, vă rog"],
+  el:["Γεια σας","Ευχαριστώ","Πού είναι η τουαλέτα;","Χρειάζομαι βοήθεια","Μπορείτε να το επαναλάβετε, παρακαλώ;","Μιλήστε πιο αργά, παρακαλώ"],
+  cs:["Ahoj","Děkuji","Kde je toaleta?","Potřebuji pomoc","Můžete to zopakovat, prosím?","Mluvte pomaleji, prosím"],
+  hu:["Szia","Köszönöm","Hol van a mosdó?","Segítségre van szükségem","Meg tudná ismételni, kérem?","Kérem, beszéljen lassabban"],
+  sv:["Hej","Tack","Var är toaletten?","Jag behöver hjälp","Kan du upprepa, tack?","Snälla, prata långsammare"],
+  da:["Hej","Tak","Hvor er toilettet?","Jeg har brug for hjælp","Kan du gentage det, tak?","Tal venligst langsommere"],
+  nb:["Hei","Takk","Hvor er toalettet?","Jeg trenger hjelp","Kan du gjenta, takk?","Vennligst snakk saktere"],
+  fi:["Hei","Kiitos","Missä on vessa?","Tarvitsen apua","Voitko toistaa, kiitos?","Puhu hitaammin, kiitos"],
+  tr:["Merhaba","Teşekkürler","Tuvalet nerede?","Yardıma ihtiyacım var","Tekrar eder misiniz, lütfen?","Lütfen daha yavaş konuşun"],
+  ar:["مرحبا","شكرا","أين الحمام؟","أحتاج إلى مساعدة","هل يمكنك التكرار من فضلك؟","تكلم ببطء من فضلك"],
+  he:["שלום","תודה","איפה השירותים?","אני צריך עזרה","אפשר לחזור על זה, בבקשה?","דבר לאט יותר, בבקשה"],
+  hi:["नमस्ते","धन्यवाद","शौचालय कहाँ है?","मुझे मदद चाहिए","क्या आप दोहरा सकते हैं, कृपया?","कृपया धीरे बोलिए"],
+  id:["Halo","Terima kasih","Di mana toiletnya?","Saya butuh bantuan","Bisa diulangi, tolong?","Tolong bicara lebih pelan"],
+  vi:["Xin chào","Cảm ơn","Nhà vệ sinh ở đâu?","Tôi cần giúp đỡ","Bạn có thể nhắc lại được không?","Xin hãy nói chậm hơn"],
+  th:["สวัสดี","ขอบคุณ","ห้องน้ำอยู่ที่ไหน","ฉันต้องการความช่วยเหลือ","ช่วยพูดอีกครั้งได้ไหม","กรุณาพูดช้าลง"],
+  ja:["こんにちは","ありがとう","トイレはどこですか？","助けが必要です","もう一度言っていただけますか？","ゆっくり話してください"],
+  ko:["안녕하세요","감사합니다","화장실이 어디예요?","도움이 필요해요","다시 말씀해 주시겠어요?","천천히 말씀해 주세요"],
+  zh:["你好","谢谢","洗手间在哪里？","我需要帮助","请再说一遍好吗？","请说慢一点"]
 };
 var SLIDES = [
   { i:"mic", t:"Hablá en tu idioma", p:"Decí lo que quieras y Fiorisacall lo traduce al instante, en cualquiera de los idiomas que elijas." },
@@ -626,9 +713,10 @@ var ICONS = {
 };
 
 var KEY = "fc:v2";
-var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", tts:"auto", soundOk:false, perms:{}, permsDone:false, contacts:[], seenVersion:"", history:[] };
-var APP_VERSION = "1.5";
+var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", apiGoogle:false, tts:"auto", soundOk:false, perms:{}, permsDone:false, contacts:[], seenVersion:"", history:[] };
+var APP_VERSION = "1.6";
 var NEWS = [
+  { v:"1.6", d:"17/10/2026", items:["28 idiomas: se sumaron polaco, ucraniano, rumano, griego, checo, húngaro, sueco, danés, noruego, finlandés, hebreo, indonesio, vietnamita y tailandés.", "Buscador de idiomas: escribís unas letras del idioma o del país (por ejemplo «arg» o «pol») y aparece al toque.", "Frases rápidas en todos los idiomas.", "Arreglo del sonido: si el teléfono no tiene la voz de un idioma, ahora suena la voz de internet.", "Fotos: si el cartel está en otro idioma, la app lo reconoce sola.", "Árabe y hebreo se muestran de derecha a izquierda.", "Traducción más exacta: ahora se usa primero el traductor de Google en todos los idiomas.", "Si el iPhone no tiene el dictado de un idioma (por ejemplo chino), la app te muestra el paso a paso para activarlo."] },
   { v:"1.5", d:"16/10/2026", items:["Esta lista de Novedades, para saber qué cambió en cada versión."] },
   { v:"1.4", d:"16/10/2026", items:["Pantallas para preparar el teléfono: navegador, micrófono, sonido, cámara y contactos.", "Micrófono nuevo: tocás Hablar, el texto aparece en vivo y no corta por las pausas. Tocás Listo para traducir.", "Contactos y Revisar permisos del teléfono en Perfil."] },
   { v:"1.3", d:"16/10/2026", items:["Arreglo del micrófono que no escuchaba.", "Botón Reiniciar micrófono y línea de diagnóstico en Perfil."] },
@@ -662,8 +750,93 @@ function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.cl
 function fillSelect(sel, val) {
   sel.textContent = "";
   LANGS.forEach(function (l) { var o = document.createElement("option"); o.value = l[0]; o.textContent = l[2] + "  " + l[1]; sel.appendChild(o); });
+  enhanceSelect(sel);
   sel.value = val;
 }
+/* ---- Buscador de idiomas: el select queda escondido y se usa un botón que abre la lista con buscador ---- */
+var SEL_VALUE = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
+function normTxt(t) { return String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim(); }
+function enhanceSelect(sel) {
+  if (sel.__lp) return;
+  var btn = el("button", "lp-btn"); btn.type = "button";
+  var lab = sel.closest("label"), labTxt = lab && lab.querySelector("span") ? lab.querySelector("span").textContent : "Idioma";
+  sel.parentNode.insertBefore(btn, sel.nextSibling);
+  sel.style.display = "none"; sel.tabIndex = -1; sel.setAttribute("aria-hidden", "true");
+  function sync() {
+    var c = SEL_VALUE.get.call(sel), l = LANGS.filter(function (x) { return x[0] === c; })[0];
+    btn.textContent = "";
+    if (!l) return;
+    btn.appendChild(el("span", "lp-flag", l[2])); btn.appendChild(el("span", "lp-name", l[1]));
+    btn.setAttribute("aria-label", labTxt + ": " + l[1] + ". Tocá para cambiar");
+  }
+  Object.defineProperty(sel, "value", {
+    configurable: true,
+    get: function () { return SEL_VALUE.get.call(sel); },
+    set: function (v) { SEL_VALUE.set.call(sel, v); sync(); }
+  });
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+    openLangPicker(labTxt, sel.value, function (code) {
+      sel.value = code;
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+    }, btn);
+  });
+  sel.__lp = { btn: btn, sync: sync };
+  sync();
+}
+var LP = { cb: null, cur: "", back: null };
+function langMatches(q) {
+  var nq = normTxt(q);
+  var rows = LANGS.map(function (l, i) {
+    var info = LANG_INFO[l[0]] || ["", ""], name = normTxt(l[1]), es = normTxt(info[0]);
+    var countries = info[1].split(",");
+    if (!nq) return { l: l, rank: 0, i: i, hint: info[0] };
+    var words = (name + " " + es).split(/[\s()]+/);
+    if (name.indexOf(nq) === 0 || es.indexOf(nq) === 0 || normTxt(l[0]) === nq) return { l: l, rank: 1, i: i, hint: info[0] };
+    if (words.some(function (w) { return w.indexOf(nq) === 0; })) return { l: l, rank: 2, i: i, hint: info[0] };
+    var hit = countries.filter(function (c) { return normTxt(c).split(/\s+/).some(function (w) { return w.indexOf(nq) === 0; }) || normTxt(c).indexOf(nq) === 0; });
+    if (hit.length) return { l: l, rank: 3, i: i, hint: info[0] + " · " + hit.slice(0, 3).join(", ") };
+    if (name.indexOf(nq) > 0 || es.indexOf(nq) > 0) return { l: l, rank: 4, i: i, hint: info[0] };
+    return null;
+  }).filter(Boolean);
+  rows.sort(function (a, b) { return a.rank - b.rank || a.i - b.i; });
+  return rows;
+}
+function renderLangList() {
+  var list = $("lpList"), q = $("lpQ").value; list.textContent = "";
+  var rows = langMatches(q);
+  if (!rows.length) { var n = el("li", "lp-none", "No encontré ningún idioma con «" + q + "». Probá con otras letras, por ejemplo el nombre del país."); list.appendChild(n); return; }
+  rows.forEach(function (r) {
+    var li = el("li"), b = el("button"); b.type = "button"; b.setAttribute("role", "option");
+    b.setAttribute("aria-selected", String(r.l[0] === LP.cur));
+    b.appendChild(el("span", "lp-flag", r.l[2]));
+    var tx = el("span", "lp-txt"); tx.appendChild(el("strong", null, r.l[1])); tx.appendChild(el("small", null, r.hint));
+    b.appendChild(tx);
+    b.addEventListener("click", function () { pickLang(r.l[0]); });
+    li.appendChild(b); list.appendChild(li);
+  });
+}
+function openLangPicker(title, cur, cb, back) {
+  LP.cb = cb; LP.cur = cur; LP.back = back;
+  $("lpTitle").textContent = title;
+  $("lpQ").value = ""; renderLangList();
+  $("lp").hidden = false;
+  try { $("lpQ").focus({ preventScroll: true }); } catch (e) { $("lpQ").focus(); }
+  $("lpList").scrollTop = 0;
+}
+function closeLangPicker() {
+  $("lp").hidden = true;
+  var b = LP.back; LP.cb = null; LP.back = null;
+  if (b) { try { b.focus({ preventScroll: true }); } catch (e) {} }
+}
+function pickLang(code) { var cb = LP.cb; closeLangPicker(); if (cb) cb(code); }
+$("lpQ").addEventListener("input", renderLangList);
+$("lpQ").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") { e.preventDefault(); var r = langMatches($("lpQ").value)[0]; if (r) pickLang(r.l[0]); }
+  if (e.key === "Escape") closeLangPicker();
+});
+$("lpClose").addEventListener("click", closeLangPicker);
+$("lp").addEventListener("click", function (e) { if (e.target === $("lp")) closeLangPicker(); });
 function applyPrefs() {
   document.documentElement.style.setProperty("--ts", [1, 1.2, 1.4][DB.size] || 1);
   document.body.classList.toggle("hc", !!DB.contrast);
@@ -895,7 +1068,7 @@ var SILENT = "data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAAB
 function getAud() { if (!AUD) { AUD = new Audio(); AUD.preload = "auto"; AUD.setAttribute("playsinline", ""); } return AUD; }
 function unlockAudio() {
   if (HAS_TTS) { try { var u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} }
-  if (!AUD_UNLOCKED && DB.tts === "cloud") {
+  if (!AUD_UNLOCKED) {
     try { var a = getAud(); a.src = SILENT; var p = a.play(); if (p && p.then) p.then(function () { AUD_UNLOCKED = true; }).catch(function () {}); else AUD_UNLOCKED = true; } catch (e) {}
   }
   S.unlocked = true;
@@ -916,7 +1089,9 @@ if (HAS_TTS) { loadVoices(); try { speechSynthesis.onvoiceschanged = loadVoices;
 /* Voces del teléfono: se usan idiomas que el iPhone trae instalados de fábrica. */
 var TTS_LOCALES = {
   es:"es-MX", en:"en-US", pt:"pt-BR", fr:"fr-FR", it:"it-IT", de:"de-DE", nl:"nl-NL",
-  ru:"ru-RU", tr:"tr-TR", ar:"ar-SA", hi:"hi-IN", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN"
+  pl:"pl-PL", ru:"ru-RU", uk:"uk-UA", ro:"ro-RO", el:"el-GR", cs:"cs-CZ", hu:"hu-HU", sv:"sv-SE",
+  da:"da-DK", nb:"nb-NO", fi:"fi-FI", tr:"tr-TR", ar:"ar-SA", he:"he-IL", hi:"hi-IN", id:"id-ID",
+  vi:"vi-VN", th:"th-TH", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN"
 };
 var IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 function pickVoice(lang) {
@@ -973,7 +1148,7 @@ function chunks(text, max) {
 }
 function speakCloud(text, lang) {
   var run = ++VOICE_RUN;
-  var tl = lang === "zh" ? "zh-CN" : lang;
+  var tl = gcode(lang);
   var list = chunks(text, 180);
   var a = getAud();
   return new Promise(function (resolve) {
@@ -1006,7 +1181,11 @@ function speak(text, lang) {
 
 /* ---- pantalla Sonido ---- */
 var SOUND_FROM = null;
-var SOUND_PHRASE = { es:"Hola, el sonido funciona.", en:"Hello, the sound works.", pt:"Olá, o som funciona.", fr:"Bonjour, le son fonctionne.", it:"Ciao, l'audio funziona.", de:"Hallo, der Ton funktioniert." };
+var SOUND_PHRASE = { es:"Hola, el sonido funciona.", en:"Hello, the sound works.", pt:"Olá, o som funciona.", fr:"Bonjour, le son fonctionne.", it:"Ciao, l'audio funziona.", de:"Hallo, der Ton funktioniert.",
+  nl:"Hallo, het geluid werkt.", pl:"Cześć, dźwięk działa.", ru:"Привет, звук работает.", uk:"Привіт, звук працює.", ro:"Bună, sunetul funcționează.", el:"Γεια σας, ο ήχος λειτουργεί.",
+  cs:"Ahoj, zvuk funguje.", hu:"Szia, a hang működik.", sv:"Hej, ljudet fungerar.", da:"Hej, lyden virker.", nb:"Hei, lyden fungerer.", fi:"Hei, ääni toimii.",
+  tr:"Merhaba, ses çalışıyor.", ar:"مرحبا، الصوت يعمل.", he:"שלום, הצליל עובד.", hi:"नमस्ते, आवाज़ काम कर रही है।", id:"Halo, suaranya berfungsi.", vi:"Xin chào, âm thanh hoạt động.",
+  th:"สวัสดี เสียงใช้งานได้", ja:"こんにちは、音が出ています。", ko:"안녕하세요, 소리가 잘 나옵니다.", zh:"你好，声音正常。" };
 function renderSound() {
   $("sMode").value = DB.tts || "auto";
   $("sAsk").hidden = true; $("sMsg").textContent = ""; $("sMsg").classList.remove("err");
@@ -1092,7 +1271,7 @@ function listen() {
       var e = log.querySelector(".empty"); if (e) e.remove();
       L.li = el("li", "msg live " + (who === "me" ? "mine" : "theirs"));
       L.li.appendChild(el("div", "who", (who === "me" ? "Vos" : "Otra persona") + " · " + langTag(lang) + " · hablando…"));
-      L.li.appendChild(el("div", "orig"));
+      var lo = el("div", "orig"); lo.dir = "auto"; L.li.appendChild(lo);
       log.appendChild(L.li);
     }
     L.li.querySelector(".orig").textContent = text() || "…";
@@ -1109,10 +1288,10 @@ function listen() {
     if (err === "not-allowed" || err === "service-not-allowed") { setStatus("Sin permiso para el dictado. Andá a Perfil → Revisar permisos del teléfono.", true); return; }
     if (err === "audio-capture") { setStatus("El micrófono quedó trabado. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return; }
     if (err === "network") { setStatus("El dictado necesita internet. Revisá la conexión y tocá Hablar de nuevo.", true); return; }
-    if (err === "language-not-supported") { setStatus("Este teléfono no tiene el dictado en " + langName(lang) + ". Podés escribir tu mensaje o elegir otro idioma.", true); return; }
+    if (err === "language-not-supported") { setStatus("Este teléfono no tiene el dictado en " + langName(lang) + "." + (dictHelp(lang) || " Podés escribir tu mensaje o elegir otro idioma."), true); return; }
     if (err && err !== "no-speech" && err !== "aborted") { setStatus("No se pudo escuchar (código: " + err + "). Probá de nuevo y, si sigue, mandá una captura de este mensaje.", true); return; }
     if (!L.open) { setStatus("No llegó sonido del micrófono. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return; }
-    setStatus("No escuché nada. Tocá Hablar y hablá cuando diga «Hablá ahora».", true);
+    setStatus("No escuché nada en " + langName(lang) + "." + (lang !== "es" && lang !== DB.me ? dictHelp(lang) : " Tocá Hablar y hablá cuando diga «Hablá ahora»."), true);
   }
   L.finish = finish;
   function startOne() {
@@ -1146,6 +1325,14 @@ function listen() {
     catch (e) { if (S.sr === sr) S.sr = null; L.err = L.err || "start"; finish(); }
   }
   startOne();
+}
+/* Para dictar en otro idioma, el iPhone tiene que tener ese teclado agregado */
+var KB_NAME = { es:"Español", en:"Inglés", pt:"Portugués", fr:"Francés", it:"Italiano", de:"Alemán", nl:"Neerlandés", pl:"Polaco", ru:"Ruso", uk:"Ucraniano",
+  ro:"Rumano", el:"Griego", cs:"Checo", hu:"Húngaro", sv:"Sueco", da:"Danés", nb:"Noruego", fi:"Finlandés", tr:"Turco", ar:"Árabe", he:"Hebreo", hi:"Hindi",
+  id:"Indonesio", vi:"Vietnamita", th:"Tailandés", ja:"Japonés", ko:"Coreano", zh:"Chino simplificado (Pinyin)" };
+function dictHelp(lang) {
+  if (!IS_IOS) return "";
+  return " Si no aparece nada, agregá el teclado en el iPhone: Ajustes → General → Teclado → Teclados → Agregar teclado → " + (KB_NAME[lang] || langName(lang)) + ". Después revisá que «Activar dictado» esté prendido y abrí la app de nuevo.";
 }
 function stopListening() {
   var L = S.listen; if (!L) return;
@@ -1181,14 +1368,18 @@ function translate(text, from, to) {
     var d = demoTranslate(text, from, to);
     if (d) return new Promise(function (r) { setTimeout(function () { r(d); }, 600); });
   }
-  if (DB.api) return translateCloud(text, from, to).catch(function () { return translateFree(text, from, to); });
-  return translateFree(text, from, to);
+  /* Precisión: primero Google. Tu servidor se usa primero solo si ya tiene conectado el traductor oficial de Google */
+  if (DB.api && DB.apiGoogle && from !== "auto") return translateCloud(text, from, to).catch(function () { return translateFree(text, from, to); });
+  return translateGoogle(text, from, to).catch(function (e) {
+    if (DB.api && from !== "auto") return translateCloud(text, from, to);
+    throw e;
+  }).catch(function () { return translateMyMemory(text, from, to); });
 }
 /* Traducción mejorada: tu servidor de Cloudflare (Workers AI) */
 function translateCloud(text, from, to) {
   return fetch(DB.api + "/translate", {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text: text, from: from, to: to })
+    body: JSON.stringify({ text: text, from: from === "nb" ? "no" : from, to: to === "nb" ? "no" : to })
   }).catch(function () { throw new ApiError(0, "network"); }).then(function (res) {
     if (!res.ok) throw new ApiError(res.status, "cloud");
     return res.json();
@@ -1198,7 +1389,8 @@ function translateCloud(text, from, to) {
   });
 }
 /* Traducción gratuita: primero Google (mucho más precisa); si falla, MyMemory */
-function gcode(c) { return c === "zh" ? "zh-CN" : c; }
+var GCODE = { zh:"zh-CN", nb:"no", he:"iw" };
+function gcode(c) { return GCODE[c] || c; }
 function translateGoogle(text, from, to) {
   var url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=" + gcode(from) + "&tl=" + gcode(to) + "&q=" + encodeURIComponent(text);
   return fetch(url).catch(function () { throw new ApiError(0, "network"); }).then(function (res) {
@@ -1217,7 +1409,8 @@ function translateFree(text, from, to) {
 }
 /* Respaldo (MyMemory): a veces se equivoca */
 function translateMyMemory(text, from, to) {
-  var code = function (c) { return c === "zh" ? "zh-CN" : c; };
+  var code = function (c) { return c === "zh" ? "zh-CN" : c === "nb" ? "no" : c; };
+  if (from === "auto") from = srcLang();
   var url = "https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=" + code(from) + "|" + code(to);
   return fetch(url).catch(function () { throw new ApiError(0, "network"); }).then(function (res) {
     if (!res.ok) throw new ApiError(res.status, "http");
@@ -1244,12 +1437,12 @@ function errText(e) {
 function buildMsg(m) {
   var li = el("li", "msg " + (m.who === "me" ? "mine" : "theirs"));
   li.appendChild(el("div", "who", (m.who === "me" ? "Vos" : "Otra persona") + " · " + langTag(m.from) + " → " + langTag(m.to)));
-  var o = el("div", "orig", m.orig); o.lang = m.from; li.appendChild(o);
+  var o = el("div", "orig", m.orig); o.lang = m.from; o.dir = "auto"; li.appendChild(o);
   var t = el("div", "trans wait", "Traduciendo…"); li.appendChild(t);
   var api = {
     li: li,
     set: function (tr) {
-      t.className = "trans"; t.textContent = tr; t.lang = m.to;
+      t.className = "trans"; t.textContent = tr; t.lang = m.to; t.dir = RTL[m.to] ? "rtl" : "ltr";
       if (!li.querySelector(".replay")) {
         var b = el("button", "replay", "Escuchar de nuevo"); b.type = "button";
         b.setAttribute("aria-label", "Escuchar de nuevo: " + tr);
@@ -1346,7 +1539,9 @@ var SAMPLE_TR = {
   pt: "Proibido fumar.\nSaída de emergência pela esquerda.",
   fr: "Interdit de fumer.\nSortie de secours à gauche.",
   it: "Vietato fumare.\nUscita di emergenza a sinistra.",
-  de: "Rauchen verboten.\nNotausgang links."
+  de: "Rauchen verboten.\nNotausgang links.",
+  pl: "Zakaz palenia.\nWyjście ewakuacyjne po lewej stronie.",
+  ru: "Курить запрещено.\nЗапасной выход слева."
 };
 var STOP = {
   es: "el la los las de del que y en un una es por con para no se su al lo como más pero sus le ya o este sí porque esta entre cuando muy sin sobre también me hasta hay donde quien desde todo nos durante todos uno les ni contra otros ese eso ante ellos e esto mí antes algunos qué unos yo otro otras otra él tanto esa estos mucho quienes nada muchos cual poco ella estar estas algunas algo nosotros",
@@ -1356,16 +1551,29 @@ var STOP = {
   it: "il lo la i gli le di del della dei che e in un una è per con non si su al come più ma suo sua suoi già o questo questa perché sono tra quando molto senza sopra anche mi fino dove chi da tutto noi durante tutti uno loro né contro altri quello essere stato hanno",
   de: "der die das den dem des und in von zu mit ist ein eine einen einem einer nicht auf für im sich auch es an als nach wie aber aus bei oder wenn noch nur so über um zum zur dass sie er wir ich ihr sind war hat haben wird kann werden vor man durch dieser diese dieses sein",
   nl: "de het een en van in is dat op te zijn met voor niet aan er ook als maar om bij of uit nog naar wat dan ze die dit zo hij wij ik je u wordt worden heeft hebben kan zal over door tot meer deze geen onder",
-  tr: "ve bir bu da de için ile çok daha olarak gibi ama en var yok ne ben sen o biz siz onlar mi mı mu mü değil kadar sonra önce her şey ya veya çünkü bile hem ki"
+  tr: "ve bir bu da de için ile çok daha olarak gibi ama en var yok ne ben sen o biz siz onlar mi mı mu mü değil kadar sonra önce her şey ya veya çünkü bile hem ki",
+  pl: "i w na z że do nie się to jest jak ale co o po od za dla tak czy już są być ma przez przy tylko jego jej ich mnie tym go zakaz wyjście",
+  ro: "și în de la cu nu pe un o să este care din pentru mai ce sau dar sunt fost ca cum el ea ei au am lui",
+  cs: "a v na se je že s z do to o jak ale co pro by jsem jsou být tak už jako po od který která které jeho její",
+  hu: "a az és hogy nem is egy van meg de el ki be csak még már mint volt lesz ez azt mi te ő ha vagy",
+  sv: "och att det som en på är av för med till den har de inte om ett jag var men vi så han hon kan från",
+  da: "og at det som en på er af for med til den har de ikke om et jeg var men vi så han hun kan fra",
+  nb: "og å det som en på er av for med til den har de ikke om et jeg var men vi så han hun kan fra",
+  fi: "ja on ei se että hän oli ovat kun mutta niin myös tai jos minä sinä me te he tämä mikä joka vain",
+  id: "dan yang di ke dari ini itu dengan untuk tidak ada saya kamu kami mereka akan pada juga atau sudah bisa dalam",
+  vi: "và của là có không được cho người này một những các với đã trong để khi"
 };
 var STOPSET = {};
 Object.keys(STOP).forEach(function (k) { STOPSET[k] = {}; STOP[k].split(" ").forEach(function (w) { STOPSET[k][w] = 1; }); });
 
 function scriptCounts(t) {
-  var c = { latin: 0, cyr: 0, ara: 0, dev: 0, kana: 0, hang: 0, han: 0 };
+  var c = { latin: 0, cyr: 0, ara: 0, dev: 0, kana: 0, hang: 0, han: 0, grk: 0, heb: 0, thai: 0 };
   for (var i = 0; i < t.length; i++) {
     var n = t.charCodeAt(i);
-    if ((n >= 65 && n <= 90) || (n >= 97 && n <= 122) || (n >= 0xC0 && n <= 0x24F)) c.latin++;
+    if ((n >= 65 && n <= 90) || (n >= 97 && n <= 122) || (n >= 0xC0 && n <= 0x24F) || (n >= 0x1E00 && n <= 0x1EFF)) c.latin++;
+    else if ((n >= 0x370 && n <= 0x3FF) || (n >= 0x1F00 && n <= 0x1FFF)) c.grk++;
+    else if (n >= 0x590 && n <= 0x5FF) c.heb++;
+    else if (n >= 0xE00 && n <= 0xE7F) c.thai++;
     else if (n >= 0x400 && n <= 0x52F) c.cyr++;
     else if ((n >= 0x600 && n <= 0x6FF) || (n >= 0x750 && n <= 0x77F)) c.ara++;
     else if (n >= 0x900 && n <= 0x97F) c.dev++;
@@ -1373,7 +1581,7 @@ function scriptCounts(t) {
     else if ((n >= 0xAC00 && n <= 0xD7AF) || (n >= 0x1100 && n <= 0x11FF)) c.hang++;
     else if (n >= 0x4E00 && n <= 0x9FFF) c.han++;
   }
-  c.total = c.latin + c.cyr + c.ara + c.dev + c.kana + c.hang + c.han;
+  c.total = c.latin + c.cyr + c.ara + c.dev + c.kana + c.hang + c.han + c.grk + c.heb + c.thai;
   return c;
 }
 /* Adivina el idioma de un texto. Devuelve un código de LANGS o null. */
@@ -1383,11 +1591,14 @@ function detectLang(text) {
   if (c.kana > 0 && c.kana + c.han >= c.total * 0.4) return "ja";
   if (c.hang >= c.total * 0.4) return "ko";
   if (c.han >= c.total * 0.4) return "zh";
-  if (c.cyr >= c.total * 0.5) return "ru";
+  if (c.cyr >= c.total * 0.5) return /[іїєґІЇЄҐ]/.test(t) ? "uk" : "ru";
   if (c.ara >= c.total * 0.5) return "ar";
+  if (c.grk >= c.total * 0.5) return "el";
+  if (c.heb >= c.total * 0.5) return "he";
+  if (c.thai >= c.total * 0.5) return "th";
   if (c.dev >= c.total * 0.5) return "hi";
   if (c.latin < c.total * 0.5) return null;
-  var words = t.toLowerCase().replace(/[^a-zà-ɏ\s']/g, " ").split(/\s+/).filter(Boolean);
+  var words = t.toLowerCase().replace(/[^a-zà-ɏ\u1e00-\u1eff\s']/g, " ").split(/\s+/).filter(Boolean);
   var score = {}; Object.keys(STOPSET).forEach(function (k) { score[k] = 0; });
   words.forEach(function (w) { Object.keys(STOPSET).forEach(function (k) { if (STOPSET[k][w]) score[k]++; }); });
   var low = t.toLowerCase();
@@ -1398,8 +1609,21 @@ function detectLang(text) {
   if (/[äöü]/.test(low)) { score.de += 1; score.tr += 1; }
   if (/[ğşı]/.test(low)) score.tr += 3;
   if (/[œêèàù]/.test(low)) score.fr += 1;
+  if (/[ąęłńśźż]/.test(low)) score.pl += 3;
+  if (/[țșăî]/.test(low)) score.ro += 3;
+  if (/[řůě]/.test(low)) score.cs += 3;
+  if (/[őű]/.test(low)) score.hu += 3;
+  if (/[æø]/.test(low)) { score.da += 2; score.nb += 2; }
+  if (/å/.test(low)) { score.sv += 1; score.da += 1; score.nb += 1; }
+  if (/[äö]/.test(low)) { score.sv += 1; score.fi += 1; }
+  if (/[ơưđ\u1ea0-\u1ef9]/.test(low)) score.vi += 4;
   var best = null, bv = 0;
   Object.keys(score).forEach(function (k) { if (score[k] > bv) { bv = score[k]; best = k; } });
+  /* Sueco, danés y noruego se parecen mucho: si la diferencia es chica, que el traductor lo reconozca solo */
+  if (best === "sv" || best === "da" || best === "nb") {
+    var near = ["sv", "da", "nb"].filter(function (k) { return k !== best && bv - score[k] < 2; });
+    if (near.length) return null;
+  }
   return bv >= 1 ? best : null;
 }
 /* Parte un texto largo en pedazos chicos para el traductor */
@@ -1420,11 +1644,13 @@ function chunkText(text, max) {
 }
 /* Textos en MAYÚSCULAS se traducen mucho peor: se pasan a minúsculas con la inicial en mayúscula */
 function normCaps(t) {
-  var letters = t.replace(/[^A-Za-zÀ-ÿ]/g, "");
+  var letters = t.match(/\p{L}/gu) || [];
   if (letters.length < 6) return t;
-  var up = letters.replace(/[^A-ZÀ-Þ]/g, "").length;
-  if (up / letters.length < 0.8) return t;
-  return t.toLowerCase().replace(/(^|[.!?¿¡]\s*)([a-zà-ÿ])/g, function (m, a, b) { return a + b.toUpperCase(); });
+  var cased = letters.filter(function (ch) { return ch.toLowerCase() !== ch.toUpperCase(); });
+  if (cased.length < 6) return t;   // idiomas sin mayúsculas (árabe, chino, tailandés…) quedan igual
+  var up = cased.filter(function (ch) { return ch !== ch.toLowerCase(); }).length;
+  if (up / cased.length < 0.8) return t;
+  return t.toLowerCase().replace(/(^|[.!?¿¡]\s*)(\p{Ll})/gu, function (m, a, b) { return a + b.toUpperCase(); });
 }
 function translateLong(text, from, to) {
   if (P.demoText && text === SAMPLE_TEXT && to === "es") return Promise.resolve(text);
@@ -1462,11 +1688,11 @@ function cleanOcrLines(d) {
   else String(d.text || "").split("\n").forEach(function (t) { raw.push({ t: t, c: d.confidence || 60, h: 0 }); });
   var out = [];
   raw.forEach(function (r) {
-    var l = r.t.replace(/[|=_~^<>{}\[\]\\]+/g, " ").replace(/(\S)[:;](?=[A-Za-zÀ-ÿ])/g, "$1 ").split(" ").filter(function (t) { return !(t.length <= 2 && /[^A-Za-z0-9À-ÿ¿¡]/.test(t) && !/^[¿¡]/.test(t)); }).join(" ").replace(/\s+/g, " ").replace(/^[^A-Za-z0-9À-ÿЀ-ӿ؀-ۿऀ-ॿ぀-ヿ一-鿿가-힯¿¡]+|[^A-Za-z0-9À-ÿЀ-ӿ؀-ۿऀ-ॿ぀-ヿ一-鿿가-힯.!?]+$/g, "").trim();
+    var l = r.t.replace(/[|=_~^<>{}\[\]\\]+/g, " ").replace(/(\S)[:;](?=\p{L})/gu, "$1 ").split(" ").filter(function (t) { return !(t.length <= 2 && /[^\p{L}\p{M}\p{N}¿¡]/u.test(t) && !/^[¿¡]/.test(t)); }).join(" ").replace(/\s+/g, " ").replace(/^[^\p{L}\p{M}\p{N}¿¡]+|[^\p{L}\p{M}\p{N}.!?。？！]+$/gu, "").trim();
     l = l.replace(/(^|\s)[\u2018\u2019`\u00B4]+/g, "$1");
     var tk = l.split(" ");                                  // resto suelto en minúsculas al lado de un renglón en MAYÚSCULAS ("i NUESTRO", "in, LUGAR")
     if (tk.length >= 2) {
-      var isUp = function (t) { return t.replace(/[^A-Za-z\u00C0-\u00FF]/g, "").length >= 3 && t === t.toUpperCase(); };
+      var isUp = function (t) { return t.replace(/[^\p{L}]/gu, "").length >= 3 && t === t.toUpperCase() && t !== t.toLowerCase(); };
       var isLowJunk = function (t) { return t.length <= 3 && t === t.toLowerCase() && !/\d/.test(t); };
       if (isLowJunk(tk[0]) && tk.slice(1).every(isUp)) tk.shift();
       else if (isLowJunk(tk[tk.length - 1]) && tk.slice(0, -1).every(isUp)) tk.pop();
@@ -1477,7 +1703,7 @@ function cleanOcrLines(d) {
     if (c.latin >= c.total * 0.5) {                        // descarta restos como "z ate DD PL Ed a d i"
       var toks = l.split(" "), good = 0, junk = 0;
       toks.forEach(function (t) {
-        var lt = t.replace(/[^A-Za-zÀ-ÿ]/g, "");
+        var lt = t.replace(/[^\p{L}\p{M}]/gu, "");
         if (lt.length >= 3) good++;
         if (lt.length === 1 && !/[aeiouyAEIOUY0-9]/.test(lt) && !/\d/.test(t)) junk++;
       });
@@ -1528,7 +1754,8 @@ function loadTess() {
     s.onerror = function () { rej(new Error("net")); }; document.head.appendChild(s);
   });
 }
-var TESS = { es:"spa", en:"eng", pt:"por", fr:"fra", it:"ita", de:"deu", nl:"nld", tr:"tur", ru:"rus", ar:"ara", hi:"hin", ja:"jpn", ko:"kor", zh:"chi_sim" };
+var TESS = { es:"spa", en:"eng", pt:"por", fr:"fra", it:"ita", de:"deu", nl:"nld", pl:"pol", ru:"rus", uk:"ukr", ro:"ron", el:"ell", cs:"ces", hu:"hun", sv:"swe",
+  da:"dan", nb:"nor", fi:"fin", tr:"tur", ar:"ara", he:"heb", hi:"hin", id:"ind", vi:"vie", th:"tha", ja:"jpn", ko:"kor", zh:"chi_sim" };
 function withTimeout(pr, ms) {
   return new Promise(function (res, rej) {
     var t = setTimeout(function () { rej(new Error("timeout")); }, ms);
@@ -1698,15 +1925,16 @@ function showPhotoResult(text, run, info, warn) {
   doPhotoTranslate();
 }
 function doPhotoTranslate() {
-  var text = $("pText").value.trim(), to = $("pTo").value, from = srcLang(text), run = ++P.run;
+  var text = $("pText").value.trim(), to = $("pTo").value, run = ++P.run;
+  var from = (P.demoText && text === SAMPLE_TEXT) ? "es" : (detectLang(text) || "auto");
   $("pSpeak").hidden = true;
   if (!text) { pStatus("No hay texto para traducir.", true); return; }
-  pStatus("Traduciendo de " + langName(from) + " a " + langName(to) + "…");
+  pStatus(from === "auto" ? "Traduciendo a " + langName(to) + "…" : "Traduciendo de " + langName(from) + " a " + langName(to) + "…");
   $("pGo").disabled = true;
   translateLong(text, from, to).then(function (tr) {
     if (run !== P.run) return;
     P.tr = tr; P.to = to;
-    var o = $("pOut"); o.hidden = false; o.textContent = tr; o.lang = to;
+    var o = $("pOut"); o.hidden = false; o.textContent = tr; o.lang = to; o.dir = RTL[to] ? "rtl" : "ltr";
     $("pSpeak").hidden = false; pStatus(from === to ? "El texto ya está en ese idioma." : (P.warn || ""));
     $("pGo").disabled = false;
   }).catch(function (e) {
@@ -2192,9 +2420,10 @@ $("aApiTest").addEventListener("click", function () {
     throw new ApiError(0, "network");
   }).then(function (h) {
     if (!h || !h.ok) throw new ApiError(500, "health");
-    if (!h.ai) { apiMsg("El servidor responde, pero le falta conectar Workers AI (el nombre tiene que ser AI).", true); return null; }
+    DB.apiGoogle = !!h.google; saveDB();
+    if (!h.ai && !h.google) { apiMsg("El servidor responde, pero le falta conectar Workers AI (el nombre tiene que ser AI).", true); return null; }
     return translateCloud("Good morning, how are you?", "en", "es").then(function (t) {
-      apiMsg("Funciona. Prueba: Good morning, how are you? → " + t);
+      apiMsg("Funciona" + (DB.apiGoogle ? " con el traductor oficial de Google" : "") + ". Prueba: Good morning, how are you? → " + t);
     });
   }).catch(function (e) {
     if (e && e.detail === "cloud" && e.status === 403) apiMsg("El servidor no autoriza este sitio. Revisá que el código tenga la dirección correcta de GitHub Pages.", true);
