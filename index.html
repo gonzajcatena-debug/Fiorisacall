@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fiorisacall · Beta 1.6</title>
+<title>Fiorisacall · Beta 1.7</title>
 <meta name="theme-color" content="#241238">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -255,7 +255,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <div class="center">
     <svg class="big" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <p class="ver">Beta 1.6</p>
+    <p class="ver">Beta 1.7</p>
   </div>
 </section>
 
@@ -378,7 +378,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <header class="top">
     <svg class="logo" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <span class="beta">BETA 1.6</span>
+    <span class="beta">BETA 1.7</span>
   </header>
   <div class="body">
     <p id="hello" class="hello"></p>
@@ -568,7 +568,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     </div>
     <div class="card">
       <h2>Acerca de</h2>
-      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.6</strong> · versión de prueba</p>
+      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.7</strong> · versión de prueba</p>
       <p id="aDiag" class="lead" style="font-size:.8rem;margin:8px 0 0"></p>
     </div>
     <div class="card">
@@ -713,9 +713,10 @@ var ICONS = {
 };
 
 var KEY = "fc:v2";
-var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", apiGoogle:false, tts:"auto", soundOk:false, perms:{}, permsDone:false, contacts:[], seenVersion:"", history:[] };
-var APP_VERSION = "1.6";
+var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", apiGoogle:false, tts:"auto", voiceOk:{}, soundOk:false, perms:{}, permsDone:false, contacts:[], seenVersion:"", history:[] };
+var APP_VERSION = "1.7";
 var NEWS = [
+  { v:"1.7", d:"17/10/2026", items:["La voz sale más rápido: la app recuerda qué idiomas tiene tu teléfono y, si falta alguno, usa directo la voz de internet sin esperar.", "El aviso del teclado solo aparece cuando de verdad falta el dictado de un idioma.", "Si con Fluida nadie habla, la app espera tranquila sin mostrar error.", "Si el micrófono no abre al primer intento, la app lo vuelve a abrir sola.", "Probado en todas las combinaciones de idiomas entre sí."] },
   { v:"1.6", d:"17/10/2026", items:["28 idiomas: se sumaron polaco, ucraniano, rumano, griego, checo, húngaro, sueco, danés, noruego, finlandés, hebreo, indonesio, vietnamita y tailandés.", "Buscador de idiomas: escribís unas letras del idioma o del país (por ejemplo «arg» o «pol») y aparece al toque.", "Frases rápidas en todos los idiomas.", "Arreglo del sonido: si el teléfono no tiene la voz de un idioma, ahora suena la voz de internet.", "Fotos: si el cartel está en otro idioma, la app lo reconoce sola.", "Árabe y hebreo se muestran de derecha a izquierda.", "Traducción más exacta: ahora se usa primero el traductor de Google en todos los idiomas.", "Si el iPhone no tiene el dictado de un idioma (por ejemplo chino), la app te muestra el paso a paso para activarlo."] },
   { v:"1.5", d:"16/10/2026", items:["Esta lista de Novedades, para saber qué cambió en cada versión."] },
   { v:"1.4", d:"16/10/2026", items:["Pantallas para preparar el teléfono: navegador, micrófono, sonido, cámara y contactos.", "Micrófono nuevo: tocás Hablar, el texto aparece en vivo y no corta por las pausas. Tocás Listo para traducir.", "Contactos y Revisar permisos del teléfono en Perfil."] },
@@ -1116,7 +1117,7 @@ function speakDevice(text, lang) {
     var done = false, started = false, guard;
     function finish(ok) { if (!done) { done = true; clearTimeout(guard); resolve(ok); } }
     // Si en 2,5 s no empezó a hablar, se considera que no sonó
-    var startGuard = setTimeout(function () { if (!started) { try { speechSynthesis.cancel(); } catch (e) {} finish(false); } }, 2500);
+    var startGuard = setTimeout(function () { if (!started) { try { speechSynthesis.cancel(); } catch (e) {} finish(false); } }, 1500);
     guard = setTimeout(function () { finish(started); }, Math.max(6000, text.length * 160));
     try {
       speechSynthesis.cancel();
@@ -1175,8 +1176,13 @@ function speak(text, lang) {
   var mode = DB.tts || "auto";
   if (mode === "cloud") return speakCloud(text, lang);
   if (mode === "device") return speakDevice(text, lang);
-  if (!hasDeviceVoice(lang)) return speakCloud(text, lang);
-  return speakDevice(text, lang).then(function (ok) { return ok ? true : speakCloud(text, lang); });
+  var known = (DB.voiceOk || {})[lang];
+  /* Si ya sabemos que el teléfono no tiene esa voz, va directo a la de internet (sin esperar) */
+  if (known === false || !hasDeviceVoice(lang)) return speakCloud(text, lang);
+  return speakDevice(text, lang).then(function (ok) {
+    if (ok !== known) { var v = {}; for (var k in (DB.voiceOk || {})) v[k] = DB.voiceOk[k]; v[lang] = ok; DB.voiceOk = v; saveDB(); }
+    return ok ? true : speakCloud(text, lang);
+  });
 }
 
 /* ---- pantalla Sonido ---- */
@@ -1252,7 +1258,7 @@ function mergeResults(results) {
   return acc.trim();
 }
 /* Tocás Hablar, hablás todo lo que quieras (aunque hagas pausas) y tocás Listo para terminar */
-function listen() {
+function listen(auto, retry) {
   if (S.phase !== "idle") return;
   if (!SR_CLASS) { setStatus("Este navegador no tiene dictado. Abrí la app desde Safari o escribí tu mensaje.", true); return; }
   var run = ++S.run;
@@ -1289,9 +1295,16 @@ function listen() {
     if (err === "audio-capture") { setStatus("El micrófono quedó trabado. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return; }
     if (err === "network") { setStatus("El dictado necesita internet. Revisá la conexión y tocá Hablar de nuevo.", true); return; }
     if (err === "language-not-supported") { setStatus("Este teléfono no tiene el dictado en " + langName(lang) + "." + (dictHelp(lang) || " Podés escribir tu mensaje o elegir otro idioma."), true); return; }
+    /* Fluida abrió el micrófono y el teléfono no lo dejó abrir: se reintenta una sola vez, sin avisar */
+    if (auto && !retry && !L.open && !L.stop) {
+      setStatus("Abriendo el micrófono de nuevo…");
+      setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(true, true); }, 700);
+      return;
+    }
     if (err && err !== "no-speech" && err !== "aborted") { setStatus("No se pudo escuchar (código: " + err + "). Probá de nuevo y, si sigue, mandá una captura de este mensaje.", true); return; }
     if (!L.open) { setStatus("No llegó sonido del micrófono. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return; }
-    setStatus("No escuché nada en " + langName(lang) + "." + (lang !== "es" && lang !== DB.me ? dictHelp(lang) : " Tocá Hablar y hablá cuando diga «Hablá ahora»."), true);
+    if (auto && !L.stop) { setStatus((who === "me" ? "Te toca a vos" : "Le toca a la otra persona") + " en " + langName(lang) + ". Tocá Hablar cuando quieran seguir."); return; }
+    setStatus("No escuché nada en " + langName(lang) + ". Tocá Hablar y hablá cuando diga «Hablá ahora».", true);
   }
   L.finish = finish;
   function startOne() {
@@ -1509,7 +1522,7 @@ function sendText(text, who, fromLang, existingRun) {
       setStatus("No se pudo reproducir la voz en " + langName(to) + ". Revisá el volumen y el modo silencio, o andá a Perfil → Probar sonido.", true);
       return;
     }
-    if (DB.auto) setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(); }, DB.voice ? 450 : 900);
+    if (DB.auto) setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(true); }, DB.voice ? 450 : 900);
   }).catch(function (e) {
     if (!alive()) return;
     entry.fail(); setPhase("idle"); setStatus(errText(e), true);
