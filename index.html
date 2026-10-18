@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fiorisacall · Beta 1.10</title>
+<title>Fiorisacall · Beta 1.11</title>
 <meta name="theme-color" content="#241238">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -246,7 +246,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
 <div id="app">
 
 <div id="fileWarn" class="warn" hidden>
-  Estás viendo una copia del archivo y así el micrófono no funciona. Abrí la app desde este link, en Safari (iPhone) o Chrome (Android):
+  Estás viendo una copia del archivo y así el micrófono no funciona. Abrí la app desde este link, en Safari:
   <a href="https://gonzajcatena-debug.github.io/Fiorisacall/">gonzajcatena-debug.github.io/Fiorisacall</a>
 </div>
 
@@ -255,7 +255,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <div class="center">
     <svg class="big" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <p class="ver">Beta 1.10</p>
+    <p class="ver">Beta 1.11</p>
   </div>
 </section>
 
@@ -378,7 +378,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <header class="top">
     <svg class="logo" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <span class="beta">BETA 1.10</span>
+    <span class="beta">BETA 1.11</span>
   </header>
   <div class="body">
     <p id="hello" class="hello"></p>
@@ -426,12 +426,10 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     <button id="tOther" type="button" role="radio" aria-checked="false">Habla la otra persona</button>
   </div>
   <p id="cNote" class="note" hidden></p>
-  <button id="micRetry" class="btn ghost" type="button" hidden style="margin:6px 14px 0;width:calc(100% - 28px)">↻ Probar otra vez el dictado de la app</button>
   <ol id="log" class="log" aria-live="polite" aria-label="Conversación"></ol>
   <div class="dock">
     <p id="status" role="status"></p>
     <button id="micReset" class="btn ghost" type="button" hidden style="margin:0 0 8px;width:100%">↻ Reiniciar micrófono</button>
-    <button id="micKb" class="btn ghost" type="button" hidden style="margin:0 0 8px;width:100%">⌨️ Usar el 🎤 del teclado</button>
     <div class="microw">
       <div class="pills"><button id="pVoice" class="pill" type="button" aria-pressed="true">Voz: sí</button></div>
       <div class="micwrap">
@@ -570,7 +568,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     </div>
     <div class="card">
       <h2>Acerca de</h2>
-      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.10</strong> · versión de prueba</p>
+      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.11</strong> · versión de prueba</p>
       <p id="aDiag" class="lead" style="font-size:.8rem;margin:8px 0 0"></p>
     </div>
     <div class="card">
@@ -716,10 +714,9 @@ var ICONS = {
 
 var KEY = "fc:v2";
 var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", apiGoogle:false, tts:"auto", soundOk:false, perms:{}, permsDone:false, contacts:[], seenVersion:"", history:[] };
-var APP_VERSION = "1.10";
+var APP_VERSION = "1.11";
 var NEWS = [
-  { v:"1.10", d:"18/10/2026", items:["Lista para Android: funciona en Google Chrome, con los pasos y ayudas propios de Android.", "Arreglado: en la 1.9 un corte chico del micrófono hacía que la app dejara de usar su dictado para siempre. Ahora el dictado de la app vuelve a funcionar como en la 1.8.", "El 🎤 del teclado queda solo como ayuda: si el teléfono no da permiso, o si tocás «Usar el 🎤 del teclado».", "Contactos: botón para abrir la agenda del teléfono. En iPhone te muestra cómo activarla en Safari (una sola vez)."] },
-  { v:"1.9", d:"17/10/2026", items:["Hablar ya no se traba: si el teléfono no deja usar el dictado de la app, el botón Hablar pasa solo al micrófono del teclado, que funciona siempre.", "Funciona también si abrís el link dentro de otra app (WhatsApp, Instagram, Claude) o desde el ícono de la pantalla de inicio.", "Botón para volver a probar el dictado de la app cuando quieras."] },
+  { v:"1.11", d:"18/10/2026", items:["Vuelta a la base de la 1.8, la que funcionaba. Se sacaron los cambios de la 1.9 y la 1.10."] },
   { v:"1.8", d:"17/10/2026", items:["Arreglado: en la 1.7 la traducción a veces dejaba de escucharse y no volvía. Ahora la voz del teléfono tiene más tiempo para arrancar y la app ya no se “olvida” de ningún idioma.", "Si una voz no suena, la app prueba con la otra antes de rendirse."] },
   { v:"1.7", d:"17/10/2026", items:["La voz sale más rápido: la app recuerda qué idiomas tiene tu teléfono y, si falta alguno, usa directo la voz de internet sin esperar.", "El aviso del teclado solo aparece cuando de verdad falta el dictado de un idioma.", "Si con Fluida nadie habla, la app espera tranquila sin mostrar error.", "Si el micrófono no abre al primer intento, la app lo vuelve a abrir sola.", "Probado en todas las combinaciones de idiomas entre sí."] },
   { v:"1.6", d:"17/10/2026", items:["28 idiomas: se sumaron polaco, ucraniano, rumano, griego, checo, húngaro, sueco, danés, noruego, finlandés, hebreo, indonesio, vietnamita y tailandés.", "Buscador de idiomas: escribís unas letras del idioma o del país (por ejemplo «arg» o «pol») y aparece al toque.", "Frases rápidas en todos los idiomas.", "Arreglo del sonido: si el teléfono no tiene la voz de un idioma, ahora suena la voz de internet.", "Fotos: si el cartel está en otro idioma, la app lo reconoce sola.", "Árabe y hebreo se muestran de derecha a izquierda.", "Traducción más exacta: ahora se usa primero el traductor de Google en todos los idiomas.", "Si el iPhone no tiene el dictado de un idioma (por ejemplo chino), la app te muestra el paso a paso para activarlo."] },
@@ -732,8 +729,6 @@ var NEWS = [
 var DB = loadDB();
 /* 1.8: se borra la lista vieja de "idiomas sin voz" que dejaba la app muda */
 if (DB.voiceOk) { delete DB.voiceOk; try { saveDB(); } catch (e) {} }
-/* 1.10: la 1.9 podía dejar guardado el modo teclado para siempre: se borra */
-if (DB.micMode) { delete DB.micMode; try { saveDB(); } catch (e) {} }
 
 function loadDB() {
   try {
@@ -915,7 +910,7 @@ $("setNext").addEventListener("click", function () {
 $("micAllow").addEventListener("click", function () {
   var msg = $("micMsg"); msg.classList.remove("err"); msg.textContent = "Pidiendo permiso…";
   var SRC = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SRC || STANDALONE_BLOCK || IN_FRAME || IN_APP_BROWSER) { msg.classList.remove("err"); msg.textContent = "Acá vas a hablar con el 🎤 del teclado, que funciona siempre."; setTimeout(function () { go("sound"); }, 1600); return; }
+  if (!SRC) { msg.classList.add("err"); msg.textContent = "Este navegador no tiene dictado. Abrí la app en Safari (iPhone) o Chrome (Android). Mientras, podés escribir tus mensajes."; return; }
   var sr = new SRC(), started = false, err = "", finished = false;
   sr.lang = LOCALES[DB.me] || DB.me; sr.interimResults = false; sr.continuous = false;
   function ok() {
@@ -928,8 +923,9 @@ $("micAllow").addEventListener("click", function () {
   sr.onaudiostart = function () { started = true; };
   sr.onerror = function (e) { err = e.error || "error"; };
   sr.onend = function () {
+    if (err === "not-allowed" || err === "service-not-allowed") return fail("No se dio el permiso. En el iPhone: Ajustes > Safari > Micrófono > Permitir, y Ajustes > Siri > activá Siri o el Dictado. Después tocá Permitir micrófono de nuevo.");
     if (started || err === "aborted" || err === "no-speech" || !err) return ok();
-    fail("El teléfono no dejó usar el dictado de la app. No pasa nada: vas a hablar con el 🎤 del teclado, que funciona siempre. Tocá Ahora no para seguir.");
+    fail("No se pudo activar (código: " + err + "). Podés seguir y escribir tus mensajes.");
   };
   setTimeout(function () { if (!finished) { try { sr.abort(); } catch (e) {} } }, 9000);
   try { sr.start(); } catch (e) { fail("No se pudo activar el micrófono. Podés seguir y escribir tus mensajes."); }
@@ -992,46 +988,6 @@ $("demoConvo").addEventListener("click", function () {
 var S = { turn: "me", phase: "idle", run: 0, sr: null, convo: null, silent: 0, unlocked: false };
 var SR_CLASS = window.SpeechRecognition || window.webkitSpeechRecognition;
 var STANDALONE = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
-/* 1.9: abierta dentro de otra app o de una vista previa: ahí el dictado de la página suele estar bloqueado */
-var IN_FRAME = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
-var IN_APP_BROWSER = /FBAN|FBAV|Instagram|WhatsApp|Line\/|Telegram|GSA\//i.test(navigator.userAgent);
-/* Plan B que funciona siempre: el micrófono del teclado del teléfono */
-var KB_SESSION = false; /* 1.10: solo dura mientras la app está abierta; nunca se guarda */
-var STANDALONE_BLOCK = STANDALONE && !IS_ANDROID; /* en Android, desde el ícono el dictado sí anda */
-function useKeyboardMic() { return KB_SESSION || !SR_CLASS || STANDALONE_BLOCK || IN_FRAME || IN_APP_BROWSER; }
-function kbReason() {
-  if (IN_FRAME || IN_APP_BROWSER) return "Estás usando la app dentro de otra app. ";
-  if (STANDALONE && IS_IOS) return "Desde el ícono de la pantalla de inicio el dictado de la app no anda en iPhone. ";
-  if (STANDALONE) return "Abriste la app desde el ícono de inicio. ";
-  if (!SR_CLASS) return "Este navegador no trae dictado propio. ";
-  return "El teléfono no dejó usar el dictado de la app. ";
-}
-function renderMicNote() {
-  var note = $("cNote"), kb = useKeyboardMic();
-  note.hidden = !kb;
-  if (kb) note.textContent = kbReason() + "No pasa nada: tocá Hablar y usá el 🎤 del teclado.";
-  $("micRetry").hidden = !(KB_SESSION && SR_CLASS && !STANDALONE_BLOCK && !IN_FRAME && !IN_APP_BROWSER);
-  $("micKb").hidden = true;
-}
-function keyboardDictate() {
-  var lang = S.turn === "me" ? DB.me : DB.other;
-  S.manual = true;
-  var inp = $("typed");
-  inp.setAttribute("lang", LOCALES[lang] || lang);
-  inp.placeholder = "Tocá el 🎤 del teclado y hablá en " + langName(lang);
-  try { inp.focus(); } catch (e) {}
-  var extra = (lang !== DB.me) ? (IS_ANDROID ? " Si el teclado está en otro idioma, deslizá la barra espaciadora o tocá el 🌐 para cambiarlo a " : " Si el teclado está en otro idioma, tocá el globo 🌐 para cambiarlo a ") + langName(lang) + "." : "";
-  setStatus("Tocá el 🎤 del teclado (" + (IS_ANDROID ? "arriba a la derecha del teclado" : "abajo a la derecha") + ") y hablá en " + langName(lang) + ". Al terminar, tocá Enviar." + extra);
-}
-function switchToKeyboard() {
-  KB_SESSION = true; renderMicNote();
-  setStatus("El teléfono no dejó usar el dictado de la app. Tocá Hablar otra vez: se abre el teclado y hablás con su 🎤. Funciona siempre.", true);
-}
-$("micKb").addEventListener("click", function () { if (S.phase !== "idle") cancelAll(); KB_SESSION = true; renderMicNote(); keyboardDictate(); });
-$("micRetry").addEventListener("click", function () {
-  KB_SESSION = false; renderMicNote();
-  setStatus("Listo. Tocá Hablar para probar el dictado de la app.");
-});
 
 function initConvo() {
   cancelAll();
@@ -1040,8 +996,13 @@ function initConvo() {
   $("log").textContent = "";
   $("log").appendChild(el("li", "empty", "Tocá Hablar y decí algo. Se traduce y se escucha, y el micrófono se abre solo para la respuesta."));
   syncToggles(); renderTurn(); renderChips();
-  $("typed").placeholder = "O escribí tu mensaje";
-  renderMicNote();
+  var note = $("cNote");
+  if (!SR_CLASS || STANDALONE) {
+    note.hidden = false;
+    note.textContent = STANDALONE
+      ? "Desde el ícono de la pantalla de inicio el dictado no funciona en iPhone. Abrí la app desde Safari para hablar, o escribí tus mensajes."
+      : "Este navegador no tiene dictado. Abrí la app desde Safari para hablar, o escribí tus mensajes.";
+  } else note.hidden = true;
   setPhase("idle");
 }
 function syncToggles() {
@@ -1094,9 +1055,8 @@ function setPhase(p) {
   setStatus(txt);
   if (p !== "listening") $("ring").style.setProperty("--lvl", 0);
 }
-function setStatus(t, err) { var s = $("status"); s.textContent = t; s.classList.toggle("err", !!err); var r = $("micReset"); if (r) r.hidden = true; var k = $("micKb"); if (k) k.hidden = true; }
-function offerMicReset() { $("micReset").hidden = false; offerKb(); }
-function offerKb() { if (!useKeyboardMic()) $("micKb").hidden = false; }
+function setStatus(t, err) { var s = $("status"); s.textContent = t; s.classList.toggle("err", !!err); var r = $("micReset"); if (r) r.hidden = true; }
+function offerMicReset() { $("micReset").hidden = false; }
 $("micReset").addEventListener("click", function () {
   try { sessionStorage.setItem("fc:goconvo", "1"); } catch (e) {}
   location.reload();
@@ -1139,7 +1099,6 @@ var TTS_LOCALES = {
   vi:"vi-VN", th:"th-TH", ja:"ja-JP", ko:"ko-KR", zh:"zh-CN"
 };
 var IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-var IS_ANDROID = /Android/i.test(navigator.userAgent);
 function pickVoice(lang) {
   // En iPhone no se elige voz (la lista trae voces de juguete): el sistema usa la suya.
   if (IS_IOS || !VOICES.length) return null;
@@ -1278,7 +1237,7 @@ $("sBack").addEventListener("click", soundDone);
 
 /* ---- botón principal ---- */
 $("mic").addEventListener("click", function () {
-  if (S.phase === "idle") { stopVoice(); releaseAudio(); if (useKeyboardMic()) { keyboardDictate(); return; } listen(); return; }
+  if (S.phase === "idle") { stopVoice(); releaseAudio(); listen(); return; }
   else if (S.phase === "listening") { stopListening(); }
   else cancelAll();
 });
@@ -1308,7 +1267,7 @@ function mergeResults(results) {
 /* Tocás Hablar, hablás todo lo que quieras (aunque hagas pausas) y tocás Listo para terminar */
 function listen(auto, retry) {
   if (S.phase !== "idle") return;
-  if (useKeyboardMic()) { if (!auto) keyboardDictate(); return; }
+  if (!SR_CLASS) { setStatus("Este navegador no tiene dictado. Abrí la app desde Safari o escribí tu mensaje.", true); return; }
   var run = ++S.run;
   var who = S.turn;
   var lang = who === "me" ? DB.me : DB.other;
@@ -1339,8 +1298,8 @@ function listen(auto, retry) {
     if (t) { S.silent = 0; sendText(t, who, lang, run); return; }
     setPhase("idle");
     var err = L.err;
-    if (err === "not-allowed" || err === "service-not-allowed") { switchToKeyboard(); return; }
-    if (err === "audio-capture" || err === "start") { setStatus("El micrófono quedó trabado. Tocá Reiniciar micrófono (no se borra nada) o usá el 🎤 del teclado.", true); offerMicReset(); return; }
+    if (err === "not-allowed" || err === "service-not-allowed") { setStatus("Sin permiso para el dictado. Andá a Perfil → Revisar permisos del teléfono.", true); return; }
+    if (err === "audio-capture") { setStatus("El micrófono quedó trabado. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return; }
     if (err === "network") { setStatus("El dictado necesita internet. Revisá la conexión y tocá Hablar de nuevo.", true); return; }
     if (err === "language-not-supported") { setStatus("Este teléfono no tiene el dictado en " + langName(lang) + "." + (dictHelp(lang) || " Podés escribir tu mensaje o elegir otro idioma."), true); return; }
     /* Fluida abrió el micrófono y el teléfono no lo dejó abrir: se reintenta una sola vez, sin avisar */
@@ -1349,8 +1308,8 @@ function listen(auto, retry) {
       setTimeout(function () { if (run === S.run && S.phase === "idle" && current === "convo") listen(true, true); }, 700);
       return;
     }
-    if (err && err !== "no-speech" && err !== "aborted") { setStatus("No se pudo escuchar (código: " + err + "). Tocá Hablar de nuevo o usá el 🎤 del teclado.", true); offerKb(); return; }
-    if (!L.open) { setStatus("No llegó sonido del micrófono. Tocá Reiniciar micrófono (no se borra nada) o usá el 🎤 del teclado.", true); offerMicReset(); return; }
+    if (err && err !== "no-speech" && err !== "aborted") { setStatus("No se pudo escuchar (código: " + err + "). Probá de nuevo y, si sigue, mandá una captura de este mensaje.", true); return; }
+    if (!L.open) { setStatus("No llegó sonido del micrófono. Tocá Reiniciar micrófono (no se borra nada).", true); offerMicReset(); return; }
     if (auto && !L.stop) { setStatus((who === "me" ? "Te toca a vos" : "Le toca a la otra persona") + " en " + langName(lang) + ". Tocá Hablar cuando quieran seguir."); return; }
     setStatus("No escuché nada en " + langName(lang) + ". Tocá Hablar y hablá cuando diga «Hablá ahora».", true);
   }
@@ -1392,7 +1351,6 @@ var KB_NAME = { es:"Español", en:"Inglés", pt:"Portugués", fr:"Francés", it:
   ro:"Rumano", el:"Griego", cs:"Checo", hu:"Húngaro", sv:"Sueco", da:"Danés", nb:"Noruego", fi:"Finlandés", tr:"Turco", ar:"Árabe", he:"Hebreo", hi:"Hindi",
   id:"Indonesio", vi:"Vietnamita", th:"Tailandés", ja:"Japonés", ko:"Coreano", zh:"Chino simplificado (Pinyin)" };
 function dictHelp(lang) {
-  if (IS_ANDROID) return " Si no aparece nada, en el teléfono abrí la app Google → tu foto → Configuración → Voz → Idiomas y agregá " + (KB_NAME[lang] || langName(lang)) + ". Después abrí la app de nuevo.";
   if (!IS_IOS) return "";
   return " Si no aparece nada, agregá el teclado en el iPhone: Ajustes → General → Teclado → Teclados → Agregar teclado → " + (KB_NAME[lang] || langName(lang)) + ". Después revisá que «Activar dictado» esté prendido y abrí la app de nuevo.";
 }
@@ -1581,7 +1539,7 @@ function sendText(text, who, fromLang, existingRun) {
 $("composer").addEventListener("submit", function (e) {
   e.preventDefault(); unlockAudio();
   var t = $("typed").value.trim(); if (!t) return;
-  $("typed").value = ""; $("typed").placeholder = "O escribí tu mensaje";
+  $("typed").value = "";
   // Lo escrito sale siempre como "yo", salvo que hayas tocado "Habla la otra persona" a propósito
   var who = S.manual ? S.turn : "me";
   S.manual = false;
@@ -2212,13 +2170,6 @@ function renderPerm() {
     ui.skip.hidden = PW.tries[key] < 2;
   };
   ui.info = function (t) { ui.msg.className = "status-msg"; ui.msg.textContent = t; };
-  /* 1.9: si el dictado de la app no anda, se sigue igual con el micrófono del teclado (nunca se traba acá) */
-  ui.kb = function (t, helpHtml, openHelp) {
-    permStopTest(); permSet(key, "ok");
-    ui.msg.className = "status-msg ok"; ui.msg.textContent = "✓ " + t;
-    if (helpHtml) { ui.helpSum.textContent = "Opcional: activar el dictado de la app"; ui.helpBody.innerHTML = helpHtml; ui.help.hidden = false; ui.help.open = !!openHelp; if (openHelp) ui.helpSum.textContent = "Recomendado: abrila en " + (onIOS() ? "Safari" : "Chrome"); }
-    ui.next.disabled = false; ui.skip.hidden = true;
-  };
   ui.btn = function (label, cls, fn) { var b = el("button", "btn " + (cls || "primary"), label); b.type = "button"; b.addEventListener("click", fn); return b; };
   PERM_STEP[key](ui);
   if (permGet(key) === "ok" && !ui.msg.textContent) { ui.msg.className = "status-msg ok"; ui.msg.textContent = "✓ Ya estaba listo. Podés probar de nuevo o seguir."; ui.next.disabled = false; }
@@ -2227,26 +2178,23 @@ function renderPerm() {
 var PERM_STEP = {
   browser: function (ui) {
     ui.ico.textContent = "🧭"; ui.title.textContent = "Abrí la app en el navegador correcto";
-    ui.why.textContent = onIOS() ? "En iPhone, el micrófono y el dictado funcionan solo en Safari." : "En Android, el micrófono y el dictado funcionan en Google Chrome.";
+    ui.why.textContent = onIOS() ? "En iPhone, el micrófono y el dictado funcionan solo en Safari." : "El micrófono y el dictado funcionan en Chrome.";
     function check(first) {
-      var ok = !!SR_CLASS && !STANDALONE_BLOCK && !inAppBrowser() && !otherIOSBrowser();
-      if (ok) { ui.ok(onIOS() ? "Estás en Safari. Todo bien." : IS_ANDROID ? "Estás en Chrome. Todo bien." : "Tu navegador tiene dictado. Todo bien."); return; }
+      var ok = !!SR_CLASS && !STANDALONE && !inAppBrowser() && !otherIOSBrowser();
+      if (ok) { ui.ok(onIOS() ? "Estás en Safari. Todo bien." : "Tu navegador tiene dictado. Todo bien."); return; }
       var why = STANDALONE ? "La abriste desde el ícono de la pantalla de inicio, y así el dictado no funciona."
         : inAppBrowser() ? "La abriste desde otra app (por ejemplo WhatsApp o Instagram)."
         : otherIOSBrowser() ? "Estás en otro navegador. En iPhone tiene que ser Safari."
-        : IS_ANDROID ? "Este navegador no tiene dictado. En Android usá Google Chrome."
         : "Este navegador no tiene dictado.";
-      ui.kb(why + " Podés seguir igual: vas a hablar con el 🎤 del teclado.", onIOS() ? helpList([
+      ui.fail(why, onIOS() ? helpList([
         "Tocá <strong>Copiar el link</strong> (acá abajo).",
         "Si estás dentro de WhatsApp u otra app: tocá los tres puntos <strong>⋯</strong> o el ícono de compartir y elegí <strong>Abrir en Safari</strong>. Si no aparece, seguí con el paso 3.",
         "Abrí <strong>Safari</strong>, tocá la barra de direcciones, mantené apretado y elegí <strong>Pegar y visitar</strong>.",
         "Si la tenías como ícono en la pantalla de inicio, para hablar usala desde Safari."
       ]) : helpList([
         "Tocá <strong>Copiar el link</strong> (acá abajo).",
-        "Si estás dentro de WhatsApp u otra app: tocá los tres puntos <strong>⋮</strong> arriba a la derecha y elegí <strong>Abrir en Chrome</strong>. Si no aparece, seguí con el paso 3.",
-        "Abrí <strong>Chrome</strong>, tocá la barra de direcciones, mantené apretado, elegí <strong>Pegar</strong> y tocá <strong>Ir</strong>.",
-        "Opcional: en Chrome tocá <strong>⋮</strong> → <strong>Agregar a la pantalla principal</strong> para tenerla como app."
-      ]), true);
+        "Abrí <strong>Chrome</strong> y pegá el link en la barra de direcciones."
+      ]));
     }
     ui.act.appendChild(ui.btn("Volver a comprobar", "ghost", function () { check(false); }));
     ui.extra.appendChild(ui.btn("📋 Copiar el link", "ghost", function (e) {
@@ -2260,13 +2208,8 @@ var PERM_STEP = {
 
   mic: function (ui) {
     ui.ico.textContent = "🎙️"; ui.title.textContent = "Micrófono y dictado";
-    ui.why.textContent = "Para que la app te escuche y pase lo que decís a texto. El " + (IS_ANDROID ? "teléfono" : "iPhone") + " te va a pedir permiso: tocá Permitir.";
-    var help = IS_ANDROID ? helpList([
-      "En Chrome tocá el ícono a la izquierda de la dirección (🔒 o ⚙️) → <strong>Permisos</strong> → <strong>Micrófono</strong> → <strong>Permitir</strong>.",
-      "Si no aparece: <strong>Ajustes</strong> del teléfono → <strong>Aplicaciones</strong> → <strong>Chrome</strong> → <strong>Permisos</strong> → <strong>Micrófono</strong> → <strong>Permitir</strong>.",
-      "Revisá que la app <strong>Google</strong> esté instalada y actualizada: Chrome la usa para el dictado.",
-      "Volvé acá y tocá <strong>Probar micrófono</strong>."
-    ]) : helpList([
+    ui.why.textContent = "Para que la app te escuche y pase lo que decís a texto. El iPhone te va a pedir permiso: tocá Permitir.";
+    var help = helpList([
       "Abrí <strong>Ajustes</strong> → <strong>Apps</strong> → <strong>Safari</strong> (en iPhone más viejos: Ajustes → Safari) → <strong>Micrófono</strong> → <strong>Permitir</strong>.",
       "En <strong>Ajustes</strong> → <strong>General</strong> → <strong>Teclado</strong>, activá <strong>Activar dictado</strong>.",
       "Si en algún momento tocaste <strong>No permitir</strong>: cerrá Safari del todo (deslizá hacia arriba) y volvé a abrir la app.",
@@ -2274,23 +2217,22 @@ var PERM_STEP = {
     ]);
     var go1 = ui.btn("Probar micrófono", "primary", function () {
       permStopTest();
-      if (!SR_CLASS || STANDALONE_BLOCK || IN_FRAME || IN_APP_BROWSER) { ui.kb("Vas a hablar con el 🎤 del teclado, que funciona siempre."); return; }
+      if (!SR_CLASS) { ui.fail("Este navegador no tiene dictado. Volvé al paso 1.", help); return; }
       var sr = new SR_CLASS(), err = "", got = "";
       PW.sr = sr;
       sr.lang = LOCALES[DB.me] || DB.me; sr.interimResults = true; sr.continuous = true;
       ui.info("Pidiendo permiso…");
       sr.onaudiostart = function () { ui.info("Ahora decí «hola» en voz alta…"); };
-      sr.onresult = function (e) { got = mergeResults(e.results); if (got) { KB_SESSION = false; ui.ok("Te escuché: «" + got + "». El micrófono funciona."); } };
+      sr.onresult = function (e) { got = mergeResults(e.results); if (got) { ui.ok("Te escuché: «" + got + "». El micrófono funciona."); } };
       sr.onerror = function (e) { err = e.error || "error"; };
       sr.onend = function () {
         if (PW.sr !== sr) return; PW.sr = null;
         if (got) return;
-        if (err === "not-allowed" || err === "service-not-allowed") { KB_SESSION = true; ui.kb("El teléfono no dejó usar el dictado de la app. No pasa nada: vas a hablar con el 🎤 del teclado, que funciona siempre.", help); }
-        else if (PW.tries.mic) ui.kb("No te escuché esta vez. Podés seguir: en la conversación, si el dictado de la app no te escucha, usá el 🎤 del teclado.", help);
-        else ui.fail("No te escuché. Tocá Probar micrófono y decí «hola» fuerte.", help);
+        if (err === "not-allowed" || err === "service-not-allowed") ui.fail("No se dio el permiso del micrófono o del dictado.", help);
+        else ui.fail("No te escuché. Fijate que no esté tapado el micrófono y probá de nuevo.", help);
       };
       PW.timer = setTimeout(function () { if (PW.sr === sr) { try { sr.stop(); } catch (e) {} } }, 9000);
-      try { sr.start(); } catch (e) { PW.sr = null; ui.kb("Vas a hablar con el 🎤 del teclado, que funciona siempre.", help); }
+      try { sr.start(); } catch (e) { PW.sr = null; ui.fail("No se pudo abrir el micrófono.", help); }
     });
     ui.act.appendChild(go1);
   },
@@ -2298,12 +2240,7 @@ var PERM_STEP = {
   sound: function (ui) {
     ui.ico.textContent = "🔊"; ui.title.textContent = "Sonido";
     ui.why.textContent = "Las traducciones se leen en voz alta. Sacá el modo silencio, subí el volumen y tocá Probar sonido.";
-    var help = IS_ANDROID ? helpList([
-      "Subí el volumen con el botón del costado <strong>mientras suena</strong> la prueba (que sea el volumen de multimedia).",
-      "Sacá <strong>No molestar</strong> si está activado (deslizá desde arriba de la pantalla).",
-      "Si sigue sin sonar: <strong>Ajustes</strong> → buscá <strong>Salida de texto a voz</strong> y elegí <strong>Google</strong>.",
-      "Tocá <strong>Probar sonido</strong> de nuevo."
-    ]) : helpList([
+    var help = helpList([
       "Sacá el <strong>modo silencio</strong>: el botón del costado (o el botón de Acción). Si ves la campanita tachada, está en silencio.",
       "Subí el volumen con los botones del costado <strong>mientras suena</strong> la prueba.",
       "Si tenés auriculares Bluetooth conectados, el sonido sale por ahí.",
@@ -2333,7 +2270,7 @@ var PERM_STEP = {
     ui.ico.textContent = "📷"; ui.title.textContent = "Cámara";
     ui.why.textContent = "Para traducir carteles, menús o cajas con una foto. Sacá una foto de prueba de cualquier cosa.";
     var help = helpList([
-      IS_ANDROID ? "En Chrome tocá el ícono a la izquierda de la dirección → <strong>Permisos</strong> → <strong>Cámara</strong> → <strong>Permitir</strong>." : "Abrí <strong>Ajustes</strong> → <strong>Apps</strong> → <strong>Safari</strong> (o Ajustes → Safari) → <strong>Cámara</strong> → <strong>Permitir</strong>.",
+      "Abrí <strong>Ajustes</strong> → <strong>Apps</strong> → <strong>Safari</strong> (o Ajustes → Safari) → <strong>Cámara</strong> → <strong>Permitir</strong>.",
       "Volvé acá y tocá <strong>Abrir la cámara</strong>.",
       "Cuando se abra, sacá la foto y tocá <strong>Usar foto</strong>."
     ]);
@@ -2360,12 +2297,8 @@ var PERM_STEP = {
     var count = el("p", "lead"); count.style.margin = "0";
     function showCount() { var n = (DB.contacts || []).length; count.textContent = n ? "Tenés " + n + " contacto" + (n === 1 ? "" : "s") + " cargado" + (n === 1 ? "" : "s") + "." : ""; }
     var steps = helpList(picker ? [
-      "Tocá <strong>Abrir mis contactos</strong>: se abre la agenda del teléfono.",
+      "Tocá <strong>Elegir de mi agenda</strong>.",
       "Marcá los contactos y tocá <strong>Listo</strong>."
-    ] : IS_ANDROID ? [
-      "Abrí la app <strong>Contactos</strong> del teléfono → <strong>⋮</strong> o <strong>Configuración</strong> → <strong>Exportar</strong> → guardá el archivo .vcf.",
-      "Volvé acá, tocá <strong>Elegir archivo de contactos</strong> y elegí ese archivo.",
-      "Más fácil: abrí la app en <strong>Google Chrome</strong>, que abre la agenda directo."
     ] : [
       "Abrí la app <strong>Contactos</strong> del iPhone.",
       "Para uno: tocá el contacto → bajá y tocá <strong>Compartir contacto</strong> → <strong>Guardar en Archivos</strong> → <strong>Guardar</strong>.",
@@ -2373,32 +2306,16 @@ var PERM_STEP = {
       "Volvé acá, tocá <strong>Elegir archivo de contactos</strong> y elegí el archivo que guardaste."
     ]);
     var how = el("div"); how.innerHTML = steps;
-    if (!picker && IS_IOS) {
-      /* En iPhone, Safari trae la agenda apagada: se activa una sola vez */
-      var flag = el("div"); flag.innerHTML = "<p class=\"lead\" style=\"margin:0 0 6px\"><strong>Para abrir la agenda del iPhone (una sola vez):</strong></p>" + helpList([
-        "Abrí <strong>Ajustes</strong> → <strong>Apps</strong> → <strong>Safari</strong> (en iPhone más viejos: Ajustes → Safari).",
-        "Bajá hasta el final y tocá <strong>Avanzado</strong> → <strong>Feature Flags</strong>.",
-        "Buscá <strong>Contact Picker API</strong> y activalo.",
-        "Volvé acá y tocá <strong>Ya lo activé</strong>."
-      ]);
-      ui.act.appendChild(flag);
-      ui.act.appendChild(ui.btn("Ya lo activé", "primary", function () {
-        try { sessionStorage.setItem("fc:goperm", "4"); } catch (e) {}
-        location.reload();
-      }));
-      var alt = el("p", "lead", "¿No aparece? Usá la otra forma: guardá tus contactos en un archivo y elegilo acá."); alt.style.margin = "14px 0 6px";
-      ui.act.appendChild(alt);
-    }
     ui.act.appendChild(how);
     if (picker) {
-      ui.act.insertBefore(ui.btn("📇 Abrir mis contactos", "primary", function () {
+      ui.act.appendChild(ui.btn("Elegir de mi agenda", "primary", function () {
         navigator.contacts.select(["name", "tel"], { multiple: true }).then(function (list) {
           var add = (list || []).map(function (c) { return { name: (c.name && c.name[0]) || (c.tel && c.tel[0]) || "", tel: (c.tel && c.tel[0]) || "" }; });
           var n = addContacts(add); showCount();
           if ((DB.contacts || []).length) ui.ok(n ? "Se cargaron " + n + " contactos." : "Los contactos ya estaban cargados.");
           else ui.fail("No se eligió ningún contacto.", steps);
         }).catch(function () { ui.fail("No se pudo abrir la agenda.", steps); });
-      }), ui.act.firstChild);
+      }));
     }
     ui.act.appendChild(ui.btn("Elegir archivo de contactos", picker ? "ghost" : "primary", function () {
       var inp = $("pwVcf"); inp.value = "";
@@ -2552,11 +2469,7 @@ if (!DB.api && DEFAULT_API) { DB.api = DEFAULT_API; saveDB(); }
 applyPrefs();
 if (location.protocol !== "https:" && location.hostname !== "localhost") $("fileWarn").hidden = false;
 var goConvo = false; try { goConvo = sessionStorage.getItem("fc:goconvo") === "1"; sessionStorage.removeItem("fc:goconvo"); } catch (e) {}
-var goPerm = null; try { goPerm = sessionStorage.getItem("fc:goperm"); sessionStorage.removeItem("fc:goperm"); } catch (e) {}
-setTimeout(function () {
-  if (goPerm) { startPerms(DB.onboarded ? "settings" : null, parseInt(goPerm, 10) || 0); return; }
-  go(DB.onboarded ? (goConvo ? "convo" : "home") : "welcome"); if (goConvo && DB.onboarded) setStatus("Micrófono reiniciado. Tocá Hablar.");
-}, (goConvo || goPerm) ? 200 : 1100);
+setTimeout(function () { go(DB.onboarded ? (goConvo ? "convo" : "home") : "welcome"); if (goConvo && DB.onboarded) setStatus("Micrófono reiniciado. Tocá Hablar."); }, goConvo ? 200 : 1100);
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
 
 })();
