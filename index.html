@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fiorisacall · Beta 1.7</title>
+<title>Fiorisacall · Beta 1.8</title>
 <meta name="theme-color" content="#241238">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -255,7 +255,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <div class="center">
     <svg class="big" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <p class="ver">Beta 1.7</p>
+    <p class="ver">Beta 1.8</p>
   </div>
 </section>
 
@@ -378,7 +378,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <header class="top">
     <svg class="logo" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <span class="beta">BETA 1.7</span>
+    <span class="beta">BETA 1.8</span>
   </header>
   <div class="body">
     <p id="hello" class="hello"></p>
@@ -568,7 +568,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     </div>
     <div class="card">
       <h2>Acerca de</h2>
-      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.7</strong> · versión de prueba</p>
+      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.8</strong> · versión de prueba</p>
       <p id="aDiag" class="lead" style="font-size:.8rem;margin:8px 0 0"></p>
     </div>
     <div class="card">
@@ -713,9 +713,10 @@ var ICONS = {
 };
 
 var KEY = "fc:v2";
-var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", apiGoogle:false, tts:"auto", voiceOk:{}, soundOk:false, perms:{}, permsDone:false, contacts:[], seenVersion:"", history:[] };
-var APP_VERSION = "1.7";
+var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", apiGoogle:false, tts:"auto", soundOk:false, perms:{}, permsDone:false, contacts:[], seenVersion:"", history:[] };
+var APP_VERSION = "1.8";
 var NEWS = [
+  { v:"1.8", d:"17/10/2026", items:["Arreglado: en la 1.7 la traducción a veces dejaba de escucharse y no volvía. Ahora la voz del teléfono tiene más tiempo para arrancar y la app ya no se “olvida” de ningún idioma.", "Si una voz no suena, la app prueba con la otra antes de rendirse."] },
   { v:"1.7", d:"17/10/2026", items:["La voz sale más rápido: la app recuerda qué idiomas tiene tu teléfono y, si falta alguno, usa directo la voz de internet sin esperar.", "El aviso del teclado solo aparece cuando de verdad falta el dictado de un idioma.", "Si con Fluida nadie habla, la app espera tranquila sin mostrar error.", "Si el micrófono no abre al primer intento, la app lo vuelve a abrir sola.", "Probado en todas las combinaciones de idiomas entre sí."] },
   { v:"1.6", d:"17/10/2026", items:["28 idiomas: se sumaron polaco, ucraniano, rumano, griego, checo, húngaro, sueco, danés, noruego, finlandés, hebreo, indonesio, vietnamita y tailandés.", "Buscador de idiomas: escribís unas letras del idioma o del país (por ejemplo «arg» o «pol») y aparece al toque.", "Frases rápidas en todos los idiomas.", "Arreglo del sonido: si el teléfono no tiene la voz de un idioma, ahora suena la voz de internet.", "Fotos: si el cartel está en otro idioma, la app lo reconoce sola.", "Árabe y hebreo se muestran de derecha a izquierda.", "Traducción más exacta: ahora se usa primero el traductor de Google en todos los idiomas.", "Si el iPhone no tiene el dictado de un idioma (por ejemplo chino), la app te muestra el paso a paso para activarlo."] },
   { v:"1.5", d:"16/10/2026", items:["Esta lista de Novedades, para saber qué cambió en cada versión."] },
@@ -725,6 +726,8 @@ var NEWS = [
   { v:"1.1", d:"15/10/2026", items:["Pantalla de Sonido con paso a paso.", "Voz en la nube.", "Traducción gratuita más precisa."] }
 ];
 var DB = loadDB();
+/* 1.8: se borra la lista vieja de "idiomas sin voz" que dejaba la app muda */
+if (DB.voiceOk) { delete DB.voiceOk; try { saveDB(); } catch (e) {} }
 
 function loadDB() {
   try {
@@ -1111,13 +1114,13 @@ function hasDeviceVoice(lang) {
   if (IS_IOS || !VOICES.length) return true; // no se puede saber: se prueba
   return !!pickVoice(lang);
 }
-function speakDevice(text, lang) {
+function speakDevice(text, lang, wait) {
   return new Promise(function (resolve) {
     if (!HAS_TTS) { resolve(false); return; }
     var done = false, started = false, guard;
     function finish(ok) { if (!done) { done = true; clearTimeout(guard); resolve(ok); } }
-    // Si en 2,5 s no empezó a hablar, se considera que no sonó
-    var startGuard = setTimeout(function () { if (!started) { try { speechSynthesis.cancel(); } catch (e) {} finish(false); } }, 1500);
+    // Si en 3 s no empezó a hablar, se considera que no sonó (el iPhone tarda más justo después de usar el micrófono)
+    var startGuard = setTimeout(function () { if (!started) { try { speechSynthesis.cancel(); } catch (e) {} finish(false); } }, wait || 3000);
     guard = setTimeout(function () { finish(started); }, Math.max(6000, text.length * 160));
     try {
       speechSynthesis.cancel();
@@ -1176,12 +1179,15 @@ function speak(text, lang) {
   var mode = DB.tts || "auto";
   if (mode === "cloud") return speakCloud(text, lang);
   if (mode === "device") return speakDevice(text, lang);
-  var known = (DB.voiceOk || {})[lang];
-  /* Si ya sabemos que el teléfono no tiene esa voz, va directo a la de internet (sin esperar) */
-  if (known === false || !hasDeviceVoice(lang)) return speakCloud(text, lang);
+  /* Siempre se prueba primero la voz del teléfono; si no arranca, la de internet */
+  if (!hasDeviceVoice(lang)) return speakCloud(text, lang);
   return speakDevice(text, lang).then(function (ok) {
-    if (ok !== known) { var v = {}; for (var k in (DB.voiceOk || {})) v[k] = DB.voiceOk[k]; v[lang] = ok; DB.voiceOk = v; saveDB(); }
-    return ok ? true : speakCloud(text, lang);
+    if (ok) return true;
+    return speakCloud(text, lang).then(function (played) {
+      if (played) return true;
+      /* Si la de internet tampoco sonó, se le da a la del teléfono una segunda oportunidad con más tiempo */
+      return speakDevice(text, lang, 4000);
+    });
   });
 }
 
