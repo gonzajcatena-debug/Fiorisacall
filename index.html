@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fiorisacall · Beta 1.11</title>
+<title>Fiorisacall · Beta 1.12</title>
 <meta name="theme-color" content="#241238">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -255,7 +255,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <div class="center">
     <svg class="big" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <p class="ver">Beta 1.11</p>
+    <p class="ver">Beta 1.12</p>
   </div>
 </section>
 
@@ -378,7 +378,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
   <header class="top">
     <svg class="logo" aria-hidden="true"><use href="#flower"/></svg>
     <h1 class="word" tabindex="-1">Fiorisacall</h1>
-    <span class="beta">BETA 1.11</span>
+    <span class="beta">BETA 1.12</span>
   </header>
   <div class="body">
     <p id="hello" class="hello"></p>
@@ -568,7 +568,7 @@ textarea.ptext{width:100%;min-height:110px;border-radius:14px;border:1.5px solid
     </div>
     <div class="card">
       <h2>Acerca de</h2>
-      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.11</strong> · versión de prueba</p>
+      <p class="lead" style="font-size:.95rem;margin:0">Fiorisacall <strong>Beta 1.12</strong> · versión de prueba</p>
       <p id="aDiag" class="lead" style="font-size:.8rem;margin:8px 0 0"></p>
     </div>
     <div class="card">
@@ -714,8 +714,9 @@ var ICONS = {
 
 var KEY = "fc:v2";
 var DEF = { onboarded:false, name:"", me:"es", other:"en", voice:true, auto:true, size:0, contrast:false, api:"", apiGoogle:false, tts:"auto", soundOk:false, perms:{}, permsDone:false, contacts:[], seenVersion:"", history:[] };
-var APP_VERSION = "1.11";
+var APP_VERSION = "1.12";
 var NEWS = [
+  { v:"1.12", d:"18/10/2026", items:["Arreglo del audio de la traducción: al tocar Hablar y Listo se habilita la voz, y el iPhone ya no bloquea el sonido después de usar el micrófono."] },
   { v:"1.11", d:"18/10/2026", items:["Vuelta a la base de la 1.8, la que funcionaba. Se sacaron los cambios de la 1.9 y la 1.10."] },
   { v:"1.8", d:"17/10/2026", items:["Arreglado: en la 1.7 la traducción a veces dejaba de escucharse y no volvía. Ahora la voz del teléfono tiene más tiempo para arrancar y la app ya no se “olvida” de ningún idioma.", "Si una voz no suena, la app prueba con la otra antes de rendirse."] },
   { v:"1.7", d:"17/10/2026", items:["La voz sale más rápido: la app recuerda qué idiomas tiene tu teléfono y, si falta alguno, usa directo la voz de internet sin esperar.", "El aviso del teclado solo aparece cuando de verdad falta el dictado de un idioma.", "Si con Fluida nadie habla, la app espera tranquila sin mostrar error.", "Si el micrófono no abre al primer intento, la app lo vuelve a abrir sola.", "Probado en todas las combinaciones de idiomas entre sí."] },
@@ -1073,13 +1074,14 @@ var SILENT = "data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAAB
 function getAud() { if (!AUD) { AUD = new Audio(); AUD.preload = "auto"; AUD.setAttribute("playsinline", ""); } return AUD; }
 function unlockAudio() {
   if (HAS_TTS) { try { var u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} }
-  if (!AUD_UNLOCKED) {
+  if (true) {
     try { var a = getAud(); a.src = SILENT; var p = a.play(); if (p && p.then) p.then(function () { AUD_UNLOCKED = true; }).catch(function () {}); else AUD_UNLOCKED = true; } catch (e) {}
   }
   S.unlocked = true;
 }
 function releaseAudio() {
-  if (AUD) { try { AUD.onended = AUD.onerror = null; AUD.pause(); AUD.removeAttribute("src"); AUD.load(); } catch (e) {} }
+  /* solo se pausa: si se borra el audio, el iPhone vuelve a bloquear el sonido */
+  if (AUD) { try { AUD.onended = AUD.onerror = null; AUD.pause(); } catch (e) {} }
 }
 function stopVoice() {
   if (HAS_TTS) { try { speechSynthesis.cancel(); } catch (e) {} }
@@ -1182,7 +1184,7 @@ function speak(text, lang) {
   if (mode === "device") return speakDevice(text, lang);
   /* Siempre se prueba primero la voz del teléfono; si no arranca, la de internet */
   if (!hasDeviceVoice(lang)) return speakCloud(text, lang);
-  return speakDevice(text, lang).then(function (ok) {
+  return speakDevice(text, lang, IS_IOS ? 5000 : 3000).then(function (ok) {
     if (ok) return true;
     return speakCloud(text, lang).then(function (played) {
       if (played) return true;
@@ -1237,8 +1239,8 @@ $("sBack").addEventListener("click", soundDone);
 
 /* ---- botón principal ---- */
 $("mic").addEventListener("click", function () {
-  if (S.phase === "idle") { stopVoice(); releaseAudio(); listen(); return; }
-  else if (S.phase === "listening") { stopListening(); }
+  if (S.phase === "idle") { stopVoice(); unlockAudio(); listen(); return; }
+  else if (S.phase === "listening") { unlockAudio(); stopListening(); }
   else cancelAll();
 });
 
